@@ -39,33 +39,30 @@ def faceRecognition():
         imgS = cv.cvtColor(imgS, cv.COLOR_BGR2RGB)
         facesCurFrame = fr.face_locations(imgS)
         encodesCurFrame = fr.face_encodings(imgS,facesCurFrame)
-        try:
+        
+        if (facesCurFrame != [] and encodesCurFrame != []):
             for encodeFace, faceLoc in zip(encodesCurFrame,facesCurFrame):
                 matches = fr.compare_faces(encodeListKnown,encodeFace)
                 faceDis = fr.face_distance(encodeListKnown,encodeFace)
-        except:
-            continue
-        matchIndex = np.argmin(faceDis)
-        if matches[matchIndex]:
-            print(9)
-            name = classNames[matchIndex].upper()
-            y1,x2,y2,x1 = faceloc
-            # since we scaled down by 4 times
-            y1, x2,y2,x1 = y1*4,x2*4,y2*4,x1*4
-            cv.rectangle(img,(x1,y1),(x2,y2),(0,255,0),2)
-            cv.rectangle(img, (x1,y2-35),(x2,y2), (0,255,0), cv.FILLED)
-            cv.putText(img,name, (x1+6,y2-5), cv.FONT_HERSHEY_COMPLEX,1,(255,255,255),2)
-            attendance(name)
-        else:
-            print('You are not a authorised user of this system')
-            exit(0)
-        cv.imshow('webcam', img)
-        if cv.waitKey(1) & 0xFF == ord('q'):
-            break
+            matchIndex = np.argmin(faceDis)
+        
+            if matches[matchIndex]:
+                name = classNames[matchIndex].upper()
+                y1,x2,y2,x1 = faceLoc
+                # since we scaled down by 4 times
+                y1, x2,y2,x1 = y1*4,x2*4,y2*4,x1*4
+                cv.rectangle(img,(x1,y1),(x2,y2),(0,255,0),2)
+                cv.rectangle(img, (x1,y2-35),(x2,y2), (0,255,0), cv.FILLED)
+                cv.putText(img,name, (x1+6,y2-5), cv.FONT_HERSHEY_COMPLEX,1,(255,255,255),2)
+                attendance(name)
+            cv.imshow('webcam', img)
+        
+            if cv.waitKey(1) & 0xFF == ord('q'):
+                break
 
 #   Marking Attendence Function
 def attendance(name):
-    with open('Attendance.csv','w+') as f:
+    with open('Attendance.csv','r+') as f:
         myDataList = f.readlines()
         nameList = []
         for line in myDataList:
