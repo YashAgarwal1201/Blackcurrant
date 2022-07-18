@@ -12,7 +12,7 @@ from datetime import *
 
 #   Face Recognition Function
 def faceRecognition():
-    #print('hello')
+
     path = 'UserImages'
     imageList = os.listdir(path)
     classNames = []
@@ -21,7 +21,8 @@ def faceRecognition():
         curImg = cv.imread(f'{path}/{cl}')
         images.append(curImg)
         classNames.append(os.path.splitext(cl)[0])
-    #   finding encodings   #
+    
+    #   finding encodings
     encodeList = []
     for img in images:
         img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
@@ -29,7 +30,8 @@ def faceRecognition():
         encodeList.append(encode)
     encodeListKnown = encodeList
     print('Encoding Complete')
-    #   capture Video   #
+    
+    #   capture Video
     cap = cv.VideoCapture(0)
     while True:
         success, img = cap.read()
@@ -41,15 +43,25 @@ def faceRecognition():
             for encodeFace, faceLoc in zip(encodesCurFrame,facesCurFrame):
                 matches = fr.compare_faces(encodeListKnown,encodeFace)
                 faceDis = fr.face_distance(encodeListKnown,encodeFace)
-            if (not matches) and (not faceDis):
-                print('You are not a authorised user of this system')
-                exit(0)
         except:
             continue
         matchIndex = np.argmin(faceDis)
         if matches[matchIndex]:
+            print(9)
             name = classNames[matchIndex].upper()
+            y1,x2,y2,x1 = faceloc
+            # since we scaled down by 4 times
+            y1, x2,y2,x1 = y1*4,x2*4,y2*4,x1*4
+            cv.rectangle(img,(x1,y1),(x2,y2),(0,255,0),2)
+            cv.rectangle(img, (x1,y2-35),(x2,y2), (0,255,0), cv.FILLED)
+            cv.putText(img,name, (x1+6,y2-5), cv.FONT_HERSHEY_COMPLEX,1,(255,255,255),2)
             attendance(name)
+        else:
+            print('You are not a authorised user of this system')
+            exit(0)
+        cv.imshow('webcam', img)
+        if cv.waitKey(1) & 0xFF == ord('q'):
+            break
 
 #   Marking Attendence Function
 def attendance(name):
@@ -63,7 +75,7 @@ def attendance(name):
             now = datetime.now()
             time = now.strftime('%I:%M:%S:%p')
             date = now.strftime('%d-%B-%Y')
-            f.writelines(f'n{name}, {time}, {date}')
+            f.writelines(f'{name}, {time}, {date}')
         else:
             print('Your Attendance has been already marked')
 
