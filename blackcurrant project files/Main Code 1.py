@@ -62,19 +62,22 @@ def faceRecognition():
 
 #   Marking Attendence Function
 def attendance(name):
-    with open('Attendance.csv','r+') as f:
+    now = datetime.now()
+    time = now.strftime('%I:%M:%S:%p')
+    date = now.strftime('%d-%B-%Y')
+    csvFile = 'Attendance ' + date + '.csv'
+    with open(csvFile,'a+') as f:
+        f.seek(0)
         myDataList = f.readlines()
         nameList = []
         for line in myDataList:
             entry = line.split(',')
             nameList.append(entry[0])
         if name not in nameList:
-            now = datetime.now()
-            time = now.strftime('%I:%M:%S:%p')
-            date = now.strftime('%d-%B-%Y')
-            f.writelines(f'{name}, {time}, {date}')
+            f.writelines(f'\n{name}, {time}, {date}')
+            print('\nYour Attendance has now been marked')
         else:
-            print('Your Attendance has been already marked')
+            print('\nYour Attendance has been already marked')
 
 #   Main Function
 def main():
