@@ -75,9 +75,9 @@ def attendance(name):
             nameList.append(entry[0])
         if name not in nameList:
             f.writelines(f'\n{name}, {time}, {date}')
-            print('\nYour Attendance has now been marked')
+            print('\nYour Attendance has now been marked, ',name)
         else:
-            print('\nYour Attendance has been already marked')
+            print('\nYour Attendance has been already marked, ',name)
 
 #   Main Function
 def main():
