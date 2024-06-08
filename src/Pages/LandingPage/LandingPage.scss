@@ -1,0 +1,23 @@
+// .landing-page {
+//   height: 100vh;
+//   width: 100vw;
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: center;
+//   align-items: center;
+//   background: url("/path-to-your-background-image.jpg") no-repeat center center
+//     fixed;
+//   background-size: cover;
+//   color: white;
+//   text-align: center;
+//   font-size: 24px;
+// }
+
+.landing-page {
+  background: radial-gradient(
+    circle at bottom,
+    var(--color3) 60%,
+    var(--color2),
+    // var(--color1)
+  );
+}

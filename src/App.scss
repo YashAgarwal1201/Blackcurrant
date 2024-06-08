@@ -1,0 +1,72 @@
+@import "primereact/resources/primereact.min.css";
+@import "primeicons/primeicons.css";
+@import "primereact/resources/themes/tailwind-light/theme.css";
+
+@import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Macondo&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    --color1: #765109;
+    --color2: #ffce42;
+    --color3: #f0deb8;
+    --color4: #1a1a1a;
+    --color5: #fafafa;
+
+    --heading: "Macondo";
+    --content: "Comfortaa";
+  }
+}
+
+#root {
+  height: 100dvh;
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+.p-button:focus,
+.p-inputtext:enabled:focus,
+.p-link:focus {
+  box-shadow: none !important;
+  outline: none !important;
+  // border: 2px solid #cb444a;
+  border-color: #353735;
+  border: 0px;
+}
+
+.p-toast {
+  z-index: 10000;
+}
+
+.p-dialog-mask {
+  backdrop-filter: blur(8px);
+}
+
+a {
+  font-style: oblique;
+}
+
+ul:not(.p-contextmenu ul) {
+  list-style-type: disc;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .p-button:hover,
+  a:hover {
+    color: var(--color4);
+    background-color: var(--color5);
+    border-color: var(--color5);
+  }
+}
+
+@media only screen and (max-width: 520px) {
+  .p-toast {
+    width: 80%;
+    max-width: 80%;
+  }
+}
