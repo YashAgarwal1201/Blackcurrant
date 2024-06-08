@@ -14,7 +14,7 @@ const Layout = ({ children }: { children: any }) => {
 
   return (
     <div className="w-full h-full bg-color3 relative">
-      <div className="h-[calc(100%-48px)] xs:h-[calc(100%-60px)] md:h-[calc(100%-72px)]">
+      <div className="h-full">
         <Header />
         <div
           className={`w-full h-[calc(100%-32px)] md:h-[calc(100%-40px)] lg:h-[calc(100%-48px)] transition-all duration-1000 transform ${

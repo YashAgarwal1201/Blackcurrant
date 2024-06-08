@@ -1,7 +1,7 @@
 import { startTransition } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
-import { DOCK_OPTIONS_LIST } from "../../Services/Constants";
+// import { DOCK_OPTIONS_LIST } from "../../Services/Constants";
 import { Button } from "primereact/button";
 import { useAppContext } from "../../Services/AppContext";
 
@@ -55,7 +55,7 @@ const ShowAllAppsComponent = () => {
         >
           <span>Home</span>
         </Button>
-        {DOCK_OPTIONS_LIST?.map((values, key) => (
+        {/* {DOCK_OPTIONS_LIST?.map((values, key) => (
           <Button
             key={key}
             title={values.name}
@@ -86,7 +86,7 @@ const ShowAllAppsComponent = () => {
           >
             <span>{values?.name}</span>
           </Button>
-        ))}
+        ))} */}
       </div>
     </Dialog>
   );

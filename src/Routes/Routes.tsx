@@ -6,7 +6,7 @@ import {
   createRoutesFromElements,
 } from "react-router-dom";
 import App from "./../App";
-import { DOCK_OPTIONS_LIST } from "../Services/Constants";
+// import { DOCK_OPTIONS_LIST } from "../Services/Constants";
 
 // Lazy Loaded Components
 const LandingPage = lazy(() => import("./../Pages/LandingPage/LandingPage"));
@@ -22,13 +22,13 @@ const Router = createBrowserRouter(
     <Route path="/" element={<App />}>
       <Route path="/" element={<LandingPage />} />
       <Route path="/home" element={<HomePage />} />
-      {DOCK_OPTIONS_LIST.map((option) => (
+      {/* {DOCK_OPTIONS_LIST.map((option) => (
         <Route
           key={option.name}
           path={`/${option.name.replace(/\s+/g, "-").toLowerCase()}`}
           element={<DynamicPage data={option} />}
         />
-      ))}
+      ))} */}
       <Route path="*" element={<PageNotFound />} />
       {/* <Route path="/image-frames" element={<ImageFramesPage />} /> */}
     </Route>
