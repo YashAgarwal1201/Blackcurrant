@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 // import { Link } from "react-router-dom";
-import { formatDate } from "../../Services/CommonFunctions";
 import { Button } from "primereact/button";
 import { useAppContext } from "../../Services/AppContext";
 import { TOAST_MSGS } from "../../Services/Constants";
@@ -13,17 +12,8 @@ const Header = () => {
 
   const { FEAT_UNDER_CONSTRUCTION } = TOAST_MSGS;
 
-  const [dateTime, setDateTime] = useState(new Date());
   const [batteryLevel, setBatteryLevel] = useState<any>(null);
   const [isCharging, setIsCharging] = useState(false);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setDateTime(new Date()); // Update the date and time every second
-    }, 1000);
-
-    return () => clearInterval(timer); // Clear the timer when the component unmounts
-  }, []);
 
   useEffect(() => {
     const fetchBattery = async () => {
@@ -50,7 +40,7 @@ const Header = () => {
   return (
     <div className="header-card h-[32px] md:h-[40px] lg:h-[48px] px-3 lg:px-7 flex justify-between items-center bg-color1 font-content text-xs xs:text-sm md:text-base shadow-lg">
       {/* Display the time and date on the left side */}
-      <div className="text-color3">{formatDate(dateTime)}</div>
+      <div className="text-color3 font-heading">Blackcurrant</div>
 
       {/* Navigation link to home */}
       {/* <Link
