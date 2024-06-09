@@ -1,13 +1,13 @@
 import { Card } from "primereact/card";
 
-const ScreenResolution = () => {
-  const cardStyle = "rounded-md";
+const ScreenResolution = ({ baseStyle }: { baseStyle: string }) => {
+  // const cardStyle = "rounded-md";
 
   return (
     <Card
-      className={cardStyle}
-      title={<h2>Screen Resolution</h2>}
-      subTitle={<p>(approx. value)</p>}
+      className={baseStyle}
+      title={<h2 className="font-heading">Screen Resolution</h2>}
+      subTitle={<p className="font-subHeading">(approx. value)</p>}
     >
       {window.screen.width * window.devicePixelRatio} *{" "}
       {window.screen.height * window.devicePixelRatio}

@@ -10,6 +10,7 @@ import CookieStatus from "../../Components/CookiesEnabled/CookiesEnabled";
 import CurrentTime from "../../Components/CurrentTime/CurrentTime";
 import CurrentDate from "../../Components/CurrentDate/CurrentDate";
 import TimeZone from "../../Components/TimeZone/TimeZone";
+import BatteryStatus from "../../Components/BatteryStatus/BatteryStatus";
 // import { useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
@@ -31,6 +32,8 @@ const LandingPage = () => {
     // },
   ];
 
+  const cardStylesBase = "bg-color4 text-color1 rounded-md";
+
   return (
     <Layout>
       <ContextMenu model={items} ref={cm} />
@@ -38,15 +41,16 @@ const LandingPage = () => {
         className="w-full h-full p-1 xs:p-2 md:p-3 lg:p-4 grid grid-flow-row gap-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 overflow-y-auto"
         onContextMenu={(e: any) => cm.current?.show(e)}
       >
-        <ScreenColorDepth />
-        <ScreenResolution />
-        <ScreenOrientation />
+        <ScreenColorDepth baseStyle={cardStylesBase} />
+        <ScreenResolution baseStyle={cardStylesBase} />
+        <ScreenOrientation baseStyle={cardStylesBase} />
 
-        <CookieStatus />
+        <CookieStatus baseStyle={cardStylesBase} />
 
-        <CurrentTime />
-        <CurrentDate />
-        <TimeZone />
+        <CurrentTime baseStyle={cardStylesBase} />
+        <CurrentDate baseStyle={cardStylesBase} />
+        <TimeZone baseStyle={cardStylesBase} />
+        <BatteryStatus baseStyle={cardStylesBase} />
       </div>
     </Layout>
   );

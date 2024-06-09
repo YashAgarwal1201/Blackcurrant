@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "primereact/card"; // Assuming PrimeReact is installed
 
-const CookieStatus: React.FC = () => {
+const CookieStatus = ({ baseStyle }: { baseStyle: string }) => {
   const [cookiesEnabled, setCookiesEnabled] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -22,13 +22,15 @@ const CookieStatus: React.FC = () => {
     checkCookiesEnabled(); // Call the function within useEffect
   }, []); // Empty dependency array to run only once on component mount
 
-  const cardStyle = "rounded-md"; // Card styling
+  // const cardStyle = "rounded-md"; // Card styling
 
   return (
     <Card
-      className={cardStyle}
-      title={<h2>Cookie Status</h2>}
-      subTitle={<p>(can be wrong for some browsers)</p>}
+      className={baseStyle}
+      title={<h2 className="font-heading">Cookie Status</h2>}
+      subTitle={
+        <p className="font-subHeading">(can be wrong for some browsers)</p>
+      }
     >
       {cookiesEnabled === null ? (
         <p>Checking cookie status...</p>

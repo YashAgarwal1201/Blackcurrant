@@ -9,7 +9,6 @@ export type Action<T> = { type: string; payload?: T };
 export interface State {
   [key: string]: any;
   toast: Toast | null;
-  showAllApps: boolean;
   showSettings: boolean;
   wallpaper: {
     changeWallpaper: boolean;
@@ -47,7 +46,6 @@ export interface AppContextType {
     detail: string,
     life?: number
   ) => void;
-  setShowAllApps: (showAllApps: boolean) => void;
   setShowSettings: (showSettings: boolean) => void;
 }
 

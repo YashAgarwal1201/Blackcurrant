@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "primereact/card"; // Assuming PrimeReact is installed
 
-const TimeZone: React.FC = () => {
+const TimeZone = ({ baseStyle }: { baseStyle: string }) => {
   const [timezone, setTimezone] = useState<string>("");
   const [timezoneOffset, setTimezoneOffset] = useState<string>("");
 
@@ -23,10 +23,14 @@ const TimeZone: React.FC = () => {
     getTimezone(); // Call the function within useEffect
   }, []); // Empty dependency array to run only once on component mount
 
-  const cardStyle = "rounded-md"; // Card styling
+  // const cardStyle = "rounded-md"; // Card styling
 
   return (
-    <Card className={cardStyle} title={<h2>Time Zone</h2>}>
+    <Card
+      className={baseStyle}
+      title={<h2 className="font-heading">Time Zone</h2>}
+      subTitle={<p className="font-subHeading">(current local time zone)</p>}
+    >
       {timezone} (UTC {timezoneOffset})
     </Card>
   );

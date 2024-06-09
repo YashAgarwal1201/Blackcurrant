@@ -14,7 +14,6 @@ const initialState: State = sessionStorage.getItem(`bananaAppData`)
   ? JSON.parse(sessionStorage.getItem(`bananaAppData`) as string)
   : {
       toast: null,
-      showAllApps: false,
       showSettings: false,
       wallpaper: {
         changeWallpaper: false,
@@ -52,13 +51,6 @@ const reducer = (state: State, action: Action<ActionType> | any): State => {
       };
     }
 
-    case "SET_SHOW_ALL_APPS": {
-      return {
-        ...state,
-        showAllApps: action.payload as boolean,
-      };
-    }
-
     case "SET_SHOW_SETTINGS": {
       return {
         ...state,
@@ -93,7 +85,6 @@ const AppContext = createContext<AppContextType>({
   state: initialState,
   dispatch: () => null,
   showToast: () => null,
-  setShowAllApps: () => null,
   setShowSettings: () => null,
 });
 
@@ -112,10 +103,6 @@ const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
     state.toast?.show({ severity, summary, detail, life });
   };
 
-  const setShowAllApps = (showAllApps: boolean) => {
-    dispatch({ type: "SET_SHOW_ALL_APPS", payload: showAllApps });
-  };
-
   const setShowSettings = (showSettings: boolean) => {
     dispatch({ type: "SET_SHOW_SETTINGS", payload: showSettings });
   };
@@ -124,7 +111,6 @@ const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
     state,
     dispatch,
     showToast,
-    setShowAllApps,
     setShowSettings,
   };
 

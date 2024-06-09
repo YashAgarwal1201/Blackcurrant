@@ -11,7 +11,7 @@ import App from "./../App";
 // Lazy Loaded Components
 const LandingPage = lazy(() => import("./../Pages/LandingPage/LandingPage"));
 const HomePage = lazy(() => import("./../Pages/HomePage/HomePage"));
-const DynamicPage = lazy(() => import("./../Pages/DynamicPage/DynamicPage"));
+// const DynamicPage = lazy(() => import("./../Pages/DynamicPage/DynamicPage"));
 const PageNotFound = lazy(() => import("../Pages/PageNotFound/PageNotFound"));
 // const ImageFramesPage = lazy(() => import("../Pages/ImageFramesPage/ImageFramesPage"));
 

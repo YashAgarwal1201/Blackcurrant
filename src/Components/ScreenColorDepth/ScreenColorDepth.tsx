@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Card } from "primereact/card";
 
-function ScreenColorDepth() {
+function ScreenColorDepth({ baseStyle }: { baseStyle: string }) {
   const [colorDepth, setColorDepth] = useState(0);
 
   useEffect(() => {
@@ -10,10 +10,12 @@ function ScreenColorDepth() {
     setColorDepth(depth);
   }, []);
 
-  const cardStyle = "rounded-md";
-
   return (
-    <Card className={cardStyle} title={<h2></h2>} subTitle={<p></p>}>
+    <Card
+      className={baseStyle}
+      title={<h2 className="font-heading"></h2>}
+      subTitle={<p className="font-subHeading"></p>}
+    >
       {colorDepth}
     </Card>
   );
