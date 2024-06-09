@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "primereact/card"; // Assuming PrimeReact is installed
 
-const CurrentDate: React.FC = () => {
+const CurrentDate = ({ baseStyle }: { baseStyle: string }) => {
   const [currentDate, setCurrentDate] = useState<string>("");
 
   useEffect(() => {
@@ -38,13 +38,13 @@ const CurrentDate: React.FC = () => {
     }
   };
 
-  const cardStyle = "rounded-md"; // Card styling
+  // const cardStyle = "rounded-md"; // Card styling
 
   return (
     <Card
-      className={cardStyle}
-      title={<h2>Current Date</h2>}
-      subTitle={<p></p>}
+      className={baseStyle}
+      title={<h2 className="font-heading">Current Date</h2>}
+      subTitle={<p className="font-subHeading">(current local date)</p>}
     >
       <p>{currentDate}</p>
     </Card>

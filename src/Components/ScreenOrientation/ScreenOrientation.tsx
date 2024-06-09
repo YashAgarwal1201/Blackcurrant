@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "primereact/card"; // Assuming PrimeReact is installed
 
-const ScreenOrientation: React.FC = () => {
+const ScreenOrientation = ({ baseStyle }: { baseStyle: string }) => {
   const [orientation, setOrientation] = useState<string>("");
 
   useEffect(() => {
@@ -28,13 +28,13 @@ const ScreenOrientation: React.FC = () => {
     };
   }, []); // Empty dependency array to run only once on component mount
 
-  const cardStyle = "rounded-md"; // Card styling
+  // const cardStyle = "rounded-md"; // Card styling
 
   return (
     <Card
-      className={cardStyle}
-      title={<h2>Screen Orientation</h2>}
-      subTitle={<p></p>}
+      className={baseStyle}
+      title={<h2 className="font-heading">Screen Orientation</h2>}
+      subTitle={<p className="font-subHeading">(current orientation)</p>}
     >
       {orientation}
     </Card>

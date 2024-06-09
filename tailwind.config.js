@@ -18,6 +18,7 @@ export default {
       },
       fontFamily: {
         heading: ["var(--heading)"],
+        subHeading: ["var(--subHeading)"],
         content: ["var(--content)"],
       },
       screens: {

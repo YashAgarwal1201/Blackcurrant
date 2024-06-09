@@ -1,8 +1,8 @@
+@import url("https://fonts.googleapis.com/css2?family=Acme&family=Righteous&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap");
+
 @import "primereact/resources/primereact.min.css";
 @import "primeicons/primeicons.css";
 @import "primereact/resources/themes/tailwind-light/theme.css";
-
-@import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Macondo&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -10,14 +10,15 @@
 
 @layer base {
   html {
-    --color1: #765109;
-    --color2: #ffce42;
-    --color3: #f0deb8;
-    --color4: #1a1a1a;
+    --color1: #312b4c;
+    --color2: #8c63a7;
+    --color3: #a08bd0;
+    --color4: #c3bce7;
     --color5: #fafafa;
 
-    --heading: "Macondo";
-    --content: "Comfortaa";
+    --heading: "Acme";
+    --subHeading: "Righteous";
+    --content: "Urbanist";
   }
 }
 
@@ -58,9 +59,9 @@ ul:not(.p-contextmenu ul) {
 @media (hover: hover) and (pointer: fine) {
   .p-button:hover,
   a:hover {
-    color: var(--color4);
-    background-color: var(--color5);
-    border-color: var(--color5);
+    color: var(--color5);
+    background-color: var(--color3);
+    border-color: var(--color3);
   }
 }
 

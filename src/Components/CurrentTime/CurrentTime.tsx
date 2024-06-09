@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "primereact/card"; // Assuming PrimeReact is installed
 
-const CurrentTime: React.FC = () => {
+const CurrentTime = ({ baseStyle }: { baseStyle: string }) => {
   const [currentTime, setCurrentTime] = useState<string>("");
 
   useEffect(() => {
@@ -20,13 +20,13 @@ const CurrentTime: React.FC = () => {
     return () => clearInterval(intervalId);
   }, []); // Empty dependency array to run only once on component mount
 
-  const cardStyle = "rounded-md"; // Card styling
+  // const cardStyle = "rounded-md"; // Card styling
 
   return (
     <Card
-      className={cardStyle}
-      title={<h2>Current Time</h2>}
-      subTitle={<p></p>}
+      className={baseStyle}
+      title={<h2 className="font-heading">Current Time</h2>}
+      subTitle={<p className="font-subHeading">(current local time)</p>}
     >
       <p>{currentTime}</p>
     </Card>

@@ -1,48 +1,48 @@
-.cards-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 10px;
-  // Adjust positioning as necessary
-}
+// .cards-container {
+//   display: grid;
+//   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+//   gap: 10px;
+//   // Adjust positioning as necessary
+// }
 
-.card {
-  width: 100px;
-  height: 100px;
-  background-color: #ccc;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: transform 1s ease;
-}
+// .card {
+//   width: 100px;
+//   height: 100px;
+//   background-color: #ccc;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   transition: transform 1s ease;
+// }
 
-.animate .card {
-  animation: clockwiseExit 4s forwards;
-}
+// .animate .card {
+//   animation: clockwiseExit 4s forwards;
+// }
 
-@keyframes clockwiseExit {
-  0% {
-    transform: translate(0, 0);
-  }
-  25% {
-    transform: translateX(100%);
-  }
-  50% {
-    transform: translate(100%, 100%);
-  }
-  75% {
-    transform: translateY(0);
-  }
-  100% {
-    transform: translate(-100vw, 0); // Move out of the screen
-  }
-}
+// @keyframes clockwiseExit {
+//   0% {
+//     transform: translate(0, 0);
+//   }
+//   25% {
+//     transform: translateX(100%);
+//   }
+//   50% {
+//     transform: translate(100%, 100%);
+//   }
+//   75% {
+//     transform: translateY(0);
+//   }
+//   100% {
+//     transform: translate(-100vw, 0); // Move out of the screen
+//   }
+// }
 
 .p-contextmenu {
-  background-color: var(--color2);
+  background-color: var(--color3);
   width: 250px;
   padding: 12px 4px;
   .p-menuitem-content {
-    color: var(--color4);
+    color: var(--color1);
     font-weight: 400;
     font-size: 12px;
     border-radius: 8px;
