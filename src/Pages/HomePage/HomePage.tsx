@@ -11,6 +11,8 @@ import CurrentTime from "../../Components/CurrentTime/CurrentTime";
 import CurrentDate from "../../Components/CurrentDate/CurrentDate";
 import TimeZone from "../../Components/TimeZone/TimeZone";
 import BatteryStatus from "../../Components/BatteryStatus/BatteryStatus";
+import SpeechRecognitionSupport from "../../Components/SpeechRecognition/SpeechRecognition";
+import SpeechSynthesisSupport from "../../Components/SpeechSynthesis/SpeechSynthesis";
 // import { useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
@@ -32,7 +34,7 @@ const LandingPage = () => {
     // },
   ];
 
-  const cardStylesBase = "bg-color4 text-color1 rounded-md";
+  const cardStylesBase = "h-[300px] bg-color4 text-color1 rounded-md";
 
   return (
     <Layout>
@@ -51,6 +53,9 @@ const LandingPage = () => {
         <CurrentDate baseStyle={cardStylesBase} />
         <TimeZone baseStyle={cardStylesBase} />
         <BatteryStatus baseStyle={cardStylesBase} />
+
+        <SpeechRecognitionSupport baseStyle={cardStylesBase} />
+        <SpeechSynthesisSupport baseStyle={cardStylesBase} />
       </div>
     </Layout>
   );
