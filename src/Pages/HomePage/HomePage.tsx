@@ -13,6 +13,8 @@ import TimeZone from "../../Components/TimeZone/TimeZone";
 import BatteryStatus from "../../Components/BatteryStatus/BatteryStatus";
 import SpeechRecognitionSupport from "../../Components/SpeechRecognition/SpeechRecognition";
 import SpeechSynthesisSupport from "../../Components/SpeechSynthesis/SpeechSynthesis";
+import HdrSupportCheck from "../../Components/HdrSupport/HdrSupport";
+import ColorGamutSupport from "../../Components/ColorGamut/ColorGamut";
 // import { useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
@@ -56,6 +58,9 @@ const LandingPage = () => {
 
         <SpeechRecognitionSupport baseStyle={cardStylesBase} />
         <SpeechSynthesisSupport baseStyle={cardStylesBase} />
+
+        <HdrSupportCheck baseStyle={cardStylesBase} />
+        <ColorGamutSupport baseStyle={cardStylesBase} />
       </div>
     </Layout>
   );
