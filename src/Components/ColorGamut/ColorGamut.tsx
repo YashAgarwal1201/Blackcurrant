@@ -2,39 +2,50 @@ import React, { useState, useEffect } from "react";
 import { Card } from "primereact/card"; // Assuming PrimeReact is installed
 
 const ColorGamutSupport = ({ baseStyle }: { baseStyle: string }) => {
-  const [colorGamut, setColorGamut] = useState<string | null>(null);
+  const [colorGamut, setColorGamut] = useState<string[]>([]);
 
   useEffect(() => {
-    const checkColorGamutSupport = async () => {
-      if (!window.matchMedia) return null;
+    const checkColorGamutSupport = () => {
+      const supportedGamuts = [];
 
-      const wideGamutMediaQuery = window.matchMedia("(color-gamut: p3)");
-      const displayP3 = wideGamutMediaQuery && wideGamutMediaQuery.matches;
-
-      if (displayP3) {
-        return "Display P3 (Wide Gamut)";
+      // Check for DCI-P3 (Wide Gamut) support
+      const dciP3MediaQuery = window.matchMedia("(color-gamut: display-p3)");
+      if (dciP3MediaQuery && dciP3MediaQuery.matches) {
+        supportedGamuts.push("DCI-P3 (Wide Gamut)");
       }
 
+      // Check for Adobe RGB support
       const adobeRgbMediaQuery = window.matchMedia("(color-gamut: adobe-rgb)");
-      const adobeRgb = adobeRgbMediaQuery && adobeRgbMediaQuery.matches;
-
-      if (adobeRgb) {
-        return "Adobe RGB";
+      if (adobeRgbMediaQuery && adobeRgbMediaQuery.matches) {
+        supportedGamuts.push("Adobe RGB");
       }
 
+      // Check for sRGB support
       const sRgbMediaQuery = window.matchMedia("(color-gamut: srgb)");
-      const sRgb = sRgbMediaQuery && sRgbMediaQuery.matches;
-
-      if (sRgb) {
-        return "sRGB";
+      if (sRgbMediaQuery && sRgbMediaQuery.matches) {
+        supportedGamuts.push("sRGB");
       }
 
-      return "Unknown";
+      // Check for NTSC support
+      const ntscMediaQuery = window.matchMedia("(color-gamut: ntsc)");
+      if (ntscMediaQuery && ntscMediaQuery.matches) {
+        supportedGamuts.push("NTSC");
+      }
+
+      // If no supported gamuts found
+      if (supportedGamuts.length === 0) {
+        supportedGamuts.push("Unknown");
+      }
+
+      return supportedGamuts;
     };
 
-    checkColorGamutSupport().then((result) => {
-      setColorGamut(result);
-    });
+    const updateColorGamutSupport = () => {
+      const supportedGamuts = checkColorGamutSupport();
+      setColorGamut(supportedGamuts);
+    };
+
+    updateColorGamutSupport();
   }, []); // Empty dependency array to run only once on component mount
 
   return (
@@ -45,10 +56,17 @@ const ColorGamutSupport = ({ baseStyle }: { baseStyle: string }) => {
         <p className="font-subHeading">(browser compatibility check)</p>
       }
     >
-      {colorGamut === null ? (
+      {colorGamut.length === 0 ? (
         <p>Checking...</p>
       ) : (
-        <p>Color Gamut Support: {colorGamut}</p>
+        <div>
+          <p>Color Gamuts Supported:</p>
+          <ul>
+            {colorGamut.map((gamut, index) => (
+              <li key={index}>{gamut}</li>
+            ))}
+          </ul>
+        </div>
       )}
     </Card>
   );

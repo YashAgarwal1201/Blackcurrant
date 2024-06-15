@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "primereact/card"; // Assuming PrimeReact is installed
 
 const HdrSupportCheck = ({ baseStyle }: { baseStyle: string }) => {
@@ -6,8 +6,14 @@ const HdrSupportCheck = ({ baseStyle }: { baseStyle: string }) => {
 
   useEffect(() => {
     const checkHdrSupport = () => {
-      const mediaQuery = "(color-gamut: rec2020)";
-      return window.matchMedia(mediaQuery).matches;
+      // Use a media query that is likely to indicate HDR support
+      const mediaQueries = [
+        "(dynamic-range: high)",
+        "(color-gamut: rec2020)",
+        "(max-color-index: 0)",
+      ];
+
+      return mediaQueries.some((query) => window.matchMedia(query).matches);
     };
 
     const updateHdrSupport = () => {
