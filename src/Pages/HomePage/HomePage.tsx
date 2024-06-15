@@ -15,6 +15,7 @@ import SpeechRecognitionSupport from "../../Components/SpeechRecognition/SpeechR
 import SpeechSynthesisSupport from "../../Components/SpeechSynthesis/SpeechSynthesis";
 import HdrSupportCheck from "../../Components/HdrSupport/HdrSupport";
 import ColorGamutSupport from "../../Components/ColorGamut/ColorGamut";
+import WindowSize from "../../Components/BrowserWindowSize/BrowserWindowSize";
 // import { useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
@@ -48,6 +49,7 @@ const LandingPage = () => {
         <ScreenColorDepth baseStyle={cardStylesBase} />
         <ScreenResolution baseStyle={cardStylesBase} />
         <ScreenOrientation baseStyle={cardStylesBase} />
+        <WindowSize baseStyle={cardStylesBase} />
 
         <CookieStatus baseStyle={cardStylesBase} />
 
