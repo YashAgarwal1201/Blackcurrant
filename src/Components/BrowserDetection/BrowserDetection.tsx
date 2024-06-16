@@ -148,14 +148,15 @@ const BrowserDetection = ({ baseStyle }: { baseStyle: string }) => {
         return "Opera";
       } else if (userAgent.indexOf("Edg") > -1) {
         return "Microsoft Edge";
+      } else if (userAgent.indexOf("SamsungBrowser") > -1) {
+        return "Samsung Internet";
       } else if (userAgent.indexOf("Chrome") > -1 && userAgent.indexOf("Safari") > -1) {
+        // This check should come after specific checks for Edge and Samsung Internet
         return "Google Chrome"; // Chrome often includes "Safari" in its user agent
       } else if (userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Chrome") === -1) {
         return "Apple Safari";
       } else if (userAgent.indexOf("Trident/") > -1 || userAgent.indexOf("MSIE ") > -1) {
         return "Internet Explorer";
-      } else if (userAgent.indexOf("SamsungBrowser") > -1) {
-        return "Samsung Internet";
       } else {
         return "Unknown Browser";
       }
