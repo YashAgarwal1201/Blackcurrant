@@ -17,7 +17,12 @@ const OsDetection = ({ baseStyle }: { baseStyle: string }) => {
       } else if (/iPad|iPhone|iPod/.test(userAgent)) {
         os = "iOS";
       } else if (/Android/.test(userAgent)) {
-        os = "Android";
+        // Check for tablet-specific identifiers to differentiate from desktop mode
+        if (/Tablet|Pad/.test(userAgent) || /Android/.test(userAgent) && !/Mobile/.test(userAgent)) {
+          os = "Android Tablet";
+        } else {
+          os = "Android";
+        }
       } else if (/Linux/.test(userAgent)) {
         os = "Linux";
       }
@@ -37,9 +42,7 @@ const OsDetection = ({ baseStyle }: { baseStyle: string }) => {
     <Card
       className={baseStyle}
       title={<h2 className="font-heading">OS Detection</h2>}
-      subTitle={
-        <p className="font-subHeading">(browser compatibility check)</p>
-      }
+      subTitle={<p className="font-subHeading">(browser compatibility check)</p>}
     >
       {osName === null ? <p>Detecting OS...</p> : <p>{osName}</p>}
     </Card>
