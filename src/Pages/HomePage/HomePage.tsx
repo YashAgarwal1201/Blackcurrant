@@ -16,6 +16,9 @@ import SpeechSynthesisSupport from "../../Components/SpeechSynthesis/SpeechSynth
 import HdrSupportCheck from "../../Components/HdrSupport/HdrSupport";
 import ColorGamutSupport from "../../Components/ColorGamut/ColorGamut";
 import WindowSize from "../../Components/BrowserWindowSize/BrowserWindowSize";
+import ThemePreference from "../../Components/DeviceThemePreference/DeviceThemePreference";
+import BrowserDetection from "../../Components/BrowserDetection/BrowserDetection";
+import OsDetection from "../../Components/UserOS/UserOS";
 // import { useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
@@ -63,6 +66,10 @@ const LandingPage = () => {
 
         <HdrSupportCheck baseStyle={cardStylesBase} />
         <ColorGamutSupport baseStyle={cardStylesBase} />
+        <ThemePreference baseStyle={cardStylesBase} />
+
+        <BrowserDetection baseStyle={cardStylesBase} />
+        <OsDetection baseStyle={cardStylesBase} />
       </div>
     </Layout>
   );
