@@ -13,11 +13,11 @@ const Layout = ({ children }: { children: any }) => {
   }, []);
 
   return (
-    <div className="w-full h-full bg-color2 relative">
-      <div className="h-full">
+    <div className="w-full h-full bg-color5 relative">
+      <div className="w-full h-full flex flex-col md:flex-row">
         <Header />
         <div
-          className={`w-full h-[calc(100%-40px)] md:h-[calc(100%-56px)] lg:h-[calc(100%-64px)] transition-all duration-1000 transform ${
+          className={`w-full md:w-[calc(100%-64px)] h-[calc(100%-40px)] md:h-full p-0 sm:p-1 md:p-2 transition-all duration-1000 transform ${
             showContent
               ? "translate-y-0 opacity-100"
               : "-translate-y-full opacity-0"
