@@ -13,7 +13,7 @@ const Layout = ({ children }: { children: any }) => {
   }, []);
 
   return (
-    <div className="w-full h-full bg-color5 relative">
+    <div className="w-full h-full bg-color1 relative">
       <div className="w-full h-full flex flex-col md:flex-row">
         <Header />
         <div

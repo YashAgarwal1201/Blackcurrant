@@ -44,7 +44,7 @@ const LandingPage = () => {
 
   return (
     <Layout>
-      <ContextMenu model={items} ref={cm} />
+      {/* <ContextMenu model={items} ref={cm} /> */}
       <div
         className="custom-scrollbar w-full h-full p-1 xs:p-2 md:p-3 lg:p-4 bg-color2 rounded-xl border-2 border-color2 grid grid-flow-row gap-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 overflow-y-auto"
         onContextMenu={(e: any) => cm.current?.show(e)}
