@@ -37,13 +37,15 @@ const StringManipulation = () => {
         <div className="h-8 md:h-9 lg:h-10 flex flex-nowrap justify-start items-center gap-x-2 md:gap-x-3 overflow-x-auto">
           {STRING_OPTIONS?.map((value, key) => (
             <Button
+              type="button"
+              title={`Click to convert input string to '${value}'`}
               key={key}
               label={value}
               // className="h-full px-5 flex-grow flex-shrink-0 text-xs sm:text-sm md:text-base lg:text-lg text-color4 font-content bg-transparent rounded-full border md:border-2 border-color4"
               className={`h-full px-5 flex-grow flex-shrink-0 text-xs sm:text-sm md:text-base lg:text-lg font-content rounded-full border md:border-2 ${
                 selectedStringFunction === value
-                  ? "bg-color4 text-color1 border-color4"
-                  : "bg-transparent text-color4 border-color4"
+                  ? "bg-color4 text-color1 border-color4 pointer-events-none"
+                  : "bg-transparent text-color4 border-color4 pointer-events-auto"
               }`}
               onClick={() => setSelectedStringFunction(value)}
             />

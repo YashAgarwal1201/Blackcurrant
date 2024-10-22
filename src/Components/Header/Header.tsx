@@ -3,8 +3,12 @@ import { Button } from "primereact/button";
 import { Image } from "primereact/image";
 import { useAppContext } from "../../Services/AppContext";
 import { TOAST_MSGS } from "../../Services/Constants";
+import { startTransition } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
+  const navigate = useNavigate();
+
   const {
     // setShowSettings,
     showToast,
@@ -17,7 +21,8 @@ const Header = () => {
       {/* Display the time and date on the left side */}
       <Image
         src="/logo2.svg"
-        className="w-auto md:w-full h-full md:h-auto aspect-square"
+        className="w-auto md:w-full h-full md:h-auto aspect-square cursor-pointer"
+        onClick={() => startTransition(() => navigate("/home"))}
       />
 
       <div className="flex items-center text-color4">

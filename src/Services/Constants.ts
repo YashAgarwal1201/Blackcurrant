@@ -5,6 +5,7 @@ import {
   toKebabCase,
   toSnakeCase,
   toScreamingSnakeCase,
+  toPascalCase,
 } from "./StringFunctions";
 
 export const TOAST_MSGS = {
@@ -15,7 +16,7 @@ export const TOAST_MSGS = {
 export const STRING_OPTIONS = [
   "Alternate Case",
   "Camel Case",
-  // "Pascal Case",
+  "Pascal Case",
   "Snake Case",
   "Screaming Snake Case",
   "Kebab Case",
@@ -25,7 +26,7 @@ export const STRING_OPTIONS = [
 export const stringFunctions = {
   "Alternate Case": alternateCase,
   Reverse: reverseString,
-  // "Pascal Case": toPascalCase,
+  "Pascal Case": toPascalCase,
   "Camel Case": toCamelCase,
   "Kebab Case": toKebabCase,
   "Snake Case": toSnakeCase,

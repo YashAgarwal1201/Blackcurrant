@@ -29,6 +29,16 @@ export function toCamelCase(input) {
     .replace(/[^a-zA-Z0-9]+(.)/g, (match, chr) => chr.toUpperCase());
 }
 
+export function toPascalCase(input: string) {
+  return input
+    .replace(
+      /(\w)(\w*)/g,
+      (_, firstLetter: string, rest: string) =>
+        firstLetter.toUpperCase() + rest.toLowerCase()
+    )
+    .replace(/\s+/g, ""); // Remove spaces
+}
+
 export function toKebabCase(input) {
   return input
     .trim()
