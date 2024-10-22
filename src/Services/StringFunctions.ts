@@ -63,3 +63,34 @@ export function toScreamingSnakeCase(input) {
 export function reverseString(input) {
   return input.split("").reverse().join("");
 }
+
+export function randomizeCase(input) {
+  return input
+    .split("")
+    .map((char) => {
+      // Randomly decide to convert the character to uppercase or lowercase
+      return Math.random() < 0.5 ? char.toLowerCase() : char.toUpperCase();
+    })
+    .join("");
+}
+
+export function removeWhitespace(input) {
+  // Remove leading and trailing whitespace
+  const trimmedString = input.trim();
+
+  // Remove all whitespace characters within the string
+  const noWhitespaceString = trimmedString.replace(/\s+/g, "");
+
+  return noWhitespaceString;
+}
+
+export function stringToBinary(input) {
+  return input
+    .split("")
+    .map((char) => char.charCodeAt(0).toString(2).padStart(8, "0")) // Convert each character to binary
+    .join(" "); // Join the binary values with spaces
+}
+
+export function stringToAscii(input) {
+  return input.split("").map((char) => char.charCodeAt(0)); // Convert each character to its ASCII code
+}
