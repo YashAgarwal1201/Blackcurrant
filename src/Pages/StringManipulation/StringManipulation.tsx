@@ -3,18 +3,15 @@ import Layout from "../../Layout/Layout";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
 import { useForm } from "react-hook-form";
-import {
-  // alternateCase,
-  reverseString,
-  // toCamelCase,
-  // toKebabCase,
-  // toScreamingSnakeCase,
-  // toSnakeCase,
-} from "../../Services/StringFunctions";
-import { STRING_OPTIONS } from "../../Services/Constants";
+import { STRING_OPTIONS, stringFunctions } from "../../Services/Constants";
+import useStringFunctionsStore from "../../Services/Stores/stringFunctionsStore";
 
 const StringManipulation = () => {
   const { register, handleSubmit, reset, watch } = useForm();
+
+  const { selectedStringFunction, setSelectedStringFunction } =
+    useStringFunctionsStore(); // Access Zustand store
+
   const [outputString, setOutputString] = useState("");
 
   const inputText = watch("inputText");
@@ -22,14 +19,12 @@ const StringManipulation = () => {
   // Function to handle form submission
   const onSubmit = (data: any) => {
     const inputString = data.inputText;
-    // Process the string (example: just echoing it back here, but you can manipulate it as needed)
-    // const pr = alternateCase(inputString);
-    // const pr = toCamelCase(inputString);
-    // const pr = toKebabCase(inputString);
-    // const pr = toSnakeCase(inputString);
-    // const pr = toScreamingSnakeCase(inputString);
-    const pr = reverseString(inputString);
-    setOutputString(pr);
+    const selectedFunction = stringFunctions[selectedStringFunction];
+
+    if (selectedFunction) {
+      const processedString = selectedFunction(inputString);
+      setOutputString(processedString);
+    }
   };
 
   return (
@@ -44,7 +39,13 @@ const StringManipulation = () => {
             <Button
               key={key}
               label={value}
-              className="h-full px-5 flex-grow flex-shrink-0 text-xs sm:text-sm md:text-base lg:text-lg text-color4 font-content bg-transparent rounded-full border md:border-2 border-color4"
+              // className="h-full px-5 flex-grow flex-shrink-0 text-xs sm:text-sm md:text-base lg:text-lg text-color4 font-content bg-transparent rounded-full border md:border-2 border-color4"
+              className={`h-full px-5 flex-grow flex-shrink-0 text-xs sm:text-sm md:text-base lg:text-lg font-content rounded-full border md:border-2 ${
+                selectedStringFunction === value
+                  ? "bg-color4 text-color1 border-color4"
+                  : "bg-transparent text-color4 border-color4"
+              }`}
+              onClick={() => setSelectedStringFunction(value)}
             />
           ))}
         </div>
