@@ -1,9 +1,25 @@
 import { useEffect, useRef } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { Toast } from "primereact/toast";
 import { useAppContext } from "./Services/AppContext";
 import "./App.scss";
-// import ErrorBoundary from "./Services/ErrorBoundary";
+
+const DocumentTitleUpdater = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const titleMap: { [key: string]: string } = {
+      "/": "Project Blackcurrant",
+      "/home": "Project Blackcurrant | Home",
+      "/string-manipulation": "Project Blackcurrant | String Manipulation",
+    };
+
+    document.title =
+      titleMap[location.pathname] || "Project Blackcurrant | Page Not found"; // Default title if route doesn't match
+  }, [location]);
+
+  return null; // This component only updates the title
+};
 
 function App() {
   const { dispatch, state } = useAppContext();
@@ -21,12 +37,11 @@ function App() {
   }, [state]);
 
   return (
-    // <ErrorBoundary>
     <div className="w-screen h-[100dvh] bg-color3">
+      <DocumentTitleUpdater />
       <Toast ref={myToast} />
       <Outlet />
     </div>
-    // </ErrorBoundary>
   );
 }
 
