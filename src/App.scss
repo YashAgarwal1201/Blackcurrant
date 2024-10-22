@@ -40,6 +40,13 @@
   border: 0px;
 }
 
+// .p-inputtextarea:focus,
+.p-inputtextarea:enabled:focus {
+  border-width: 2px;
+  border-style: solid;
+  border-color: var(--color4);
+}
+
 .p-toast {
   z-index: 10000;
 }

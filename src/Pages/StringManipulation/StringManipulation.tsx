@@ -16,7 +16,6 @@ const StringManipulation = () => {
 
   const inputText = watch("inputText");
 
-  // Function to handle form submission
   const onSubmit = (data: any) => {
     const inputString = data.inputText;
     const selectedFunction = stringFunctions[selectedStringFunction];
@@ -34,7 +33,7 @@ const StringManipulation = () => {
           String Manipulation
         </h1>
 
-        <div className="h-8 md:h-9 lg:h-10 flex flex-nowrap justify-start items-center gap-x-2 md:gap-x-3 overflow-x-auto">
+        <div className="flex flex-nowrap justify-start items-center gap-x-2 md:gap-x-3 overflow-x-auto">
           {STRING_OPTIONS?.map((value, key) => (
             <Button
               type="button"
@@ -42,7 +41,7 @@ const StringManipulation = () => {
               key={key}
               label={value}
               // className="h-full px-5 flex-grow flex-shrink-0 text-xs sm:text-sm md:text-base lg:text-lg text-color4 font-content bg-transparent rounded-full border md:border-2 border-color4"
-              className={`h-full px-5 flex-grow flex-shrink-0 text-xs sm:text-sm md:text-base lg:text-lg font-content rounded-full border md:border-2 ${
+              className={`h-8 md:h-9 lg:h-10 px-5 flex-shrink-0 text-xs sm:text-sm md:text-base lg:text-lg font-content rounded-full border md:border-2 ${
                 selectedStringFunction === value
                   ? "bg-color4 text-color1 border-color4 pointer-events-none"
                   : "bg-transparent text-color4 border-color4 pointer-events-auto"
@@ -68,7 +67,7 @@ const StringManipulation = () => {
                   </p>
                 </div>
                 <InputTextarea
-                  className="h-[27vh] md:h-[40vh] p-4 text-base xs:text-lg mdl:text-xl text-color5 font-content border-2 border-color3 bg-color2 rounded-xl mdl:rounded-2xl resize-none"
+                  className="custom-scrollbar h-[27vh] md:h-[40vh] p-4 text-base xs:text-lg mdl:text-xl text-color5 font-content border-2 border-color3 bg-color2 rounded-xl mdl:rounded-2xl resize-none"
                   maxLength={3500}
                   {...register("inputText", { required: true })}
                 />

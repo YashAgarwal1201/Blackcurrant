@@ -6,6 +6,10 @@ import {
   toSnakeCase,
   toScreamingSnakeCase,
   toPascalCase,
+  randomizeCase,
+  removeWhitespace,
+  stringToBinary,
+  stringToAscii,
 } from "./StringFunctions";
 
 export const TOAST_MSGS = {
@@ -21,6 +25,10 @@ export const STRING_OPTIONS = [
   "Screaming Snake Case",
   "Kebab Case",
   "Reverse",
+  "Randomise Case",
+  "No Whitespace",
+  "Binary String",
+  "ASCII String",
 ];
 
 export const stringFunctions = {
@@ -31,4 +39,8 @@ export const stringFunctions = {
   "Kebab Case": toKebabCase,
   "Snake Case": toSnakeCase,
   "Screaming Snake Case": toScreamingSnakeCase,
+  "Randomise Case": randomizeCase,
+  "No Whitespace": removeWhitespace,
+  "Binary String": stringToBinary,
+  "ASCII String": stringToAscii,
 };
