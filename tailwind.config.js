@@ -28,5 +28,26 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        ".scrollbar-hide": {
+          /* Hide scrollbar for webkit browsers */
+          "-ms-overflow-style": "none" /* IE and Edge */,
+          "scrollbar-width": "none" /* Firefox */,
+          "&::-webkit-scrollbar": {
+            display: "none" /* Safari and Chrome */,
+          },
+        },
+        ".scrollbar-default": {
+          /* Show scrollbars */
+          "-ms-overflow-style": "auto",
+          "scrollbar-width": "auto",
+          "&::-webkit-scrollbar": {
+            display: "block",
+          },
+        },
+      });
+    },
+  ],
 };

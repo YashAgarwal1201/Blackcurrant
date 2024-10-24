@@ -14,6 +14,9 @@ const HomePage = lazy(() => import("./../Pages/HomePage/HomePage"));
 const StringManipulation = lazy(
   () => import("./../Pages/StringManipulation/StringManipulation")
 );
+const NumberManipulation = lazy(
+  () => import("./../Pages/Number/NumberManipulation")
+);
 const PageNotFound = lazy(() => import("../Pages/PageNotFound/PageNotFound"));
 
 const Router = createBrowserRouter(
@@ -22,6 +25,7 @@ const Router = createBrowserRouter(
       <Route path="/" element={<LandingPage />} />
       <Route path="/home" element={<HomePage />} />
       <Route path="/string-manipulation" element={<StringManipulation />} />
+      <Route path="/number" element={<NumberManipulation />} />
       <Route path="*" element={<PageNotFound />} />
     </Route>
   )
