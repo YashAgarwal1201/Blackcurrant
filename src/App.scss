@@ -31,7 +31,7 @@
 }
 
 .p-button:focus,
-.p-inputtext:enabled:focus,
+// .p-inputtext:enabled:focus,
 .p-link:focus {
   box-shadow: none !important;
   outline: none !important;
@@ -41,10 +41,22 @@
 }
 
 // .p-inputtextarea:focus,
-.p-inputtextarea:enabled:focus {
+.p-inputtextarea:enabled:focus,
+.p-inputtext:enabled:focus,
+.p-inputwrapper:enabled:focus {
   border-width: 2px;
   border-style: solid;
   border-color: var(--color4);
+  outline: none;
+  box-shadow: none;
+}
+
+.p-inputnumber-input {
+  box-shadow: none;
+}
+.p-inputnumber-input:enabled:focus {
+  border: 0px;
+  box-shadow: none;
 }
 
 .p-toast {
@@ -66,7 +78,9 @@ ul:not(.p-contextmenu ul) {
 
 @media (hover: hover) and (pointer: fine) {
   .p-button:hover,
-  a:hover {
+  a:hover,
+  .custom-panel-header:hover,
+  .feedback-form .form-section:hover {
     color: var(--color5);
     background-color: var(--color3);
     border-color: var(--color3);

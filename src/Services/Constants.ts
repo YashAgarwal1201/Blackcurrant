@@ -1,4 +1,17 @@
 import {
+  binaryToNumber,
+  factorial,
+  fibonacci,
+  gcd,
+  hexToNumber,
+  isPrime,
+  lcm,
+  numberToBinary,
+  numberToHex,
+  reverseNumber,
+  sumOfDigits,
+} from "./NumberFunctions";
+import {
   alternateCase,
   reverseString,
   toCamelCase,
@@ -43,4 +56,32 @@ export const stringFunctions = {
   "No Whitespace": removeWhitespace,
   "Binary String": stringToBinary,
   "ASCII String": stringToAscii,
+};
+
+export const NUMBER_OPTIONS = [
+  "Number to HEX",
+  "HEX to Number",
+  "Number to Binary",
+  "Binary to Number",
+  "Is Prime",
+  "Factorial",
+  "Fibonacci",
+  "Sum of Digits",
+  "Reverse of Number",
+  "Greatest Common Divisor",
+  "Least Common Multiple",
+];
+
+export const numberFunctions = {
+  "Number to HEX": numberToHex,
+  "HEX to Number": hexToNumber,
+  "Number to Binary": numberToBinary,
+  "Binary to Number": binaryToNumber,
+  "Is Prime": isPrime,
+  Factorial: factorial,
+  Fibonacci: fibonacci,
+  "Sum of Digits": sumOfDigits,
+  "Reverse of Number": reverseNumber,
+  "Greatest Common Divisor": gcd,
+  "Least Common Multiple": lcm,
 };

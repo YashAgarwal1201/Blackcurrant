@@ -12,8 +12,12 @@ import App from "./../App";
 const LandingPage = lazy(() => import("./../Pages/LandingPage/LandingPage"));
 const HomePage = lazy(() => import("./../Pages/HomePage/HomePage"));
 const StringManipulation = lazy(
-  () => import("./../Pages/StringManipulation/StringManipulation")
+  () => import("../Pages/StringManipulationPage/StringManipulation")
 );
+const NumberManipulation = lazy(
+  () => import("../Pages/NumbersPage/NumberManipulation")
+);
+const WebAPI = lazy(() => import("../Pages/WebAPIsPage/WebAPI"));
 const PageNotFound = lazy(() => import("../Pages/PageNotFound/PageNotFound"));
 
 const Router = createBrowserRouter(
@@ -22,6 +26,8 @@ const Router = createBrowserRouter(
       <Route path="/" element={<LandingPage />} />
       <Route path="/home" element={<HomePage />} />
       <Route path="/string-manipulation" element={<StringManipulation />} />
+      <Route path="/number" element={<NumberManipulation />} />
+      <Route path="/web-apis" element={<WebAPI />} />
       <Route path="*" element={<PageNotFound />} />
     </Route>
   )

@@ -5,6 +5,7 @@ import { Button } from "primereact/button";
 import { useForm } from "react-hook-form";
 import { STRING_OPTIONS, stringFunctions } from "../../Services/Constants";
 import useStringFunctionsStore from "../../Services/Stores/stringFunctionsStore";
+import SwiperContainer from "../../Components/SwiperContainer/SwiperContainer";
 
 const StringManipulation = () => {
   const { register, handleSubmit, reset, watch } = useForm();
@@ -33,7 +34,7 @@ const StringManipulation = () => {
           String Manipulation
         </h1>
 
-        <div className="flex flex-nowrap justify-start items-center gap-x-2 md:gap-x-3 overflow-x-auto">
+        {/* <div className="flex flex-nowrap justify-start items-center gap-x-2 md:gap-x-3 overflow-x-auto">
           {STRING_OPTIONS?.map((value, key) => (
             <Button
               type="button"
@@ -49,7 +50,25 @@ const StringManipulation = () => {
               onClick={() => setSelectedStringFunction(value)}
             />
           ))}
-        </div>
+        </div> */}
+
+        <SwiperContainer>
+          {STRING_OPTIONS?.map((value, key) => (
+            <Button
+              type="button"
+              title={`Click to convert input string to '${value}'`}
+              key={key}
+              label={value}
+              // className="h-full px-5 flex-grow flex-shrink-0 text-xs sm:text-sm md:text-base lg:text-lg text-color4 font-content bg-transparent rounded-full border md:border-2 border-color4"
+              className={`h-8 md:h-9 lg:h-10 px-5 flex-shrink-0 text-xs sm:text-sm md:text-base lg:text-lg font-content rounded-full border md:border-2 ${
+                selectedStringFunction === value
+                  ? "bg-color4 text-color1 border-color4 pointer-events-none"
+                  : "bg-transparent text-color4 border-color4 pointer-events-auto"
+              }`}
+              onClick={() => setSelectedStringFunction(value)}
+            />
+          ))}
+        </SwiperContainer>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 xl:gap-8">
           <div className="">

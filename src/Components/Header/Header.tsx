@@ -6,7 +6,7 @@ import { TOAST_MSGS } from "../../Services/Constants";
 import { startTransition } from "react";
 import { useNavigate } from "react-router-dom";
 
-const Header = () => {
+const Header = ({ setShowSideMenu }) => {
   const navigate = useNavigate();
 
   const {
@@ -30,7 +30,8 @@ const Header = () => {
           icon={<span className="material-symbols-rounded">settings</span>}
           // onClick={() => showToast("info", "Info", FEAT_UNDER_CONSTRUCTION)}
           onClick={() => {
-            showToast("info", "Info", FEAT_UNDER_CONSTRUCTION);
+            // showToast("info", "Info", FEAT_UNDER_CONSTRUCTION);
+            setShowSideMenu(true);
             // setShowSettings(true);
           }}
           className="p-0"
