@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 // import DockComponent from "../Components/Dock/Dock";
 import Header from "../Components/Header/Header";
 import SideMenu from "../Components/SideMenu/SideMenu";
+import FeedbackDialog from "../Components/FeedbackDialog/FeedbackDialog";
 // import ShowAllAppsComponent from "../Components/ShowAllAppsComponent/ShowAllAppsComponent";
 // import SettingsDialog from "../Components/SettingsDialog/SettingsDialog";
 
 const Layout = ({ children }: { children: any }) => {
   const [showContent, setShowContent] = useState<boolean>(false);
   const [showSideMenu, setShowSideMenu] = useState<boolean>(false);
+  const [showFeedbackDialog, setShowFeedbackDialog] = useState<boolean>(false);
 
   useEffect(() => {
     setShowContent(true);
@@ -29,7 +31,16 @@ const Layout = ({ children }: { children: any }) => {
         </div>
       </div>
 
-      <SideMenu showSideMenu={showSideMenu} setShowSideMenu={setShowSideMenu} />
+      <SideMenu
+        showSideMenu={showSideMenu}
+        setShowSideMenu={setShowSideMenu}
+        showFeedbackDialog={showFeedbackDialog}
+        setShowFeedbackDialog={setShowFeedbackDialog}
+      />
+      <FeedbackDialog
+        showFeedbackDialog={showFeedbackDialog}
+        setShowFeedbackDialog={setShowFeedbackDialog}
+      />
     </div>
   );
 };

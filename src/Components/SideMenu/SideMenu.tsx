@@ -4,10 +4,15 @@ import { Button } from "primereact/button";
 // import { Divider } from "primereact/divider";
 import "./SideMenu.scss";
 
-const SideMenu = ({ showSideMenu, setShowSideMenu }) => {
+const SideMenu = ({
+  showSideMenu,
+  setShowSideMenu,
+  showFeedbackDialog,
+  setShowFeedbackDialog,
+}) => {
   return (
     <Sidebar
-      visible={showSideMenu}
+      visible={showSideMenu && !showFeedbackDialog}
       onHide={() => setShowSideMenu(false)}
       position="right"
       header={
@@ -18,6 +23,7 @@ const SideMenu = ({ showSideMenu, setShowSideMenu }) => {
       className="side-menu w-full md:w-1/3 max-w-[768px] bg-color1 rounded-none md:rounded-l-2xl"
       closeIcon={<span className="pi pi-times text-color5"></span>}
       maskClassName="backdrop-blur"
+      dismissable
     >
       <div className="w-full bg-color4 rounded-3xl py-4 px-4">
         <Panel
@@ -31,7 +37,7 @@ const SideMenu = ({ showSideMenu, setShowSideMenu }) => {
                 className="cursor-pointer custom-panel-header w-full flex justify-between items-center px-2 py-4 rounded-xl"
                 onClick={togglePanel}
               >
-                <h3 className="font-subHeading font-medium text-color1 flex items-center">
+                <h3 className="font-subHeading font-medium text-lg sm:text-xl text-color1 flex items-center">
                   <span className="pi pi-palette mr-4"></span>
                   Change Theme
                 </h3>
@@ -56,7 +62,10 @@ const SideMenu = ({ showSideMenu, setShowSideMenu }) => {
 
         <div className="mx-2 my-1 p-0 max-w-full h-[1.5px] bg-color2" />
 
-        <Button className="w-full py-4 px-2 bg-color4 font-subHeading text-color1 rounded-xl">
+        <Button
+          className="w-full py-4 px-2 bg-color4 font-subHeading text-lg sm:text-xl text-color1 rounded-xl"
+          onClick={() => setShowFeedbackDialog(true)}
+        >
           <h3 className="font-subHeading font-medium text-color1 flex items-center">
             <span className="pi pi-comment mr-4"></span>
             Feedback
@@ -69,7 +78,7 @@ const SideMenu = ({ showSideMenu, setShowSideMenu }) => {
           href="https://yashagarwal1201.github.io/"
           target="_blank"
           rel="noopener"
-          className="!w-full block py-4 px-2 bg-color4 font-subHeading text-color1 rounded-xl not-italic"
+          className="!w-full block py-4 px-2 bg-color4 font-subHeading text-lg sm:text-xl text-color1 rounded-xl not-italic"
         >
           <h3 className="font-subHeading font-medium text-color1 flex items-center">
             <span className="pi pi-github mr-4"></span>

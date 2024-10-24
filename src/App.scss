@@ -79,7 +79,8 @@ ul:not(.p-contextmenu ul) {
 @media (hover: hover) and (pointer: fine) {
   .p-button:hover,
   a:hover,
-  .custom-panel-header:hover {
+  .custom-panel-header:hover,
+  .feedback-form .form-section:hover {
     color: var(--color5);
     background-color: var(--color3);
     border-color: var(--color3);

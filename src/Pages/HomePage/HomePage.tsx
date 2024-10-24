@@ -15,7 +15,7 @@ const LandingPage = () => {
           Project blackcurrant
         </h1>
         <div className="w-full h-full flex justify-center items-center">
-          <div className="w-full sm:w-[90%] md:w-[640px] aspect-square grid grid-cols-2 gap-4">
+          <div className="w-full sm:w-[75%] md:w-[560px] lg:w-[640px] aspect-square grid grid-cols-2 gap-4">
             {[
               { title: "Play with Strings", link: "/string-manipulation" },
               { title: "Play with Numbers", link: "/number" },
