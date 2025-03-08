@@ -7,5 +7,34 @@
   "orientation": "any",
   "scope": "/",
   "start_url": "/",
-  "icons": [{ "src": "./logo.svg", "sizes": "any", "type": "image/svg+xml" }]
+  "icons": [{ "src": "./logo.svg", "sizes": "any", "type": "image/svg+xml" }],
+  "shortcuts": [
+    {
+      "name": "Play with Dates",
+      "short_name": "Play with Dates",
+      "description": "Play with Dates",
+      "url": "/play-with-dates",
+      "icons": [
+        { "src": "./logo.svg", "sizes": "any", "type": "image/svg+xml" }
+      ]
+    },
+    {
+      "name": "Play with Numbers",
+      "short_name": "Play with Numbers",
+      "description": "Play with Numbers",
+      "url": "/play-with-numbers",
+      "icons": [
+        { "src": "./logo.svg", "sizes": "any", "type": "image/svg+xml" }
+      ]
+    },
+    {
+      "name": "Play with Strings",
+      "short_name": "Play with Strings",
+      "description": "Play with Strings",
+      "url": "/play-with-strings",
+      "icons": [
+        { "src": "./logo.svg", "sizes": "any", "type": "image/svg+xml" }
+      ]
+    }
+  ]
 }
