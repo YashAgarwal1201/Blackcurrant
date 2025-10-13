@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
+import useToastStore from "../../Services/Stores/toastMessageStore";
 
 type Language = "html" | "react" | "vue";
 
@@ -21,6 +22,8 @@ interface ConsoleLog {
 }
 
 const PlaygroundComponent = () => {
+  const showToast = useToastStore((state) => state.showToast);
+
   const [language, setLanguage] = useState<Language>("html");
   const [code, setCode] = useState<string>("");
   const [showOutput, setShowOutput] = useState<boolean>(false);
@@ -461,7 +464,9 @@ export default {
           />
           <Button
             title="Change editor and output orientation"
-            onClick={handleDownload}
+            onClick={() =>
+              showToast("info", "Info", "Feature under development.")
+            }
             className="h-9 px-3 py-2 bg-transparent text-color5 rounded-lg border sm:border-2 border-color2 font-content transition-colors flex items-center gap-2"
           >
             <Columns2 size={16} />
@@ -502,7 +507,9 @@ export default {
               </Button>
               <Button
                 title="Maximise Editor View"
-                onClick={handleDownload}
+                onClick={() =>
+                  showToast("info", "Info", "Feature under development.")
+                }
                 className="h-9 px-3 py-2 bg-transparent text-color4 rounded-lg border sm:border-2 border-color4 font-content transition-colors flex items-center gap-2"
               >
                 <Maximize2 size={16} />
@@ -551,7 +558,9 @@ export default {
               {showOutput && (
                 <Button
                   title="Maximise Output View"
-                  onClick={handleDownload}
+                  onClick={() =>
+                    showToast("info", "Info", "Feature under development.")
+                  }
                   className="h-9 px-3 py-2 bg-transparent text-color4 rounded-lg border sm:border-2 border-color4 font-content transition-colors flex items-center gap-2"
                 >
                   <Maximize2 size={16} />
