@@ -6,7 +6,7 @@ interface NumberFunctionStore {
 }
 
 const useNumberFunctionsStore = create<NumberFunctionStore>((set) => ({
-  selectedNumberFunction: "Number to HEX",
+  selectedNumberFunction: "",
   setSelectedNumberFunction: (fn: string) =>
     set({ selectedNumberFunction: fn }),
 }));

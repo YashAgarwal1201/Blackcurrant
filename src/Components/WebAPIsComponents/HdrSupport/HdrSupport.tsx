@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Card } from "primereact/card"; // Assuming PrimeReact is installed
+import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
 
-const HdrSupportCheck = ({ baseStyle }: { baseStyle: string }) => {
+const HdrSupportCheck = () => {
   const [isHdrSupported, setIsHdrSupported] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -26,7 +27,7 @@ const HdrSupportCheck = ({ baseStyle }: { baseStyle: string }) => {
 
   return (
     <Card
-      className={baseStyle}
+      className={WEB_APIS_CARDS_BASE_STYLES}
       title={<h2 className="font-heading">HDR Support Check</h2>}
       subTitle={
         <p className="font-subHeading">(browser compatibility check)</p>

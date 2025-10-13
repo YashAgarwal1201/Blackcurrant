@@ -6,7 +6,7 @@ interface StringFunctionStore {
 }
 
 const useStringFunctionsStore = create<StringFunctionStore>((set) => ({
-  selectedStringFunction: "Alternate Case",
+  selectedStringFunction: "",
   setSelectedStringFunction: (fn: string) =>
     set({ selectedStringFunction: fn }),
 }));

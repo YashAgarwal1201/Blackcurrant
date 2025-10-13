@@ -3,8 +3,11 @@ import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Sidebar } from "primereact/sidebar";
 import { useForm } from "react-hook-form";
+import useNavStore from "../../Services/Stores/navStore";
+import { Send, Trash } from "lucide-react";
 
-const FeedbackDialog = ({ showFeedbackDialog, setShowFeedbackDialog }) => {
+const FeedbackDialog = () => {
+  const { isFeedbackDialogOpen, closeFeedbackDialog } = useNavStore();
   const {
     handleSubmit,
     reset,
@@ -19,7 +22,7 @@ const FeedbackDialog = ({ showFeedbackDialog, setShowFeedbackDialog }) => {
     console.log("Form submitted with data:", data);
     // Handle form submission logic here
     reset(); // Reset the form after submission if needed
-    setShowFeedbackDialog(false); // Close the dialog
+    closeFeedbackDialog(); // Close the dialog
   };
 
   const onDiscard = () => {
@@ -28,15 +31,15 @@ const FeedbackDialog = ({ showFeedbackDialog, setShowFeedbackDialog }) => {
 
   return (
     <Sidebar
-      visible={showFeedbackDialog}
-      onHide={() => setShowFeedbackDialog(false)}
+      visible={isFeedbackDialogOpen}
+      onHide={() => closeFeedbackDialog()}
       position="right"
       header={
         <h2 className="font-heading text-xl sm:text-2xl lg:text-3xl text-color5">
           Have some suggestions?
         </h2>
       }
-      className="side-menu w-full md:w-1/3 max-w-[768px] bg-color1 rounded-none md:rounded-l-2xl"
+      className="side-menu !w-full md:!w-[768px] rounded-none md:!rounded-l-xl bg-color1"
       closeIcon={<span className="pi pi-times text-color5"></span>}
       maskClassName="backdrop-blur"
     >
@@ -101,23 +104,19 @@ const FeedbackDialog = ({ showFeedbackDialog, setShowFeedbackDialog }) => {
           <div className="w-full py-0 flex flex-row items-center flex-1 gap-y-2 sm:gap-y-3 rounded-xl">
             <Button
               type="button"
-              // icon="pi pi-send"
-              // label="Send"
               onClick={() => onDiscard()}
-              className=" flex-1 justify-center items-center py-4 px-2 bg-color4 font-subHeading text-color1 rounded-xl"
+              className=" flex-1 flex justify-center items-center gap-x-2 py-4 px-2 bg-color4 font-subHeading text-color1 rounded-xl"
             >
-              <span className="pi pi-trash mr-4"></span>
+              <Trash size={16} />
               <span>Discard</span>
             </Button>
 
             <Button
               type="submit"
-              // icon="pi pi-send"
-              // label="Send"
               disabled={!isValid}
-              className=" flex-1 justify-center items-center py-4 px-2 bg-color4 font-subHeading text-color1 rounded-xl"
+              className=" flex-1 flex justify-center items-center gap-x-2 py-4 px-2 bg-color4 font-subHeading text-color1 rounded-xl"
             >
-              <span className="pi pi-send mr-4"></span>
+              <Send size={16} />
               <span>Send</span>
             </Button>
           </div>

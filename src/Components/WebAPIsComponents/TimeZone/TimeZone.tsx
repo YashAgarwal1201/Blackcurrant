@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Card } from "primereact/card"; // Assuming PrimeReact is installed
+import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
 
-const TimeZone = ({ baseStyle }: { baseStyle: string }) => {
+const TimeZone = () => {
   const [timezone, setTimezone] = useState<string>("");
   const [timezoneOffset, setTimezoneOffset] = useState<string>("");
 
@@ -27,7 +28,7 @@ const TimeZone = ({ baseStyle }: { baseStyle: string }) => {
 
   return (
     <Card
-      className={baseStyle}
+      className={WEB_APIS_CARDS_BASE_STYLES}
       title={<h2 className="font-heading">Time Zone</h2>}
       subTitle={<p className="font-subHeading">(current local time zone)</p>}
     >

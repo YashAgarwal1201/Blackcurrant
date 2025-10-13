@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Card } from "primereact/card"; // Assuming PrimeReact is installed
+import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
 
-const CookieStatus = ({ baseStyle }: { baseStyle: string }) => {
+const CookieStatus = () => {
   const [cookiesEnabled, setCookiesEnabled] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -26,7 +27,7 @@ const CookieStatus = ({ baseStyle }: { baseStyle: string }) => {
 
   return (
     <Card
-      className={baseStyle}
+      className={WEB_APIS_CARDS_BASE_STYLES}
       title={<h2 className="font-heading">Cookie Status</h2>}
       subTitle={
         <p className="font-subHeading">(can be wrong for some browsers)</p>

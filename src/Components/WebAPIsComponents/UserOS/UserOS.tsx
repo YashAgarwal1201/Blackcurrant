@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Card } from "primereact/card"; // Assuming PrimeReact is installed
+import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
 
-const OsDetection = ({ baseStyle }: { baseStyle: string }) => {
+const OsDetection = () => {
   const [osName, setOsName] = useState<string | null>(null);
 
   useEffect(() => {
@@ -18,7 +19,10 @@ const OsDetection = ({ baseStyle }: { baseStyle: string }) => {
         os = "iOS";
       } else if (/Android/.test(userAgent)) {
         // Check for tablet-specific identifiers to differentiate from desktop mode
-        if (/Tablet|Pad/.test(userAgent) || /Android/.test(userAgent) && !/Mobile/.test(userAgent)) {
+        if (
+          /Tablet|Pad/.test(userAgent) ||
+          (/Android/.test(userAgent) && !/Mobile/.test(userAgent))
+        ) {
           os = "Android Tablet";
         } else {
           os = "Android";
@@ -40,9 +44,11 @@ const OsDetection = ({ baseStyle }: { baseStyle: string }) => {
 
   return (
     <Card
-      className={baseStyle}
+      className={WEB_APIS_CARDS_BASE_STYLES}
       title={<h2 className="font-heading">OS Detection</h2>}
-      subTitle={<p className="font-subHeading">(browser compatibility check)</p>}
+      subTitle={
+        <p className="font-subHeading">(browser compatibility check)</p>
+      }
     >
       {osName === null ? <p>Detecting OS...</p> : <p>{osName}</p>}
     </Card>

@@ -138,7 +138,7 @@ const PlayWithDatesPage = () => {
                   title="Click to remove everything"
                   icon={"pi pi-trash"}
                   label={"Discard"}
-                  className="h-full px-5 text-sm md:text-base lg:text-lg text-color4 bg-transparent font-content border-1 sm:border-2 border-color4 rounded-full"
+                  className="h-full px-5 text-sm md:text-base lg:text-lg text-color4 bg-transparent font-content border sm:border-2 border-color4 rounded-full"
                   onClick={() => reset()}
                 />
                 <Button
@@ -173,7 +173,7 @@ const PlayWithDatesPage = () => {
                   title="Click to remove everything"
                   icon={"pi pi-trash"}
                   label={"Discard"}
-                  className="h-full px-5 text-sm md:text-base lg:text-lg text-color4 bg-transparent font-content border-1 sm:border-2 border-color4 rounded-full"
+                  className="h-full px-5 text-sm md:text-base lg:text-lg text-color4 bg-transparent font-content border sm:border-2 border-color4 rounded-full"
                   onClick={() => setOutputString("")}
                 />
                 <Button

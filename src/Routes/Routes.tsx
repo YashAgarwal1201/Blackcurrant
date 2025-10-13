@@ -21,6 +21,9 @@ const PlayWithJsDates = lazy(
   () => import("./../Pages/DatesPage/PlayWithDatesPage")
 );
 const WebAPI = lazy(() => import("../Pages/WebAPIsPage/WebAPI"));
+const Playground = lazy(
+  () => import("../Pages/CoditorPlayground/PlaygroundPage")
+);
 const PageNotFound = lazy(() => import("../Pages/PageNotFound/PageNotFound"));
 
 const Router = createBrowserRouter(
@@ -32,6 +35,7 @@ const Router = createBrowserRouter(
       <Route path="/play-with-numbers" element={<NumberManipulation />} />
       <Route path="/play-with-dates" element={<PlayWithJsDates />} />
       <Route path="/web-apis" element={<WebAPI />} />
+      <Route path="/coditor-playground" element={<Playground />} />
       <Route path="*" element={<PageNotFound />} />
     </Route>
   )

@@ -1,6 +1,7 @@
 import { Card } from "primereact/card";
+import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
 
-const ScreenResolution = ({ baseStyle }: { baseStyle: string }) => {
+const ScreenResolution = () => {
   const getDeviceResolution = () => {
     // Calculate the exact resolution
     const width = window.screen.width * window.devicePixelRatio;
@@ -15,7 +16,7 @@ const ScreenResolution = ({ baseStyle }: { baseStyle: string }) => {
 
   return (
     <Card
-      className={baseStyle}
+      className={WEB_APIS_CARDS_BASE_STYLES}
       title={<h2 className="font-heading">Screen Resolution</h2>}
       subTitle={<p className="font-subHeading">(approx. value)</p>}
     >
