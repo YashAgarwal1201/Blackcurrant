@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Card } from "primereact/card";
+import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
 
-const WindowSize = ({ baseStyle }: { baseStyle: string }) => {
+const WindowSize = () => {
   const getWindowSize = () => {
     const width = window.innerWidth * window.devicePixelRatio;
     const height = window.innerHeight * window.devicePixelRatio;
@@ -25,7 +26,7 @@ const WindowSize = ({ baseStyle }: { baseStyle: string }) => {
 
   return (
     <Card
-      className={baseStyle}
+      className={WEB_APIS_CARDS_BASE_STYLES}
       title={<h2 className="font-heading">Window Size</h2>}
       subTitle={<p className="font-subHeading">(exact value)</p>}
     >

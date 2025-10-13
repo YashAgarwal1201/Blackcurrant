@@ -19,8 +19,6 @@ import ScreenOrientation from "../../Components/WebAPIsComponents/ScreenOrientat
 import "./WebAPI.scss";
 
 const WebAPI = () => {
-  const cardStylesBase = "h-[300px] bg-color2 text-color5 rounded-md";
-
   return (
     <Layout>
       <div className="custom-scrollbar w-full h-full py-2 md:py-3 lg:py-4 pl-2 md:pl-3 lg:pl-4 flex flex-col gap-y-4 sm:pa-y-6 md:gap-y-10 overflow-y-auto">
@@ -28,27 +26,27 @@ const WebAPI = () => {
           Web APIs
         </h1>
         <div className="web-apis w-full pr-2 grid grid-flow-row gap-2 md:gap-3 lg:gap-4 grid-cols-1 sm:grid-cols-2 mdl:grid-cols-3 lg:grid-cols-4 ">
-          <ScreenColorDepth baseStyle={cardStylesBase} />
-          <ScreenResolution baseStyle={cardStylesBase} />
-          <ScreenOrientation baseStyle={cardStylesBase} />
-          <WindowSize baseStyle={cardStylesBase} />
+          <ScreenColorDepth />
+          <ScreenResolution />
+          <ScreenOrientation />
+          <WindowSize />
 
-          <CookieStatus baseStyle={cardStylesBase} />
+          <CookieStatus />
 
-          <CurrentTime baseStyle={cardStylesBase} />
-          <CurrentDate baseStyle={cardStylesBase} />
-          <TimeZone baseStyle={cardStylesBase} />
-          <BatteryStatus baseStyle={cardStylesBase} />
+          <CurrentTime />
+          <CurrentDate />
+          <TimeZone />
+          <BatteryStatus />
 
-          <SpeechRecognitionSupport baseStyle={cardStylesBase} />
-          <SpeechSynthesisSupport baseStyle={cardStylesBase} />
+          <SpeechRecognitionSupport />
+          <SpeechSynthesisSupport />
 
-          <HdrSupportCheck baseStyle={cardStylesBase} />
-          <ColorGamutSupport baseStyle={cardStylesBase} />
-          <ThemePreference baseStyle={cardStylesBase} />
+          <HdrSupportCheck />
+          <ColorGamutSupport />
+          <ThemePreference />
 
-          <BrowserDetection baseStyle={cardStylesBase} />
-          <OsDetection baseStyle={cardStylesBase} />
+          <BrowserDetection />
+          <OsDetection />
         </div>
       </div>
     </Layout>

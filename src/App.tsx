@@ -15,6 +15,7 @@ const DocumentTitleUpdater = () => {
       "/play-with-numbers": "Project Blackcurrant | Play with Numbers",
       "/play-with-dates": "Project Blackcurrant | Play with JS Dates",
       "/web-apis": "Project Blackcurrant | Web APIs",
+      "/coditor-playground": "Project Blackcurrant | Coditor Playground",
     };
 
     document.title =
@@ -25,7 +26,7 @@ const DocumentTitleUpdater = () => {
 };
 
 function App() {
-  const toastRef = useRef<Toast>(null);
+  const toastRef = useRef<Toast | null>(null);
   const setToastRef = useToastStore((state) => state.setToastRef);
 
   useEffect(() => {

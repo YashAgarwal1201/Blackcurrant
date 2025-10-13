@@ -4,8 +4,8 @@ import { RefObject } from "react";
 import { Toast } from "primereact/toast";
 
 interface ToastState {
-  toastRef: RefObject<Toast>;
-  setToastRef: (ref: RefObject<Toast>) => void;
+  toastRef: RefObject<Toast | null>;
+  setToastRef: (ref: RefObject<Toast | null>) => void;
   showToast: (
     severity: "success" | "info" | "warn" | "error" | undefined,
     summary: string,
@@ -16,7 +16,7 @@ interface ToastState {
 
 const useToastStore = create<ToastState>((set, get) => ({
   toastRef: { current: null },
-  setToastRef: (ref: RefObject<Toast>) => set({ toastRef: ref }),
+  setToastRef: (ref: RefObject<Toast | null>) => set({ toastRef: ref }),
   showToast: (severity, summary, detail, life = 2000) => {
     const toast = get().toastRef.current;
     if (toast) {

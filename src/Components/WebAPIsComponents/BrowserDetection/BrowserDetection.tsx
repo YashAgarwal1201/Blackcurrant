@@ -1,7 +1,7 @@
 // import React, { useState, useEffect } from "react";
 // import { Card } from "primereact/card"; // Assuming PrimeReact is installed
 
-// const BrowserDetection = ({ baseStyle }: { baseStyle: string }) => {
+// const BrowserDetection = () => {
 //   const [browserName, setBrowserName] = useState<string | null>(null);
 
 //   useEffect(() => {
@@ -37,7 +37,7 @@
 
 //   return (
 //     <Card
-//       className={baseStyle}
+//       className={WEB_APIS_CARDS_BASE_STYLES}
 //       title={<h2 className="font-heading">Browser Detection</h2>}
 //       subTitle={
 //         <p className="font-subHeading">(user agent identification)</p>
@@ -58,7 +58,7 @@
 // import React, { useState, useEffect } from "react";
 // import { Card } from "primereact/card"; // Assuming PrimeReact is installed
 
-// const BrowserDetection = ({ baseStyle }: { baseStyle: string }) => {
+// const BrowserDetection = () => {
 //   const [browserName, setBrowserName] = useState<string | null>(null);
 //   const [browserEngine, setBrowserEngine] = useState<string | null>(null);
 
@@ -110,7 +110,7 @@
 
 //   return (
 //     <Card
-//       className={baseStyle}
+//       className={WEB_APIS_CARDS_BASE_STYLES}
 //       title={<h2 className="font-heading">Browser Detection</h2>}
 //       subTitle={<p className="font-subHeading">(based on browser engine)</p>}
 //     >
@@ -131,8 +131,9 @@
 
 import { useState, useEffect } from "react";
 import { Card } from "primereact/card"; // Assuming PrimeReact is installed
+import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
 
-const BrowserDetection = ({ baseStyle }: { baseStyle: string }) => {
+const BrowserDetection = () => {
   const [browserName, setBrowserName] = useState<string | null>(null);
   const [browserEngine, setBrowserEngine] = useState<string | null>(null);
 
@@ -202,7 +203,7 @@ const BrowserDetection = ({ baseStyle }: { baseStyle: string }) => {
 
   return (
     <Card
-      className={baseStyle}
+      className={WEB_APIS_CARDS_BASE_STYLES}
       title={<h2 className="font-heading">Browser Detection</h2>}
       subTitle={<p className="font-subHeading">(based on browser engine)</p>}
     >

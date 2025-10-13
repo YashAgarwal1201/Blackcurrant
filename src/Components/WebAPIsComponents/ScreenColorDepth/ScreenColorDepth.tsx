@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Card } from "primereact/card";
+import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
 
-function ScreenColorDepth({ baseStyle }: { baseStyle: string }) {
+function ScreenColorDepth() {
   const [colorDepth, setColorDepth] = useState(0);
 
   useEffect(() => {
@@ -12,7 +13,7 @@ function ScreenColorDepth({ baseStyle }: { baseStyle: string }) {
 
   return (
     <Card
-      className={baseStyle}
+      className={WEB_APIS_CARDS_BASE_STYLES}
       title={<h2 className="font-heading"></h2>}
       subTitle={<p className="font-subHeading"></p>}
     >

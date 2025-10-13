@@ -15,27 +15,29 @@ import {
   TelegramIcon,
   TelegramShareButton,
 } from "react-share";
+import useNavStore from "../../Services/Stores/navStore";
 
-const SideMenu = ({
-  showSideMenu,
-  setShowSideMenu,
-  showFeedbackDialog,
-  setShowFeedbackDialog,
-}) => {
+const SideMenu = () => {
+  const {
+    isSideMenuOpen,
+    isFeedbackDialogOpen,
+    toggleSideMenu,
+    openFeedbackDialog,
+  } = useNavStore();
   const shareUrl = window.location.href;
   const shareText = "Check out this website!";
 
   return (
     <Sidebar
-      visible={showSideMenu && !showFeedbackDialog}
-      onHide={() => setShowSideMenu(false)}
+      visible={isSideMenuOpen && !isFeedbackDialogOpen}
+      onHide={() => toggleSideMenu()}
       position="right"
       header={
         <h2 className="font-heading text-xl sm:text-2xl lg:text-3xl text-color5">
           Settings
         </h2>
       }
-      className="side-menu w-full md:w-1/3 max-w-[768px] bg-color1 rounded-none md:rounded-l-2xl"
+      className="side-menu !w-full md:!w-[768px] rounded-none md:!rounded-l-xl bg-color1"
       closeIcon={<span className="pi pi-times text-color5"></span>}
       maskClassName="backdrop-blur"
       dismissable
@@ -79,7 +81,7 @@ const SideMenu = ({
 
         <Button
           className="w-full py-4 px-2 bg-color4 font-subHeading text-lg sm:text-xl text-color1 rounded-xl"
-          onClick={() => setShowFeedbackDialog(true)}
+          onClick={() => openFeedbackDialog()}
         >
           <h3 className="font-subHeading font-medium text-color1 flex items-center">
             <span className="pi pi-comment mr-4"></span>
@@ -150,17 +152,19 @@ const SideMenu = ({
 
         <div className="mx-2 my-1 p-0 max-w-full h-[1.5px] bg-color2" />
 
-        <a
-          href="https://yashagarwal1201.github.io/"
-          target="_blank"
-          rel="noopener"
-          className="!w-full block py-4 px-2 bg-color4 font-subHeading text-lg sm:text-xl text-color1 rounded-xl not-italic"
-        >
-          <h3 className="font-subHeading font-medium text-color1 flex items-center">
-            <span className="pi pi-github mr-4"></span>
-            Developer Profile
-          </h3>
-        </a>
+        {import.meta.env.VITE_DEVELOPER_PROFILE && (
+          <a
+            href={import.meta.env.VITE_DEVELOPER_PROFILE ?? ""}
+            target="_blank"
+            rel="noopener"
+            className="!w-full block py-4 px-2 bg-color4 font-subHeading text-lg sm:text-xl text-color1 rounded-xl not-italic"
+          >
+            <h3 className="font-subHeading font-medium text-color1 flex items-center">
+              <span className="pi pi-github mr-4"></span>
+              Developer Profile
+            </h3>
+          </a>
+        )}
       </div>
     </Sidebar>
   );

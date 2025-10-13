@@ -36,6 +36,9 @@ import {
   stringToAscii,
 } from "./StringFunctions";
 
+export const WEB_APIS_CARDS_BASE_STYLES =
+  "h-[300px] bg-color2 text-color5 rounded-md";
+
 export const TOAST_MSGS = {
   FEAT_UNDER_CONSTRUCTION: "This feature is under construction.",
   LINK_IN_NEW_TAB: "This app is opened in new tab.",
@@ -141,3 +144,11 @@ export const dateFunctions = {
 export const STRING_OPTIONS = Object.keys(stringFunctions);
 export const NUMBER_OPTIONS = Object.keys(numberFunctions);
 export const DATE_OPTIONS = Object.keys(dateFunctions);
+
+export const NAV_OPTIONS = [
+  { title: "Play with Strings", link: "/play-with-strings" },
+  { title: "Play with Numbers", link: "/play-with-numbers" },
+  // { title: "Play with JS Dates", link: "/play-with-dates" },
+  { title: "Web APIs", link: "/web-apis" },
+  { title: "Coditor Playground", link: "/coditor-playground" },
+];

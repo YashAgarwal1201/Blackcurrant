@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Acme&family=Righteous&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap");
-
 @import "primereact/resources/primereact.min.css";
 @import "primeicons/primeicons.css";
 @import "primereact/resources/themes/tailwind-light/theme.css";
@@ -81,9 +79,9 @@ ul:not(.p-contextmenu ul) {
   a:hover,
   .custom-panel-header:hover,
   .feedback-form .form-section:hover {
-    color: var(--color5);
-    background-color: var(--color3);
-    border-color: var(--color3);
+    color: var(--color5) !important;
+    background-color: var(--color3) !important;
+    border-color: var(--color3) !important;
   }
 }
 

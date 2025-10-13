@@ -25,39 +25,41 @@ export function alternateCase(input) {
 
 export function toCamelCase(input) {
   return input
+    .trim()
     .toLowerCase()
-    .replace(/[^a-zA-Z0-9]+(.)/g, (chr) => chr.toUpperCase());
+    .replace(/[^a-zA-Z0-9]+(.)/g, (chr) => chr.toUpperCase())
+    .replace(/^[A-Z]/, (match) => match.toLowerCase()); // Ensure first letter is lowercase
 }
 
 export function toPascalCase(input: string) {
   return input
-    .replace(
-      /(\w)(\w*)/g,
-      (_, firstLetter: string, rest: string) =>
-        firstLetter.toUpperCase() + rest.toLowerCase()
-    )
-    .replace(/\s+/g, ""); // Remove spaces
+    .trim()
+    .replace(/[^a-zA-Z0-9]+(.)?/g, (chr) => (chr ? chr.toUpperCase() : ""))
+    .replace(/^[a-z]/, (match) => match.toUpperCase()); // Ensure first letter is uppercase
 }
 
 export function toKebabCase(input) {
   return input
     .trim()
     .toLowerCase()
-    .replace(/[^a-zA-Z0-9]+/g, "-");
+    .replace(/[^a-zA-Z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, ""); // Remove leading/trailing dashes
 }
 
 export function toSnakeCase(input) {
   return input
     .trim()
     .toLowerCase()
-    .replace(/[^a-zA-Z0-9]+/g, "_");
+    .replace(/[^a-zA-Z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, ""); // Remove leading/trailing underscores
 }
 
 export function toScreamingSnakeCase(input) {
   return input
     .trim()
     .toUpperCase()
-    .replace(/[^a-zA-Z0-9]+/g, "_");
+    .replace(/[^a-zA-Z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, ""); // Remove leading/trailing underscores
 }
 
 export function reverseString(input) {
@@ -92,5 +94,8 @@ export function stringToBinary(input) {
 }
 
 export function stringToAscii(input) {
-  return input.split("").map((char) => char.charCodeAt(0)); // Convert each character to its ASCII code
+  return input
+    .split("")
+    .map((char) => char.charCodeAt(0))
+    .join(", "); // Return as comma-separated string for better display
 }

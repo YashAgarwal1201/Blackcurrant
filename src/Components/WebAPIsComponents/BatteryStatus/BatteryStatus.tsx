@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Card } from "primereact/card";
+import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
 
-const BatteryStatus = ({ baseStyle }: { baseStyle: string }) => {
+const BatteryStatus = () => {
   const [batteryLevel, setBatteryLevel] = useState<number | null>(null);
   const [isCharging, setIsCharging] = useState<boolean | null>(null);
 
@@ -35,7 +36,7 @@ const BatteryStatus = ({ baseStyle }: { baseStyle: string }) => {
 
   return (
     <Card
-      className={baseStyle}
+      className={WEB_APIS_CARDS_BASE_STYLES}
       title={<h2 className="font-heading">Battery Status</h2>}
       subTitle={
         <p className="font-subHeading">

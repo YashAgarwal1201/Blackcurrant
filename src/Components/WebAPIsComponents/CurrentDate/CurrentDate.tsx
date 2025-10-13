@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Card } from "primereact/card"; // Assuming PrimeReact is installed
+import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
 
-const CurrentDate = ({ baseStyle }: { baseStyle: string }) => {
+const CurrentDate = () => {
   const [currentDate, setCurrentDate] = useState<string>("");
 
   useEffect(() => {
@@ -42,7 +43,7 @@ const CurrentDate = ({ baseStyle }: { baseStyle: string }) => {
 
   return (
     <Card
-      className={baseStyle}
+      className={WEB_APIS_CARDS_BASE_STYLES}
       title={<h2 className="font-heading">Current Date</h2>}
       subTitle={<p className="font-subHeading">(current local date)</p>}
     >
