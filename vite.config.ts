@@ -10,21 +10,9 @@ export default defineConfig({
   server: {
     host: true, // allows LAN access if you want to test on a phone
     port: 5353,
-    https: {
-      key: fs.readFileSync(
-        path.resolve(__dirname, "certs/localhost+2-key.pem")
-      ),
-      cert: fs.readFileSync(path.resolve(__dirname, "certs/localhost+2.pem")),
-    },
   },
   preview: {
     host: true, // allows LAN access if you want to test on a phone
     port: 5353,
-    https: {
-      key: fs.readFileSync(
-        path.resolve(__dirname, "certs/localhost+2-key.pem")
-      ),
-      cert: fs.readFileSync(path.resolve(__dirname, "certs/localhost+2.pem")),
-    },
   },
 });
