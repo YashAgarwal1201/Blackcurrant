@@ -35,6 +35,15 @@
       "icons": [
         { "src": "./logo.svg", "sizes": "any", "type": "image/svg+xml" }
       ]
+    },
+    {
+      "name": "Coditor Playground",
+      "short_name": "Coditor Playground",
+      "description": "Basic online code editor for react, vue and HTML/CSS snippets",
+      "url": "/coditor-playground",
+      "icons": [
+        { "src": "./logo.svg", "sizes": "any", "type": "image/svg+xml" }
+      ]
     }
   ]
 }
