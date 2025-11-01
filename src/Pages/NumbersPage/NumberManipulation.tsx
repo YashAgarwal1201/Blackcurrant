@@ -304,11 +304,12 @@ const NumberManipulation = () => {
                 type="button"
                 disabled={!outputVal && outputVal !== 0}
                 title="Use output as new input"
-                icon="pi pi-arrow-up"
-                label="Use as Input"
-                className="h-full px-4 text-sm md:text-base text-color1 bg-color4 font-content rounded-full line-clamp-1"
+                className="h-full px-3 md:px-4 flex items-center gap-x-2 text-sm md:text-base text-color1 bg-color4 font-content rounded-full"
                 onClick={handleUseAsInput}
-              />
+              >
+                <span className="pi pi-arrow-up"></span>
+                <span className="line-clamp-1">Use as Input</span>
+              </Button>
               <Button
                 type="button"
                 disabled={!outputVal && outputVal !== 0}

@@ -1,26 +1,43 @@
-// import { useState, useEffect } from "react";
 import { Button } from "primereact/button";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import useNavStore from "../../Services/Stores/navStore";
-import { Home, Menu } from "lucide-react";
+import { ChevronLeft, Home, Menu } from "lucide-react";
 
 const Navbar = () => {
+  const { pathname } = useLocation();
   const { toggleSideMenu } = useNavStore();
 
-  // const { FEAT_UNDER_CONSTRUCTION } = TOAST_MSGS;
+  const goBackBtn = () => {
+    window.history.back();
+  };
 
   return (
-    <div className="header-card w-full md:w-[64px] h-[56px] md:h-full px-3 md:px-1 py-1 md:py-3 flex flex-row md:flex-col justify-between items-center bg-color1 font-content text-base xs:text-lg md:text-xl lg:text-2xl select-none">
-      <Link
-        to={"/home"}
-        className="w-auto md:w-full h-full md:h-auto aspect-square flex items-center justify-center rounded-2xl bg-color2 text-color4"
-      >
-        <Home size={16} />
-      </Link>
+    <div className="header-card w-full md:w-[64px] h-[56px] md:h-full p-1 flex flex-row md:flex-col justify-between items-center bg-color1 font-content text-base xs:text-lg md:text-xl lg:text-2xl select-none">
+      <div className="w-fit md:w-full h-full md:h-fit flex flex-row md:flex-col items-center gap-2">
+        {pathname !== "/" && !pathname.includes("/home") && (
+          <Button
+            title="Go back"
+            aria-label="GO back btn"
+            onClick={() => goBackBtn()}
+            className="w-auto md:!w-full h-full md:h-auto aspect-square flex items-center justify-center rounded-2xl !bg-color2 text-color4"
+          >
+            <ChevronLeft size={16} />
+          </Button>
+        )}
+        <Link
+          title="Go to home page"
+          aria-label="Home page btn"
+          to={"/home"}
+          className="w-auto md:w-full h-full md:h-auto aspect-square flex items-center justify-center rounded-2xl bg-color2 text-color4"
+        >
+          <Home size={16} />
+        </Link>
+      </div>
 
       <div className="w-auto md:!w-full h-full md:h-auto flex items-center text-color4">
         <Button
-          // onClick={() => showToast("info", "Info", FEAT_UNDER_CONSTRUCTION)}
+          title="Open side menu"
+          aria-label="Side menu btn"
           onClick={() => toggleSideMenu()}
           className="w-auto md:!w-full h-full md:h-auto aspect-square flex items-center justify-center rounded-2xl !bg-color2"
         >
