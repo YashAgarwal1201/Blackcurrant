@@ -16,7 +16,7 @@ const LandingPage = () => {
               <Link
                 key={key}
                 to={`${value?.link}`}
-                className="bg-color2 flex justify-center items-center cursor-pointer rounded-3xl not-italic"
+                className="bg-color2 flex justify-center items-center cursor-pointer rounded-3xl not-italic p-3"
               >
                 <span className="font-subHeading text-center text-color5 text-xl xs:text-2xl mdl:text-3xl">
                   {value?.title}

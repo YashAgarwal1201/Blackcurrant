@@ -80,6 +80,7 @@ const SideMenu = () => {
         <div className="mx-2 my-1 p-0 max-w-full h-[1.5px] bg-color2" />
 
         <Button
+          title="Give feedback"
           className="w-full py-4 px-2 bg-color4 font-subHeading text-lg sm:text-xl text-color1 rounded-xl"
           onClick={() => openFeedbackDialog()}
         >
