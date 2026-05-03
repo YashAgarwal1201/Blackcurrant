@@ -31,6 +31,8 @@ const CookieStatus = () => {
     <ApiCard
       title="Cookie Status"
       icon="🍪"
+      category="browser-environment"
+      purpose="Checks whether the browser permits reading and writing cookies in this context. Sandboxed iframes may block them even when the browser allows them."
       status={status}
       statusLabel={statusLabel}
       mdnUrl="https://developer.mozilla.org/en-US/docs/Web/API/Navigator/cookieEnabled"

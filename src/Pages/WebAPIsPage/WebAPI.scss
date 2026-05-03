@@ -1,4 +1,46 @@
-.web-apis {
+// src/Pages/WebAPIsPage/WebAPI.scss
+
+.web-apis-page {
+  // Smooth scroll for the page container
+  scroll-behavior: smooth;
+}
+
+// Search input — remove browser default search cancel button
+.web-apis-search-input {
+  &::-webkit-search-cancel-button {
+    display: none;
+  }
+  &::-webkit-search-decoration {
+    display: none;
+  }
+}
+
+// Filter pills scroll container — fade out edges to hint overflow
+.web-apis-filters {
+  position: relative;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 2%,
+    black 92%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 2%,
+    black 92%,
+    transparent 100%
+  );
+}
+
+// Filter pill pressed state — stronger visual feedback
+.web-apis-filter-pill[aria-pressed="true"] {
+  box-shadow: 0 0 0 1px var(--color3);
+}
+
+// PrimeReact card overrides scoped to this page (kept for backward compat)
+.web-apis-page {
   .p-card {
     .p-card-body {
       .p-card-subtitle {

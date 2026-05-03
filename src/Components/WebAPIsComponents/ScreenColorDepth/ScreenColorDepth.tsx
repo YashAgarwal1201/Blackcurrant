@@ -28,6 +28,8 @@ function ScreenColorDepth() {
     <ApiCard
       title="Screen Color Depth"
       icon="🎨"
+      category="display"
+      purpose="Tells you how many bits the OS allocates per pixel. 30-bit+ confirms a 10-bit HDR-capable display pipeline is active."
       status={is10Bit ? "supported" : "info"}
       statusLabel={is10Bit ? "Wide Gamut" : "Standard"}
       mdnUrl="https://developer.mozilla.org/en-US/docs/Web/API/Screen/colorDepth"
@@ -61,10 +63,12 @@ function ScreenColorDepth() {
       <DataRow
         label="Colour Depth"
         value={`${colorDepth}-bit — ${depthLabel(colorDepth)}`}
+        copyable
       />
       <DataRow
         label="Pixel Depth"
         value={`${pixelDepth}-bit — ${depthLabel(pixelDepth)}`}
+        copyable
       />
     </ApiCard>
   );

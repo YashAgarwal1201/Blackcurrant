@@ -1,29 +1,14 @@
 import { Button } from "primereact/button";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import useNavStore from "../../Services/Stores/navStore";
-import { ChevronLeft, Home, Menu } from "lucide-react";
+import { Home, Menu } from "lucide-react";
 
 const Navbar = () => {
-  const { pathname } = useLocation();
   const { toggleSideMenu } = useNavStore();
-
-  const goBackBtn = () => {
-    window.history.back();
-  };
 
   return (
     <div className="header-card w-full md:w-[64px] h-[56px] md:h-full p-1 flex flex-row md:flex-col justify-between items-center bg-color1 font-content text-base xs:text-lg md:text-xl lg:text-2xl select-none">
       <div className="w-fit md:w-full h-full md:h-fit flex flex-row md:flex-col items-center gap-2">
-        {pathname !== "/" && !pathname.includes("/home") && (
-          <Button
-            title="Go back"
-            aria-label="GO back btn"
-            onClick={() => goBackBtn()}
-            className="w-auto md:!w-full h-full md:h-auto aspect-square flex items-center justify-center rounded-2xl !bg-color2 text-color4"
-          >
-            <ChevronLeft size={16} />
-          </Button>
-        )}
         <Link
           title="Go to home page"
           aria-label="Home page btn"

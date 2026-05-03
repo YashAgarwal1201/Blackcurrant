@@ -24,6 +24,9 @@ const ThemePreference = () => {
     <ApiCard
       title="Theme Preference"
       icon="🎨"
+      category="theme-accessibility"
+      isLive
+      purpose="Reads the OS-level dark/light mode setting. Use this to default your app's colour scheme on first load without causing a flash of the wrong theme."
       status="info"
       mdnUrl="https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme"
       detailTitle="Theme Preference — Details"

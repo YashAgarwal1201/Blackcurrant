@@ -14,7 +14,6 @@ const OS_ICONS: Record<string, string> = {
 
 const detectOs = (): string => {
   const ua = window.navigator.userAgent;
-  // iPadOS must come before macOS — iPad in Desktop Mode sends a Mac-like UA
   if (/iPad/.test(ua) || (/Mac/.test(ua) && "ontouchend" in document))
     return "iPadOS";
   else if (/iPhone|iPod/.test(ua)) return "iOS";
@@ -50,6 +49,8 @@ const OsDetection = () => {
     <ApiCard
       title="OS Detection"
       icon="💻"
+      category="browser-environment"
+      purpose="Detects the host OS from the User Agent. Useful for OS-specific download links, keyboard shortcut labelling (⌘ vs Ctrl), or bug reproduction context."
       status="info"
       mdnUrl="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent"
       detailTitle="OS Detection — Details"
@@ -82,7 +83,7 @@ const OsDetection = () => {
         <span className="text-2xl" aria-hidden="true">
           {icon}
         </span>
-        <DataRow label="Operating System" value={os} />
+        <DataRow label="Operating System" value={os} copyable />
       </div>
     </ApiCard>
   );

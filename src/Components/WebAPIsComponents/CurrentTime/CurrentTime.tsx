@@ -20,6 +20,9 @@ const CurrentTime = () => {
     <ApiCard
       title="Current Time"
       icon="⏰"
+      category="time-locale"
+      isLive
+      purpose="Reads the local system clock — not a server. If the device clock is wrong, this value will be wrong too."
       status="info"
       mdnUrl="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
       detailTitle="Current Time — Details"
@@ -48,7 +51,11 @@ const CurrentTime = () => {
         </div>
       }
     >
-      <div className="flex items-baseline gap-2">
+      <div
+        className="flex items-baseline gap-2"
+        aria-live="polite"
+        aria-atomic="true"
+      >
         <span className="text-2xl font-mono font-bold tracking-widest">
           {time}
         </span>

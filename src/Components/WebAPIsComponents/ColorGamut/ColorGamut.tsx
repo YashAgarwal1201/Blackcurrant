@@ -47,6 +47,8 @@ const ColorGamutSupport = () => {
     <ApiCard
       title="Color Gamut"
       icon="🌈"
+      category="display"
+      purpose="Display P3 covers ~25% more colours than sRGB. Use this to conditionally serve wide-gamut images or CSS colours only to capable displays."
       status={
         topGamut?.query === "rec2020"
           ? "supported"

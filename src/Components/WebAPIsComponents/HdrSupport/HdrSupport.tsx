@@ -34,6 +34,8 @@ const HdrSupportCheck = () => {
     <ApiCard
       title="HDR Support"
       icon="✨"
+      category="display"
+      purpose="Gate HDR video or wide-gamut image delivery behind this check — only serve high-dynamic-range content to displays that can actually render it."
       status={
         result.supported ? "supported" : showCaveat ? "partial" : "unsupported"
       }

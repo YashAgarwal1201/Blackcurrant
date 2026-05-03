@@ -30,6 +30,9 @@ const CurrentDate = () => {
     <ApiCard
       title="Current Date"
       icon="📅"
+      category="time-locale"
+      isLive
+      purpose="The browser's local calendar date. Useful for defaulting date pickers and scheduling UIs without a server round-trip."
       status="info"
       mdnUrl="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
       detailTitle="Current Date — Details"
@@ -48,7 +51,11 @@ const CurrentDate = () => {
         </div>
       }
     >
-      <div className="flex flex-col gap-1">
+      <div
+        className="flex flex-col gap-1"
+        aria-live="polite"
+        aria-atomic="true"
+      >
         <span className="text-xl font-semibold">{date.display}</span>
         <span className="text-sm text-color5/60">{date.weekday}</span>
       </div>

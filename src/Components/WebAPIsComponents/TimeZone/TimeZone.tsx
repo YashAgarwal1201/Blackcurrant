@@ -3,7 +3,7 @@ import { ApiCard, DataRow, DetailSection } from "../Shared/ApiCard";
 
 const getTimeZoneInfo = () => {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const rawOffset = new Date().getTimezoneOffset(); // negative for east-of-UTC
+  const rawOffset = new Date().getTimezoneOffset();
   const totalMins = Math.abs(rawOffset);
   const sign = rawOffset <= 0 ? "+" : "-";
   const hours = String(Math.floor(totalMins / 60)).padStart(2, "0");
@@ -18,7 +18,6 @@ const TimeZone = () => {
   const [info, setInfo] = useState(getTimeZoneInfo);
 
   useEffect(() => {
-    // Timezone rarely changes at runtime, but refresh on visibility change just in case
     const handleVisibility = () => {
       if (!document.hidden) setInfo(getTimeZoneInfo());
     };
@@ -31,6 +30,8 @@ const TimeZone = () => {
     <ApiCard
       title="Time Zone"
       icon="🌍"
+      category="time-locale"
+      purpose="The IANA timezone and UTC offset reported by the browser. Use this to default datetime pickers and localise server-side timestamps without asking the user."
       status="info"
       mdnUrl="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/resolvedOptions"
       detailTitle="Time Zone — Details"
@@ -63,9 +64,9 @@ const TimeZone = () => {
         </div>
       }
     >
-      <DataRow label="IANA Timezone" value={info.tz} mono />
-      <DataRow label="UTC Offset" value={info.offset} />
-      <DataRow label="Locale" value={info.locale} />
+      <DataRow label="IANA Timezone" value={info.tz} mono copyable />
+      <DataRow label="UTC Offset" value={info.offset} copyable />
+      <DataRow label="Locale" value={info.locale} copyable />
     </ApiCard>
   );
 };
