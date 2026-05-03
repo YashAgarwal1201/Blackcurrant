@@ -20,6 +20,9 @@ const WindowSize = () => {
     <ApiCard
       title="Window Size"
       icon="📐"
+      category="display"
+      isLive
+      purpose="The CSS viewport is what all your layout calculations use. Physical size matters when targeting Hi-DPI canvas or image rendering."
       status="info"
       mdnUrl="https://developer.mozilla.org/en-US/docs/Web/API/Window/innerWidth"
       detailTitle="Window Size — Details"
@@ -43,9 +46,14 @@ const WindowSize = () => {
         </div>
       }
     >
-      <DataRow label="CSS Viewport" value={size.css} mono />
-      <DataRow label="Physical (rendered px)" value={size.physical} mono />
-      <DataRow label="Device Pixel Ratio" value={`${size.dpr}×`} />
+      <DataRow label="CSS Viewport" value={size.css} mono copyable />
+      <DataRow
+        label="Physical (rendered px)"
+        value={size.physical}
+        mono
+        copyable
+      />
+      <DataRow label="Device Pixel Ratio" value={`${size.dpr}×`} copyable />
     </ApiCard>
   );
 };

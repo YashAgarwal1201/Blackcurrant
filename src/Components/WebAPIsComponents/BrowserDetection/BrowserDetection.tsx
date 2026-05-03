@@ -26,7 +26,6 @@ const detectBrowserInfo = (): BrowserInfo => {
   else if ((navigator as any).brave || /Brave/.test(ua)) name = "Brave";
   else if (/Chrome\//.test(ua) && /Safari\//.test(ua)) name = "Google Chrome";
   else if (/Safari\//.test(ua) && !/Chrome\//.test(ua)) {
-    // Safari never runs on Linux — if UA looks like Safari on Linux it's Epiphany (v44+ dropped the "Epiphany" token)
     name =
       /Linux/.test(ua) || /X11/.test(ua)
         ? "GNOME Web (Epiphany)"
@@ -48,6 +47,8 @@ const BrowserDetection = () => {
     <ApiCard
       title="Browser Detection"
       icon="🌐"
+      category="browser-environment"
+      purpose="Infers the browser name and rendering engine from the User Agent string. Useful for feature-gating or reproducing environment-specific bugs."
       status="info"
       mdnUrl="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent"
       detailTitle="Browser Detection — Details"
@@ -93,8 +94,8 @@ const BrowserDetection = () => {
         </div>
       }
     >
-      <DataRow label="Browser" value={info.name} />
-      <DataRow label="Engine" value={info.engine} />
+      <DataRow label="Browser" value={info.name} copyable />
+      <DataRow label="Engine" value={info.engine} copyable />
       <div className="mt-1">
         <span className="text-xs text-color5/50 uppercase tracking-wide">
           User Agent (truncated)

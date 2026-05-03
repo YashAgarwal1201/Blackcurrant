@@ -15,6 +15,8 @@ const SpeechRecognitionSupport = () => {
     <ApiCard
       title="Speech Recognition"
       icon="🎤"
+      category="media-sensors"
+      purpose="Checks if the browser can transcribe speech to text via the Web Speech API. Chrome and Edge support it natively; Firefox does not."
       status={
         supported === null ? undefined : supported ? "supported" : "unsupported"
       }

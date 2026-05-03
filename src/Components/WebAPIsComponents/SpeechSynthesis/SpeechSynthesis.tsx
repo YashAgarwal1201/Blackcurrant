@@ -21,7 +21,6 @@ const SpeechSynthesisSupport = () => {
 
     updateVoices();
     window.speechSynthesis.addEventListener("voiceschanged", updateVoices);
-    // Fallback: WebKitGTK may never fire voiceschanged without a TTS backend
     const timeout = setTimeout(updateVoices, 2000);
 
     return () => {
@@ -52,6 +51,8 @@ const SpeechSynthesisSupport = () => {
     <ApiCard
       title="Speech Synthesis"
       icon="🔊"
+      category="media-sensors"
+      purpose="Text-to-speech via the browser's built-in voice engine. Voice availability depends on OS-installed TTS packages, not just browser support."
       status={cardStatus}
       statusLabel={statusLabel}
       mdnUrl="https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis"

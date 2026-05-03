@@ -45,6 +45,9 @@ const ScreenOrientationCard = () => {
     <ApiCard
       title="Screen Orientation"
       icon="🔄"
+      category="display"
+      isLive
+      purpose="Reflects the current display rotation in real time. Essential for responsive canvas layouts and rotation-aware mobile UX."
       status="info"
       mdnUrl="https://developer.mozilla.org/en-US/docs/Web/API/ScreenOrientation"
       detailTitle="Screen Orientation — Details"
@@ -84,7 +87,7 @@ const ScreenOrientationCard = () => {
           </span>
         }
       />
-      <DataRow label="Raw value" value={orientation} mono />
+      <DataRow label="Raw value" value={orientation} mono copyable />
     </ApiCard>
   );
 };

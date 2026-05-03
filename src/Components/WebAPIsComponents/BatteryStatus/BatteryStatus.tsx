@@ -57,6 +57,9 @@ const BatteryStatus = () => {
     <ApiCard
       title="Battery Status"
       icon="🔋"
+      category="device-hardware"
+      isLive
+      purpose="Use battery level and charging state to throttle background sync, animations, or data-heavy tasks on low-power devices."
       status={
         !supported
           ? "unsupported"
