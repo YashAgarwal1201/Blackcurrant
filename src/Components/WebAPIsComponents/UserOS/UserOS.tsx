@@ -1,60 +1,90 @@
 import { useState, useEffect } from "react";
-import { Card } from "primereact/card";
-import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
+import { ApiCard, DataRow, DetailSection } from "../Shared/ApiCard";
+
+const OS_ICONS: Record<string, string> = {
+  "Windows 10 / 11": "🪟",
+  macOS: "🍎",
+  Linux: "🐧",
+  Android: "🤖",
+  "Android (Tablet)": "🤖",
+  iOS: "📱",
+  iPadOS: "📱",
+  "Chrome OS": "🖥️",
+};
 
 const detectOs = (): string => {
   const ua = window.navigator.userAgent;
-
-  // iPadOS MUST come before macOS:
-  // iPad on modern iPadOS (13+) in Desktop Mode reports a macOS-style UA.
-  // The "ontouchend" check disambiguates real Macs from iPads spoofing them.
-  if (/iPad/.test(ua) || (/Mac/.test(ua) && "ontouchend" in document)) {
+  // iPadOS must come before macOS — iPad in Desktop Mode sends a Mac-like UA
+  if (/iPad/.test(ua) || (/Mac/.test(ua) && "ontouchend" in document))
     return "iPadOS";
-  } else if (/iPhone|iPod/.test(ua)) {
-    return "iOS";
-  } else if (/Windows/.test(ua)) {
-    const match = ua.match(/Windows NT (\d+\.\d+)/);
-    const versionMap: Record<string, string> = {
+  else if (/iPhone|iPod/.test(ua)) return "iOS";
+  else if (/Windows/.test(ua)) {
+    const m = ua.match(/Windows NT (\d+\.\d+)/);
+    const map: Record<string, string> = {
       "10.0": "Windows 10 / 11",
       "6.3": "Windows 8.1",
       "6.2": "Windows 8",
       "6.1": "Windows 7",
-      "6.0": "Windows Vista",
-      "5.1": "Windows XP",
     };
-    return match
-      ? (versionMap[match[1]] ?? `Windows (NT ${match[1]})`)
-      : "Windows";
-  } else if (/Android/.test(ua)) {
-    const isTablet = /Tablet|Pad/.test(ua) || !/Mobile/.test(ua);
-    return isTablet ? "Android (Tablet)" : "Android";
-  } else if (/CrOS/.test(ua)) {
-    return "Chrome OS";
-  } else if (/Mac/.test(ua)) {
-    return "macOS";
-  } else if (/Linux/.test(ua)) {
-    return "Linux";
-  }
-
+    return m ? (map[m[1]] ?? `Windows (NT ${m[1]})`) : "Windows";
+  } else if (/Android/.test(ua))
+    return /Tablet|Pad/.test(ua) || !/Mobile/.test(ua)
+      ? "Android (Tablet)"
+      : "Android";
+  else if (/CrOS/.test(ua)) return "Chrome OS";
+  else if (/Mac/.test(ua)) return "macOS";
+  else if (/Linux/.test(ua)) return "Linux";
   return "Unknown OS";
 };
 
 const OsDetection = () => {
-  const [osName, setOsName] = useState<string>(detectOs);
+  const [os, setOs] = useState<string>(detectOs);
 
   useEffect(() => {
-    // UA is static — re-run once on mount for SSR/hydration safety
-    setOsName(detectOs());
+    setOs(detectOs());
   }, []);
 
+  const icon = OS_ICONS[os] ?? "💻";
+
   return (
-    <Card
-      className={WEB_APIS_CARDS_BASE_STYLES}
-      title={<h2 className="font-heading">OS Detection</h2>}
-      subTitle={<p className="font-subHeading">(based on user agent)</p>}
+    <ApiCard
+      title="OS Detection"
+      icon="💻"
+      status="info"
+      mdnUrl="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent"
+      detailTitle="OS Detection — Details"
+      detailContent={
+        <div>
+          <DetailSection heading="How OS is detected">
+            <p className="text-sm text-color5/80 leading-relaxed">
+              The OS is inferred from{" "}
+              <code className="text-xs bg-white/10 px-1 rounded">
+                navigator.userAgent
+              </code>
+              . This is not always accurate — browsers can be configured to
+              spoof their UA string.
+            </p>
+          </DetailSection>
+          <DetailSection heading="iPadOS note">
+            <p className="text-sm text-color5/80 leading-relaxed">
+              Since iPadOS 13, Safari in Desktop Mode sends a UA identical to
+              macOS Safari. We disambiguate by checking for{" "}
+              <code className="text-xs bg-white/10 px-1 rounded">
+                ontouchend
+              </code>{" "}
+              on the document — present on iPads, absent on real Macs.
+            </p>
+          </DetailSection>
+        </div>
+      }
     >
-      <p>{osName}</p>
-    </Card>
+      <div className="flex items-center gap-2">
+        <span className="text-2xl" aria-hidden="true">
+          {icon}
+        </span>
+        <DataRow label="Operating System" value={os} />
+      </div>
+    </ApiCard>
   );
 };
 

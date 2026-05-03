@@ -1,32 +1,72 @@
 import { useState, useEffect } from "react";
-import { Card } from "primereact/card"; // Assuming PrimeReact is installed
-import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
+import { ApiCard, DataRow, DetailSection } from "../Shared/ApiCard";
+
+const getTimeZoneInfo = () => {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const rawOffset = new Date().getTimezoneOffset(); // negative for east-of-UTC
+  const totalMins = Math.abs(rawOffset);
+  const sign = rawOffset <= 0 ? "+" : "-";
+  const hours = String(Math.floor(totalMins / 60)).padStart(2, "0");
+  const mins = String(totalMins % 60).padStart(2, "0");
+  const offset = `UTC ${sign}${hours}:${mins}`;
+  const locale =
+    Intl.DateTimeFormat().resolvedOptions().locale ?? navigator.language;
+  return { tz, offset, locale };
+};
 
 const TimeZone = () => {
-  const [timezone, setTimezone] = useState<string>("");
-  const [timezoneOffset, setTimezoneOffset] = useState<string>("");
+  const [info, setInfo] = useState(getTimeZoneInfo);
 
   useEffect(() => {
-    const rawOffset = new Date().getTimezoneOffset();
-    const absMinutes = Math.abs(rawOffset);
-    const offsetHours = Math.floor(absMinutes / 60)
-      .toString()
-      .padStart(2, "0");
-    const offsetMins = (absMinutes % 60).toString().padStart(2, "0");
-    // rawOffset is NEGATIVE for east-of-UTC (e.g. IST = -330), POSITIVE for west
-    const offsetSign = rawOffset <= 0 ? "+" : "-";
-    setTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone);
-    setTimezoneOffset(`UTC ${offsetSign}${offsetHours}:${offsetMins}`);
+    // Timezone rarely changes at runtime, but refresh on visibility change just in case
+    const handleVisibility = () => {
+      if (!document.hidden) setInfo(getTimeZoneInfo());
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibility);
   }, []);
 
   return (
-    <Card
-      className={WEB_APIS_CARDS_BASE_STYLES}
-      title={<h2 className="font-heading">Time Zone</h2>}
-      subTitle={<p className="font-subHeading">(current local time zone)</p>}
+    <ApiCard
+      title="Time Zone"
+      icon="🌍"
+      status="info"
+      mdnUrl="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/resolvedOptions"
+      detailTitle="Time Zone — Details"
+      detailContent={
+        <div>
+          <DetailSection heading="How it's detected">
+            <p className="text-sm text-color5/80 leading-relaxed">
+              The IANA timezone identifier (e.g.{" "}
+              <code className="text-xs bg-white/10 px-1 rounded">
+                Asia/Kolkata
+              </code>
+              ) comes from{" "}
+              <code className="text-xs bg-white/10 px-1 rounded">
+                Intl.DateTimeFormat().resolvedOptions().timeZone
+              </code>
+              . The UTC offset is computed from{" "}
+              <code className="text-xs bg-white/10 px-1 rounded">
+                Date.prototype.getTimezoneOffset()
+              </code>
+              , which returns minutes west of UTC (negative = east).
+            </p>
+          </DetailSection>
+          <DetailSection heading="DST note">
+            <p className="text-sm text-color5/80 leading-relaxed">
+              The offset shown is the <strong>current</strong> offset including
+              any active Daylight Saving Time adjustment. It may change when DST
+              starts or ends.
+            </p>
+          </DetailSection>
+        </div>
+      }
     >
-      {timezone} (UTC {timezoneOffset})
-    </Card>
+      <DataRow label="IANA Timezone" value={info.tz} mono />
+      <DataRow label="UTC Offset" value={info.offset} />
+      <DataRow label="Locale" value={info.locale} />
+    </ApiCard>
   );
 };
 

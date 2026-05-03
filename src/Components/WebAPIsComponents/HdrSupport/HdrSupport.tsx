@@ -1,38 +1,21 @@
 import { useState, useEffect } from "react";
-import { Card } from "primereact/card";
-import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
+import { ApiCard, DataRow, CaveatNote, DetailSection } from "../Shared/ApiCard";
 
 interface HdrResult {
   supported: boolean;
-  // True when dynamic-range:high OR color-gamut:rec2020 matches
   viaCssQuery: boolean;
-  // Heuristic: 10-bit colour depth suggests HDR-capable pipeline
   via10Bit: boolean;
-  // True on Linux/WebKitGTK where compositor may not report HDR accurately
-  hasCompositorCaveat: boolean;
+  isLinux: boolean;
 }
 
 const checkHdr = (): HdrResult => {
   const viaCssQuery =
     window.matchMedia("(dynamic-range: high)").matches ||
     window.matchMedia("(color-gamut: rec2020)").matches;
-
   const via10Bit = window.screen.colorDepth >= 30;
-
-  // WebKitGTK on Linux doesn't expose HDR via CSS media queries
-  // even on HDR-capable hardware — it depends on colord/GTK colour stack
   const ua = navigator.userAgent;
-  const isWebKitOnLinux =
-    /AppleWebKit/.test(ua) &&
-    !/Chrome\//.test(ua) &&
-    (/Linux/.test(ua) || /X11/.test(ua));
-
-  return {
-    supported: viaCssQuery || via10Bit,
-    viaCssQuery,
-    via10Bit,
-    hasCompositorCaveat: isWebKitOnLinux,
-  };
+  const isLinux = /Linux/.test(ua) || /X11/.test(ua);
+  return { supported: viaCssQuery || via10Bit, viaCssQuery, via10Bit, isLinux };
 };
 
 const HdrSupportCheck = () => {
@@ -45,27 +28,107 @@ const HdrSupportCheck = () => {
     return () => mq.removeEventListener("change", handleChange);
   }, []);
 
+  const showCaveat = result.isLinux && !result.supported;
+
   return (
-    <Card
-      className={WEB_APIS_CARDS_BASE_STYLES}
-      title={<h2 className="font-heading">HDR Support Check</h2>}
-      subTitle={
-        <p className="font-subHeading">(browser compatibility check)</p>
+    <ApiCard
+      title="HDR Support"
+      icon="✨"
+      status={
+        result.supported ? "supported" : showCaveat ? "partial" : "unsupported"
+      }
+      statusLabel={
+        result.supported
+          ? "Detected"
+          : showCaveat
+            ? "Uncertain"
+            : "Not Detected"
+      }
+      mdnUrl="https://developer.mozilla.org/en-US/docs/Web/CSS/@media/dynamic-range"
+      detailTitle="HDR Support — Details"
+      detailContent={
+        <div>
+          <DetailSection heading="Detection method">
+            <ul className="text-sm text-color5/80 space-y-1 list-disc list-inside leading-relaxed">
+              <li>
+                <strong>CSS media query</strong>:{" "}
+                <code className="text-xs bg-white/10 px-1 rounded">
+                  (dynamic-range: high)
+                </code>{" "}
+                or{" "}
+                <code className="text-xs bg-white/10 px-1 rounded">
+                  (color-gamut: rec2020)
+                </code>
+              </li>
+              <li>
+                <strong>Heuristic</strong>:{" "}
+                <code className="text-xs bg-white/10 px-1 rounded">
+                  screen.colorDepth ≥ 30
+                </code>{" "}
+                (10-bit = HDR-capable pipeline)
+              </li>
+            </ul>
+          </DetailSection>
+          <DetailSection heading="Linux limitation">
+            <p className="text-sm text-color5/80 leading-relaxed">
+              On Linux, WebKitGTK (Epiphany) and some Chromium builds defer to
+              the GTK/colord colour stack rather than reading the display EDID
+              directly. This means HDR-capable hardware may still report as
+              unsupported. Brave/Chrome on Linux reads EDID directly and is more
+              reliable.
+            </p>
+          </DetailSection>
+          <DetailSection heading="Browser support">
+            <ul className="text-sm text-color5/80 space-y-1 list-disc list-inside leading-relaxed">
+              <li>
+                <strong>Chrome/Edge/Brave</strong> — Supported since v98
+              </li>
+              <li>
+                <strong>Firefox</strong> — Supported since v100
+              </li>
+              <li>
+                <strong>Safari</strong> — Supported since v13.1
+              </li>
+            </ul>
+          </DetailSection>
+        </div>
       }
     >
       {result.supported ? (
-        <p>HDR is supported in this browser.</p>
+        <div className="flex flex-col gap-2">
+          <DataRow
+            label="HDR status"
+            value="HDR is available in this browser"
+          />
+          {result.via10Bit && !result.viaCssQuery && (
+            <DataRow
+              label="Detection method"
+              value="Via 10-bit colour depth heuristic"
+            />
+          )}
+          {result.viaCssQuery && (
+            <DataRow
+              label="Detection method"
+              value="Via CSS dynamic-range media query"
+            />
+          )}
+        </div>
       ) : (
-        <p>HDR is not detected in this browser.</p>
+        <div className="flex flex-col gap-2">
+          <DataRow
+            label="HDR status"
+            value="HDR not detected in this browser"
+          />
+          {showCaveat && (
+            <CaveatNote>
+              On Linux, the browser may report no HDR even on capable hardware —
+              the OS compositor (GTK/colord) doesn't always expose HDR metadata
+              to the browser.
+            </CaveatNote>
+          )}
+        </div>
       )}
-      {result.hasCompositorCaveat && (
-        <p style={{ fontSize: "0.75rem", marginTop: "0.5rem", opacity: 0.8 }}>
-          Note: On Linux, this reflects what the system compositor reports — not
-          raw hardware capability. HDR may be available on your display but
-          unreported by the GTK colour stack.
-        </p>
-      )}
-    </Card>
+    </ApiCard>
   );
 };
 

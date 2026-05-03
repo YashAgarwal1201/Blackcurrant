@@ -1,33 +1,82 @@
 import { useState, useEffect } from "react";
-import { Card } from "primereact/card";
-import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
+import { ApiCard, DataRow, DetailSection } from "../Shared/ApiCard";
 
 const SpeechRecognitionSupport = () => {
-  const [isSupported, setIsSupported] = useState<boolean | null>(null);
+  const [supported, setSupported] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const SpeechRecognitionAPI =
+    const api =
       (window as any).SpeechRecognition ||
       (window as any).webkitSpeechRecognition;
-    setIsSupported(!!SpeechRecognitionAPI);
+    setSupported(!!api);
   }, []);
 
   return (
-    <Card
-      className={WEB_APIS_CARDS_BASE_STYLES}
-      title={<h2 className="font-heading">Speech Recognition Support</h2>}
-      subTitle={
-        <p className="font-subHeading">(browser compatibility check)</p>
+    <ApiCard
+      title="Speech Recognition"
+      icon="🎤"
+      status={
+        supported === null ? undefined : supported ? "supported" : "unsupported"
+      }
+      statusLabel={
+        supported === null
+          ? undefined
+          : supported
+            ? "Supported"
+            : "Not Supported"
+      }
+      mdnUrl="https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition"
+      detailTitle="Speech Recognition — Details"
+      detailContent={
+        <div>
+          <DetailSection heading="What it does">
+            <p className="text-sm text-color5/80 leading-relaxed">
+              The Web Speech API's{" "}
+              <code className="text-xs bg-white/10 px-1 rounded">
+                SpeechRecognition
+              </code>{" "}
+              interface converts spoken audio (via the microphone) into text in
+              real-time. It requires microphone permission and a network
+              connection (for cloud-based recognition in Chrome).
+            </p>
+          </DetailSection>
+          <DetailSection heading="Browser support">
+            <ul className="text-sm text-color5/80 space-y-1 list-disc list-inside leading-relaxed">
+              <li>
+                <strong>Chrome / Brave / Edge / Vivaldi</strong> — Supported via{" "}
+                <code className="text-xs bg-white/10 px-1 rounded">
+                  webkitSpeechRecognition
+                </code>
+              </li>
+              <li>
+                <strong>Firefox</strong> — Not implemented (no plans as of 2026)
+              </li>
+              <li>
+                <strong>Safari</strong> — Supported since Safari 14.1
+                (macOS/iOS)
+              </li>
+              <li>
+                <strong>Epiphany (WebKitGTK / Linux)</strong> — Not exposed even
+                though engine is WebKit-based
+              </li>
+            </ul>
+          </DetailSection>
+        </div>
       }
     >
-      {isSupported === null ? (
-        <p>Checking...</p>
-      ) : isSupported ? (
-        <p>Speech Recognition is supported in this browser.</p>
+      {supported === null ? (
+        <p className="text-sm text-color5/50">Checking…</p>
       ) : (
-        <p>Speech Recognition is not supported in this browser.</p>
+        <DataRow
+          label="API availability"
+          value={
+            supported
+              ? "SpeechRecognition is available in this browser"
+              : "SpeechRecognition is not available in this browser"
+          }
+        />
       )}
-    </Card>
+    </ApiCard>
   );
 };
 

@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
-import { Card } from "primereact/card";
-import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
+import { ApiCard, DataRow, DetailSection } from "../Shared/ApiCard";
+
+const ORIENTATION_LABELS: Record<string, { label: string; icon: string }> = {
+  "portrait-primary": { label: "Portrait", icon: "📱" },
+  "portrait-secondary": { label: "Portrait (flipped)", icon: "📱" },
+  "landscape-primary": { label: "Landscape", icon: "🖥️" },
+  "landscape-secondary": { label: "Landscape (flipped)", icon: "🖥️" },
+};
 
 const getOrientation = (): string => {
   if (window.screen.orientation?.type) return window.screen.orientation.type;
@@ -15,34 +21,72 @@ const getOrientation = (): string => {
     : "portrait-primary";
 };
 
-const ScreenOrientation = () => {
+const ScreenOrientationCard = () => {
   const [orientation, setOrientation] = useState<string>(getOrientation);
 
   useEffect(() => {
     const handleChange = () => setOrientation(getOrientation());
-    if (window.screen.orientation) {
-      window.screen.orientation.addEventListener("change", handleChange);
-    }
-    window.addEventListener("orientationchange", handleChange); // deprecated but iOS fallback
-    window.addEventListener("resize", handleChange); // catch-all
+    window.screen.orientation?.addEventListener("change", handleChange);
+    window.addEventListener("orientationchange", handleChange);
+    window.addEventListener("resize", handleChange);
     return () => {
-      if (window.screen.orientation) {
-        window.screen.orientation.removeEventListener("change", handleChange);
-      }
+      window.screen.orientation?.removeEventListener("change", handleChange);
       window.removeEventListener("orientationchange", handleChange);
       window.removeEventListener("resize", handleChange);
     };
   }, []);
 
+  const info = ORIENTATION_LABELS[orientation] ?? {
+    label: orientation,
+    icon: "🔄",
+  };
+
   return (
-    <Card
-      className={WEB_APIS_CARDS_BASE_STYLES}
-      title={<h2 className="font-heading">Screen Orientation</h2>}
-      subTitle={<p className="font-subHeading">(current orientation)</p>}
+    <ApiCard
+      title="Screen Orientation"
+      icon="🔄"
+      status="info"
+      mdnUrl="https://developer.mozilla.org/en-US/docs/Web/API/ScreenOrientation"
+      detailTitle="Screen Orientation — Details"
+      detailContent={
+        <div>
+          <DetailSection heading="Orientation Types">
+            <ul className="text-sm text-color5/80 space-y-1 list-disc list-inside leading-relaxed">
+              <li>
+                <strong>portrait-primary</strong> — upright, natural position
+              </li>
+              <li>
+                <strong>portrait-secondary</strong> — upside down
+              </li>
+              <li>
+                <strong>landscape-primary</strong> — rotated 90° left
+              </li>
+              <li>
+                <strong>landscape-secondary</strong> — rotated 90° right
+              </li>
+            </ul>
+          </DetailSection>
+          <DetailSection heading="Desktop behaviour">
+            <p className="text-sm text-color5/80 leading-relaxed">
+              Desktop browsers always report <strong>landscape-primary</strong>{" "}
+              since the display orientation is fixed. Rotation detection is most
+              meaningful on mobile and tablet devices.
+            </p>
+          </DetailSection>
+        </div>
+      }
     >
-      {orientation}
-    </Card>
+      <DataRow
+        label="Orientation"
+        value={
+          <span>
+            {info.icon} {info.label}
+          </span>
+        }
+      />
+      <DataRow label="Raw value" value={orientation} mono />
+    </ApiCard>
   );
 };
 
-export default ScreenOrientation;
+export default ScreenOrientationCard;

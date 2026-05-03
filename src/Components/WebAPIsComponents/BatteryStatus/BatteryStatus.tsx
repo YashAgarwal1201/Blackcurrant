@@ -1,70 +1,133 @@
-import { useState, useEffect } from "react";
-import { Card } from "primereact/card";
-import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
+import { useState, useEffect, useRef } from "react";
+import { ApiCard, DataRow, DetailSection } from "../Shared/ApiCard";
 
 const BatteryStatus = () => {
-  const [batteryLevel, setBatteryLevel] = useState<number | null>(null);
-  const [isCharging, setIsCharging] = useState<boolean | null>(null);
-  const [isSupported, setIsSupported] = useState<boolean>(true);
+  const [level, setLevel] = useState<number | null>(null);
+  const [charging, setCharging] = useState<boolean | null>(null);
+  const [supported, setSupported] = useState(true);
+  const batteryRef = useRef<any>(null);
 
   useEffect(() => {
     if (!("getBattery" in navigator)) {
-      setIsSupported(false);
+      setSupported(false);
       return;
     }
 
-    let battery: any = null;
-
-    const updateBatteryStatus = () => {
-      const level = battery?.level;
-      if (battery && typeof level === "number" && !isNaN(level)) {
-        setBatteryLevel(Math.floor(level * 100));
-        setIsCharging(battery.charging);
+    const update = () => {
+      const bat = batteryRef.current;
+      if (!bat) return;
+      const lvl = bat.level;
+      if (typeof lvl === "number" && !isNaN(lvl)) {
+        setLevel(Math.floor(lvl * 100));
+        setCharging(bat.charging);
       } else {
-        setIsSupported(false);
+        setSupported(false);
       }
     };
 
     (navigator as any)
       .getBattery()
       .then((bat: any) => {
-        battery = bat;
-        updateBatteryStatus();
-        battery.addEventListener("levelchange", updateBatteryStatus);
-        battery.addEventListener("chargingchange", updateBatteryStatus);
+        batteryRef.current = bat;
+        update();
+        bat.onlevelchange = update;
+        bat.onchargingchange = update;
       })
-      .catch(() => setIsSupported(false));
+      .catch(() => setSupported(false));
 
-    // Cleanup has access to battery via closure — this actually runs
     return () => {
-      if (battery) {
-        battery.removeEventListener("levelchange", updateBatteryStatus);
-        battery.removeEventListener("chargingchange", updateBatteryStatus);
+      const bat = batteryRef.current;
+      if (bat) {
+        bat.onlevelchange = null;
+        bat.onchargingchange = null;
       }
     };
   }, []);
 
+  const barWidth = level ?? 0;
+  const barColor = !supported
+    ? "bg-color5/20"
+    : barWidth <= 15
+      ? "bg-red-400"
+      : barWidth <= 40
+        ? "bg-yellow-400"
+        : "bg-green-400";
+
   return (
-    <Card
-      className={WEB_APIS_CARDS_BASE_STYLES}
-      title={<h2 className="font-heading">Battery Status</h2>}
-      subTitle={
-        <p className="font-subHeading">
-          (may not be supported in all browsers)
-        </p>
+    <ApiCard
+      title="Battery Status"
+      icon="🔋"
+      status={
+        !supported
+          ? "unsupported"
+          : charging
+            ? "supported"
+            : level !== null && level <= 15
+              ? "partial"
+              : "info"
+      }
+      statusLabel={
+        !supported ? "Not Available" : charging ? "Charging" : "On Battery"
+      }
+      mdnUrl="https://developer.mozilla.org/en-US/docs/Web/API/Battery_Status_API"
+      detailTitle="Battery Status API — Details"
+      detailContent={
+        <div>
+          <DetailSection heading="Browser support">
+            <ul className="text-sm text-color5/80 space-y-1 list-disc list-inside leading-relaxed">
+              <li>
+                <strong>Chrome / Brave / Edge / Vivaldi</strong> — Supported
+                (HTTPS required in newer versions)
+              </li>
+              <li>
+                <strong>Firefox</strong> — Removed in v52 (2017) due to
+                fingerprinting concerns
+              </li>
+              <li>
+                <strong>Safari / Epiphany</strong> — Never supported
+              </li>
+            </ul>
+          </DetailSection>
+          <DetailSection heading="Why Firefox removed it">
+            <p className="text-sm text-color5/80 leading-relaxed">
+              The Battery API can be used as a fingerprinting vector — precise
+              battery level and discharge rate can uniquely identify a device
+              across sessions. Firefox intentionally removed it to protect
+              privacy.
+            </p>
+          </DetailSection>
+        </div>
       }
     >
-      {!isSupported ? (
-        <p>Battery Status API is not supported in this browser.</p>
-      ) : batteryLevel === null ? (
-        <p>Checking battery status...</p>
+      {!supported ? (
+        <p className="text-sm text-color5/60">
+          Battery Status API is not supported in this browser.
+        </p>
+      ) : level === null ? (
+        <p className="text-sm text-color5/50">Checking battery…</p>
       ) : (
-        <div>
-          <p>Battery Level: {batteryLevel}%</p>
-          <p>Status: {isCharging ? "Charging" : "Not Charging"}</p>
+        <div className="flex flex-col gap-3">
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-color5/50 uppercase tracking-wide">
+                Battery Level
+              </span>
+              <span className="text-sm font-semibold">{level}%</span>
+            </div>
+            <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+              <div
+                className={`h-2 rounded-full transition-all duration-500 ${barColor}`}
+                style={{ width: `${barWidth}%` }}
+              />
+            </div>
+          </div>
+          <DataRow
+            label="Status"
+            value={charging ? "⚡ Charging" : "🔋 Discharging"}
+          />
         </div>
       )}
-    </Card>
+    </ApiCard>
   );
 };
 

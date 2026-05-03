@@ -1,32 +1,60 @@
 import { useState, useEffect } from "react";
-import { Card } from "primereact/card";
-import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
+import { ApiCard, DetailSection } from "../Shared/ApiCard";
+
+const formatTime = (): string => {
+  const now = new Date();
+  return [now.getHours(), now.getMinutes(), now.getSeconds()]
+    .map((n) => String(n).padStart(2, "0"))
+    .join(":");
+};
 
 const CurrentTime = () => {
-  const formatTime = (): string => {
-    const now = new Date();
-    const hours = now.getHours().toString().padStart(2, "0");
-    const minutes = now.getMinutes().toString().padStart(2, "0");
-    const seconds = now.getSeconds().toString().padStart(2, "0");
-    return `${hours}:${minutes}:${seconds}`;
-  };
-
-  // Lazy initializer — called immediately on mount, no blank flash
-  const [currentTime, setCurrentTime] = useState<string>(formatTime);
+  const [time, setTime] = useState<string>(formatTime);
 
   useEffect(() => {
-    const intervalId = setInterval(() => setCurrentTime(formatTime()), 1000);
-    return () => clearInterval(intervalId);
+    const id = setInterval(() => setTime(formatTime()), 1000);
+    return () => clearInterval(id);
   }, []);
 
   return (
-    <Card
-      className={WEB_APIS_CARDS_BASE_STYLES}
-      title={<h2 className="font-heading">Current Time</h2>}
-      subTitle={<p className="font-subHeading">(current local time)</p>}
+    <ApiCard
+      title="Current Time"
+      icon="⏰"
+      status="info"
+      mdnUrl="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+      detailTitle="Current Time — Details"
+      detailContent={
+        <div>
+          <DetailSection heading="Source">
+            <p className="text-sm text-color5/80 leading-relaxed">
+              Time is read from{" "}
+              <code className="text-xs bg-white/10 px-1 rounded">
+                new Date()
+              </code>
+              , which reflects the local system clock in the browser. It is not
+              fetched from a server — if your system clock is wrong, this will
+              be wrong too.
+            </p>
+          </DetailSection>
+          <DetailSection heading="Live updates">
+            <p className="text-sm text-color5/80 leading-relaxed">
+              This card re-reads the clock every second using{" "}
+              <code className="text-xs bg-white/10 px-1 rounded">
+                setInterval
+              </code>
+              .
+            </p>
+          </DetailSection>
+        </div>
+      }
     >
-      <p>{currentTime}</p>
-    </Card>
+      <div className="flex items-baseline gap-2">
+        <span className="text-2xl font-mono font-bold tracking-widest">
+          {time}
+        </span>
+        <span className="text-xs text-color5/50 uppercase">local time</span>
+      </div>
+    </ApiCard>
   );
 };
 
