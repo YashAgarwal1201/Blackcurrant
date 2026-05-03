@@ -3,7 +3,7 @@ import { Dialog } from "primereact/dialog";
 import type { WebApiCategory } from "../../../Services/webApiCategories";
 import { WEB_API_CATEGORIES } from "../../../Services/webApiCategories";
 
-// Types ───────────
+// Types
 
 export type StatusType = "supported" | "partial" | "unsupported" | "info";
 
@@ -82,7 +82,7 @@ const CategoryChip = ({ category }: { category: WebApiCategory }) => {
   );
 };
 
-// Copy button ──
+// Copy button
 
 const CopyButton = ({ value }: { value: string }) => {
   const [copied, setCopied] = useState(false);
@@ -244,7 +244,7 @@ export const ApiCard = ({
   );
 };
 
-// DataRow ──────
+// DataRow
 
 export const DataRow = ({
   label,
@@ -272,7 +272,7 @@ export const DataRow = ({
   </div>
 );
 
-// CaveatNote ───
+// CaveatNote
 
 export const CaveatNote = ({ children }: { children: ReactNode }) => (
   <div className="flex gap-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20 p-2.5 mt-1">
