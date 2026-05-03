@@ -1,35 +1,38 @@
 import { useState, useEffect } from "react";
-import { Card } from "primereact/card"; // Assuming PrimeReact is installed
+import { Card } from "primereact/card";
 import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
 
+const getOrientation = (): string => {
+  if (window.screen.orientation?.type) return window.screen.orientation.type;
+  if (typeof (window as any).orientation !== "undefined") {
+    const angle = (window as any).orientation as number;
+    return angle === 0 || angle === 180
+      ? "portrait-primary"
+      : "landscape-primary";
+  }
+  return window.innerWidth > window.innerHeight
+    ? "landscape-primary"
+    : "portrait-primary";
+};
+
 const ScreenOrientation = () => {
-  const [orientation, setOrientation] = useState<string>("");
+  const [orientation, setOrientation] = useState<string>(getOrientation);
 
   useEffect(() => {
-    const handleOrientationChange = () => {
-      const orientationType = window.screen.orientation.type;
-      setOrientation(orientationType);
-    };
-
-    // Initial set
-    handleOrientationChange();
-
-    // Add event listener for orientation changes
-    window.screen.orientation.addEventListener(
-      "change",
-      handleOrientationChange
-    );
-
-    // Cleanup event listener on component unmount
+    const handleChange = () => setOrientation(getOrientation());
+    if (window.screen.orientation) {
+      window.screen.orientation.addEventListener("change", handleChange);
+    }
+    window.addEventListener("orientationchange", handleChange); // deprecated but iOS fallback
+    window.addEventListener("resize", handleChange); // catch-all
     return () => {
-      window.screen.orientation.removeEventListener(
-        "change",
-        handleOrientationChange
-      );
+      if (window.screen.orientation) {
+        window.screen.orientation.removeEventListener("change", handleChange);
+      }
+      window.removeEventListener("orientationchange", handleChange);
+      window.removeEventListener("resize", handleChange);
     };
-  }, []); // Empty dependency array to run only once on component mount
-
-  // const cardStyle = "rounded-md"; // Card styling
+  }, []);
 
   return (
     <Card

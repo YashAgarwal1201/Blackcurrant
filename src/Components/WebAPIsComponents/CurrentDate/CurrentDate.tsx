@@ -1,45 +1,38 @@
 import { useState, useEffect } from "react";
-import { Card } from "primereact/card"; // Assuming PrimeReact is installed
+import { Card } from "primereact/card";
 import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
 
+const getOrdinalSuffix = (day: number): string => {
+  if (day >= 11 && day <= 13) return "th";
+  switch (day % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+};
+
+const formatDate = (): string => {
+  const now = new Date();
+  const day = now.getDate();
+  const month = now.toLocaleString("en-US", { month: "long" });
+  const year = now.getFullYear();
+  return `${day}${getOrdinalSuffix(day)} of ${month}, ${year}`;
+};
+
 const CurrentDate = () => {
-  const [currentDate, setCurrentDate] = useState<string>("");
+  // Lazy initializer — populated before first paint
+  const [currentDate, setCurrentDate] = useState<string>(formatDate);
 
   useEffect(() => {
-    const updateDate = () => {
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = now.toLocaleString("en-US", { month: "long" }); // Full month name
-      const day = now.getDate();
-      const ordinalSuffix = getOrdinalSuffix(day); // Get ordinal suffix for the day
-      setCurrentDate(`${day}${ordinalSuffix} of ${month}, ${year}`);
-    };
-
-    // Update date when component mounts
-    updateDate();
-
-    // Cleanup interval on component unmount
-    return () => {};
-  }, []); // Empty dependency array to run only once on component mount
-
-  // Function to get the ordinal suffix for the day
-  const getOrdinalSuffix = (day: number) => {
-    if (day >= 11 && day <= 13) {
-      return "th";
-    }
-    switch (day % 10) {
-      case 1:
-        return "st";
-      case 2:
-        return "nd";
-      case 3:
-        return "rd";
-      default:
-        return "th";
-    }
-  };
-
-  // const cardStyle = "rounded-md"; // Card styling
+    // Re-check every 60 seconds — handles midnight roll-over without hammering CPU
+    const intervalId = setInterval(() => setCurrentDate(formatDate()), 60_000);
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <Card

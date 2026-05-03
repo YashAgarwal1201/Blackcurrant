@@ -1,21 +1,16 @@
 import { useState, useEffect } from "react";
-import { Card } from "primereact/card"; // Assuming PrimeReact is installed
+import { Card } from "primereact/card";
 import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
 
 const SpeechRecognitionSupport = () => {
   const [isSupported, setIsSupported] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const checkSpeechRecognitionSupport = () => {
-      const SpeechRecognition =
-        (window as any).SpeechRecognition ||
-        (window as any).webkitSpeechRecognition;
-      setIsSupported(!!SpeechRecognition);
-    };
-
-    // Check for speech recognition support when component mounts
-    checkSpeechRecognitionSupport();
-  }, []); // Empty dependency array to run only once on component mount
+    const SpeechRecognitionAPI =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
+    setIsSupported(!!SpeechRecognitionAPI);
+  }, []);
 
   return (
     <Card

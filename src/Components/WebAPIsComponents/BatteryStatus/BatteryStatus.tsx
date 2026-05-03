@@ -5,33 +5,43 @@ import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
 const BatteryStatus = () => {
   const [batteryLevel, setBatteryLevel] = useState<number | null>(null);
   const [isCharging, setIsCharging] = useState<boolean | null>(null);
+  const [isSupported, setIsSupported] = useState<boolean>(true);
 
   useEffect(() => {
-    const getBatteryStatus = async () => {
-      if ("getBattery" in navigator) {
-        const battery = await (navigator as any).getBattery();
+    if (!("getBattery" in navigator)) {
+      setIsSupported(false);
+      return;
+    }
 
-        const updateBatteryStatus = () => {
-          setBatteryLevel(Math.floor(battery.level * 100));
-          setIsCharging(battery.charging);
-        };
+    let battery: any = null;
 
-        updateBatteryStatus();
-
-        battery.addEventListener("levelchange", updateBatteryStatus);
-        battery.addEventListener("chargingchange", updateBatteryStatus);
-
-        return () => {
-          battery.removeEventListener("levelchange", updateBatteryStatus);
-          battery.removeEventListener("chargingchange", updateBatteryStatus);
-        };
+    const updateBatteryStatus = () => {
+      const level = battery?.level;
+      if (battery && typeof level === "number" && !isNaN(level)) {
+        setBatteryLevel(Math.floor(level * 100));
+        setIsCharging(battery.charging);
       } else {
-        setBatteryLevel(null);
-        setIsCharging(null);
+        setIsSupported(false);
       }
     };
 
-    getBatteryStatus();
+    (navigator as any)
+      .getBattery()
+      .then((bat: any) => {
+        battery = bat;
+        updateBatteryStatus();
+        battery.addEventListener("levelchange", updateBatteryStatus);
+        battery.addEventListener("chargingchange", updateBatteryStatus);
+      })
+      .catch(() => setIsSupported(false));
+
+    // Cleanup has access to battery via closure — this actually runs
+    return () => {
+      if (battery) {
+        battery.removeEventListener("levelchange", updateBatteryStatus);
+        battery.removeEventListener("chargingchange", updateBatteryStatus);
+      }
+    };
   }, []);
 
   return (
@@ -44,15 +54,15 @@ const BatteryStatus = () => {
         </p>
       }
     >
-      {batteryLevel !== null ? (
-        <div>
-          <p>
-            Battery Level: {batteryLevel}% (
-            {isCharging ? "Charging" : "Not Charging"})
-          </p>
-        </div>
+      {!isSupported ? (
+        <p>Battery Status API is not supported in this browser.</p>
+      ) : batteryLevel === null ? (
+        <p>Checking battery status...</p>
       ) : (
-        <p>Battery status not supported on this browser.</p>
+        <div>
+          <p>Battery Level: {batteryLevel}%</p>
+          <p>Status: {isCharging ? "Charging" : "Not Charging"}</p>
+        </div>
       )}
     </Card>
   );

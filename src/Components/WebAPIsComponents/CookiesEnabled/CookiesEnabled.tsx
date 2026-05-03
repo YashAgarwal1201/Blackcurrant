@@ -1,36 +1,39 @@
 import { useEffect, useState } from "react";
-import { Card } from "primereact/card"; // Assuming PrimeReact is installed
+import { Card } from "primereact/card";
 import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
+
+const checkCookies = (): boolean => {
+  // navigator.cookieEnabled is the standard, reliable API
+  if (typeof navigator.cookieEnabled === "boolean") {
+    return navigator.cookieEnabled;
+  }
+  // Fallback: manual write-read-delete for very old browsers
+  try {
+    document.cookie = "__bc_test=1; path=/; SameSite=Lax";
+    const enabled = document.cookie.includes("__bc_test");
+    document.cookie =
+      "__bc_test=; path=/; SameSite=Lax; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+    return enabled;
+  } catch {
+    return false;
+  }
+};
 
 const CookieStatus = () => {
   const [cookiesEnabled, setCookiesEnabled] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const checkCookiesEnabled = () => {
-      // Attempt to set a test cookie
-      document.cookie = "testCookie=1";
-
-      // Check if the test cookie was set
-      const cookieEnabled = document.cookie.indexOf("testCookie") !== -1;
-
-      // Delete the test cookie
-      document.cookie =
-        "testCookie=1; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-      setCookiesEnabled(cookieEnabled);
-    };
-
-    checkCookiesEnabled(); // Call the function within useEffect
-  }, []); // Empty dependency array to run only once on component mount
-
-  // const cardStyle = "rounded-md"; // Card styling
+    setCookiesEnabled(checkCookies());
+  }, []);
 
   return (
     <Card
       className={WEB_APIS_CARDS_BASE_STYLES}
       title={<h2 className="font-heading">Cookie Status</h2>}
       subTitle={
-        <p className="font-subHeading">(can be wrong for some browsers)</p>
+        <p className="font-subHeading">
+          (may vary in private/sandboxed contexts)
+        </p>
       }
     >
       {cookiesEnabled === null ? (

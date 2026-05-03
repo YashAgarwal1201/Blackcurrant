@@ -1,29 +1,21 @@
 import { useState, useEffect } from "react";
-import { Card } from "primereact/card"; // Assuming PrimeReact is installed
+import { Card } from "primereact/card";
 import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
 
+const checkHdr = (): boolean =>
+  window.matchMedia("(dynamic-range: high)").matches ||
+  window.matchMedia("(color-gamut: rec2020)").matches;
+
 const HdrSupportCheck = () => {
-  const [isHdrSupported, setIsHdrSupported] = useState<boolean | null>(null);
+  const [isHdrSupported, setIsHdrSupported] = useState<boolean>(checkHdr);
 
   useEffect(() => {
-    const checkHdrSupport = () => {
-      // Use a media query that is likely to indicate HDR support
-      const mediaQueries = [
-        "(dynamic-range: high)",
-        "(color-gamut: rec2020)",
-        "(max-color-index: 0)",
-      ];
-
-      return mediaQueries.some((query) => window.matchMedia(query).matches);
-    };
-
-    const updateHdrSupport = () => {
-      const hdrSupported = checkHdrSupport();
-      setIsHdrSupported(hdrSupported);
-    };
-
-    updateHdrSupport();
-  }, []); // Empty dependency array to run only once on component mount
+    // Listen for display changes (e.g. HDR toggle in OS settings)
+    const mq = window.matchMedia("(dynamic-range: high)");
+    const handleChange = () => setIsHdrSupported(checkHdr());
+    mq.addEventListener("change", handleChange);
+    return () => mq.removeEventListener("change", handleChange);
+  }, []);
 
   return (
     <Card
@@ -33,9 +25,7 @@ const HdrSupportCheck = () => {
         <p className="font-subHeading">(browser compatibility check)</p>
       }
     >
-      {isHdrSupported === null ? (
-        <p>Checking...</p>
-      ) : isHdrSupported ? (
+      {isHdrSupported ? (
         <p>HDR is supported in this browser.</p>
       ) : (
         <p>HDR is not supported in this browser.</p>

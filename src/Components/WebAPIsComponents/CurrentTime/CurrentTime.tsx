@@ -1,27 +1,23 @@
 import { useState, useEffect } from "react";
-import { Card } from "primereact/card"; // Assuming PrimeReact is installed
+import { Card } from "primereact/card";
 import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
 
 const CurrentTime = () => {
-  const [currentTime, setCurrentTime] = useState<string>("");
+  const formatTime = (): string => {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, "0");
+    const minutes = now.getMinutes().toString().padStart(2, "0");
+    const seconds = now.getSeconds().toString().padStart(2, "0");
+    return `${hours}:${minutes}:${seconds}`;
+  };
+
+  // Lazy initializer — called immediately on mount, no blank flash
+  const [currentTime, setCurrentTime] = useState<string>(formatTime);
 
   useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      const hours = now.getHours().toString().padStart(2, "0");
-      const minutes = now.getMinutes().toString().padStart(2, "0");
-      const seconds = now.getSeconds().toString().padStart(2, "0");
-      setCurrentTime(`${hours}:${minutes}:${seconds}`);
-    };
-
-    // Update time every second
-    const intervalId = setInterval(updateTime, 1000);
-
-    // Cleanup interval on component unmount
+    const intervalId = setInterval(() => setCurrentTime(formatTime()), 1000);
     return () => clearInterval(intervalId);
-  }, []); // Empty dependency array to run only once on component mount
-
-  // const cardStyle = "rounded-md"; // Card styling
+  }, []);
 
   return (
     <Card

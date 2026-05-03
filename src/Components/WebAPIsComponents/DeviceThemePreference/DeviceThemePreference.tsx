@@ -1,35 +1,26 @@
 import { useState, useEffect } from "react";
-import { Card } from "primereact/card"; // Assuming PrimeReact is installed
+import { Card } from "primereact/card";
 import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
 
+const getThemePreference = (): string => {
+  if (window.matchMedia("(prefers-color-scheme: dark)").matches) return "Dark";
+  if (window.matchMedia("(prefers-color-scheme: light)").matches)
+    return "Light";
+  return "No Preference";
+};
+
 const ThemePreference = () => {
-  const [themePreference, setThemePreference] = useState<string | null>(null);
+  const [themePreference, setThemePreference] =
+    useState<string>(getThemePreference);
 
   useEffect(() => {
-    const checkThemePreference = () => {
-      const prefersDarkMode = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
-      const prefersLightMode = window.matchMedia(
-        "(prefers-color-scheme: light)"
-      ).matches;
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = () => setThemePreference(getThemePreference());
 
-      if (prefersDarkMode) {
-        return "Dark";
-      } else if (prefersLightMode) {
-        return "Light";
-      } else {
-        return "Unknown";
-      }
-    };
-
-    const updateThemePreference = () => {
-      const preference = checkThemePreference();
-      setThemePreference(preference);
-    };
-
-    updateThemePreference();
-  }, []); // Empty dependency array to run only once on component mount
+    // Live update when user switches system theme while page is open
+    mq.addEventListener("change", handleChange);
+    return () => mq.removeEventListener("change", handleChange);
+  }, []);
 
   return (
     <Card
@@ -37,11 +28,7 @@ const ThemePreference = () => {
       title={<h2 className="font-heading">Theme Preference</h2>}
       subTitle={<p className="font-subHeading">(system color scheme)</p>}
     >
-      {themePreference === null ? (
-        <p>Checking...</p>
-      ) : (
-        <p>Preferred Theme: {themePreference}</p>
-      )}
+      <p>Preferred Theme: {themePreference}</p>
     </Card>
   );
 };

@@ -1,205 +1,66 @@
-// import React, { useState, useEffect } from "react";
-// import { Card } from "primereact/card"; // Assuming PrimeReact is installed
-
-// const BrowserDetection = () => {
-//   const [browserName, setBrowserName] = useState<string | null>(null);
-
-//   useEffect(() => {
-//     const detectBrowser = () => {
-//       const userAgent = navigator.userAgent;
-
-//       if (userAgent.indexOf("Firefox") > -1) {
-//         return "Mozilla Firefox";
-//       } else if (userAgent.indexOf("Opera") > -1 || userAgent.indexOf("OPR") > -1) {
-//         return "Opera";
-//       } else if (userAgent.indexOf("Chrome") > -1) {
-//         return "Google Chrome";
-//       } else if (userAgent.indexOf("Safari") > -1) {
-//         return "Apple Safari";
-//       } else if (userAgent.indexOf("Edge") > -1) {
-//         return "Microsoft Edge";
-//       } else if (userAgent.indexOf("MSIE") > -1 || userAgent.indexOf("Trident/") > -1) {
-//         return "Internet Explorer";
-//       } else if (userAgent.indexOf("Samsung") > -1) {
-//         return "Samsung Internet";
-//       } else {
-//         return "Unknown Browser";
-//       }
-//     };
-
-//     const updateBrowserName = () => {
-//       const detectedBrowser = detectBrowser();
-//       setBrowserName(detectedBrowser);
-//     };
-
-//     updateBrowserName();
-//   }, []); // Empty dependency array to run only once on component mount
-
-//   return (
-//     <Card
-//       className={WEB_APIS_CARDS_BASE_STYLES}
-//       title={<h2 className="font-heading">Browser Detection</h2>}
-//       subTitle={
-//         <p className="font-subHeading">(user agent identification)</p>
-//       }
-//     >
-//       {browserName === null ? (
-//         <p>Checking...</p>
-//       ) : (
-//         <p>Detected Browser: {browserName}</p>
-//       )}
-//       {navigator.userAgent}
-//     </Card>
-//   );
-// };
-
-// export default BrowserDetection;
-
-// import React, { useState, useEffect } from "react";
-// import { Card } from "primereact/card"; // Assuming PrimeReact is installed
-
-// const BrowserDetection = () => {
-//   const [browserName, setBrowserName] = useState<string | null>(null);
-//   const [browserEngine, setBrowserEngine] = useState<string | null>(null);
-
-//   useEffect(() => {
-//     const detectBrowser = () => {
-//       const userAgent = navigator.userAgent;
-
-//       if (userAgent.indexOf("Gecko/") > -1 && userAgent.indexOf("Firefox/") > -1) {
-//         return "Mozilla Firefox";
-//       } else if (userAgent.indexOf("AppleWebKit/") > -1 && userAgent.indexOf("Chrome/") > -1) {
-//         return "Google Chrome";
-//       } else if (userAgent.indexOf("AppleWebKit/") > -1 && userAgent.indexOf("Safari/") > -1) {
-//         return "Apple Safari";
-//       } else if (userAgent.indexOf("AppleWebKit/") > -1 && userAgent.indexOf("Edge/") > -1) {
-//         return "Microsoft Edge";
-//       } else if (userAgent.indexOf("Trident/") > -1 || userAgent.indexOf("MSIE ") > -1) {
-//         return "Internet Explorer";
-//       } else if (userAgent.indexOf("SamsungBrowser/") > -1) {
-//         return "Samsung Internet";
-//       } else {
-//         return "Unknown Browser";
-//       }
-//     };
-
-//     const detectBrowserEngine = () => {
-//       const userAgent = navigator.userAgent;
-
-//       if (userAgent.indexOf("Gecko/") > -1) {
-//         return "Gecko";
-//       } else if (userAgent.indexOf("AppleWebKit/") > -1) {
-//         return "WebKit";
-//       } else if (userAgent.indexOf("Trident/") > -1 || userAgent.indexOf("MSIE ") > -1) {
-//         return "Trident/MSIE";
-//       } else {
-//         return "Unknown Engine";
-//       }
-//     };
-
-//     const updateBrowserInfo = () => {
-//       const detectedBrowser = detectBrowser();
-//       setBrowserName(detectedBrowser);
-
-//       const detectedEngine = detectBrowserEngine();
-//       setBrowserEngine(detectedEngine);
-//     };
-
-//     updateBrowserInfo();
-//   }, []); // Empty dependency array to run only once on component mount
-
-//   return (
-//     <Card
-//       className={WEB_APIS_CARDS_BASE_STYLES}
-//       title={<h2 className="font-heading">Browser Detection</h2>}
-//       subTitle={<p className="font-subHeading">(based on browser engine)</p>}
-//     >
-//       {browserName === null ? (
-//         <p>Checking...</p>
-//       ) : (
-//         <>
-//           <p>Detected Browser: {browserName}</p>
-//           <p>Detected Engine: {browserEngine}</p>
-//         </>
-//       )}
-//       <p>User Agent: {navigator.userAgent}</p>
-//     </Card>
-//   );
-// };
-
-// export default BrowserDetection;
-
 import { useState, useEffect } from "react";
-import { Card } from "primereact/card"; // Assuming PrimeReact is installed
+import { Card } from "primereact/card";
 import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
 
+interface BrowserInfo {
+  name: string;
+  engine: string;
+  userAgent: string;
+}
+
+const detectBrowserInfo = (): BrowserInfo => {
+  const ua = navigator.userAgent;
+
+  // --- Engine detection ---
+  // Blink check must come FIRST: Chrome, Edge, Opera all have both
+  // "Chrome/" and "AppleWebKit/" in their UA strings.
+  let engine = "Unknown";
+  if (/Chrome\//.test(ua) && /AppleWebKit\//.test(ua)) {
+    engine = "Blink";
+  } else if (/Gecko\//.test(ua) && /Firefox\//.test(ua)) {
+    engine = "Gecko";
+  } else if (/AppleWebKit\//.test(ua) && !/Chrome\//.test(ua)) {
+    // Pure WebKit — Safari on iOS/macOS
+    engine = "WebKit";
+  } else if (/Trident\//.test(ua) || /MSIE /.test(ua)) {
+    engine = "Trident (IE)";
+  }
+
+  // --- Browser name detection (most-specific first) ---
+  let name = "Unknown Browser";
+  if (/Firefox\//.test(ua)) {
+    name = "Mozilla Firefox";
+  } else if (/OPR\//.test(ua) || /Opera\//.test(ua)) {
+    name = "Opera";
+  } else if (/Edg\//.test(ua)) {
+    // Chromium Edge uses "Edg/" (not "Edge/")
+    name = "Microsoft Edge";
+  } else if (/SamsungBrowser\//.test(ua)) {
+    name = "Samsung Internet";
+  } else if (/YaBrowser\//.test(ua)) {
+    name = "Yandex Browser";
+  } else if ((navigator as any).brave || /Brave/.test(ua)) {
+    // navigator.brave is the reliable signal; UA sniff as fallback
+    name = "Brave";
+  } else if (/Chrome\//.test(ua) && /Safari\//.test(ua)) {
+    name = "Google Chrome";
+  } else if (/Safari\//.test(ua) && !/Chrome\//.test(ua)) {
+    name = "Apple Safari";
+  } else if (/Trident\//.test(ua) || /MSIE /.test(ua)) {
+    name = "Internet Explorer";
+  }
+
+  return { name, engine, userAgent: ua };
+};
+
 const BrowserDetection = () => {
-  const [browserName, setBrowserName] = useState<string | null>(null);
-  const [browserEngine, setBrowserEngine] = useState<string | null>(null);
+  const [browserInfo, setBrowserInfo] =
+    useState<BrowserInfo>(detectBrowserInfo);
 
   useEffect(() => {
-    const detectBrowser = () => {
-      const userAgent = navigator.userAgent;
-
-      if (userAgent.indexOf("Firefox") > -1) {
-        return "Mozilla Firefox";
-      } else if (
-        userAgent.indexOf("OPR") > -1 ||
-        userAgent.indexOf("Opera") > -1
-      ) {
-        return "Opera";
-      } else if (userAgent.indexOf("Edg") > -1) {
-        return "Microsoft Edge";
-      } else if (userAgent.indexOf("SamsungBrowser") > -1) {
-        return "Samsung Internet";
-      } else if (
-        userAgent.indexOf("Chrome") > -1 &&
-        userAgent.indexOf("Safari") > -1
-      ) {
-        // This check should come after specific checks for Edge and Samsung Internet
-        return "Google Chrome"; // Chrome often includes "Safari" in its user agent
-      } else if (
-        userAgent.indexOf("Safari") > -1 &&
-        userAgent.indexOf("Chrome") === -1
-      ) {
-        return "Apple Safari";
-      } else if (
-        userAgent.indexOf("Trident/") > -1 ||
-        userAgent.indexOf("MSIE ") > -1
-      ) {
-        return "Internet Explorer";
-      } else {
-        return "Unknown Browser";
-      }
-    };
-
-    const detectBrowserEngine = () => {
-      const userAgent = navigator.userAgent;
-
-      if (userAgent.indexOf("Gecko/") > -1) {
-        return "Gecko";
-      } else if (userAgent.indexOf("AppleWebKit/") > -1) {
-        return "WebKit";
-      } else if (
-        userAgent.indexOf("Trident/") > -1 ||
-        userAgent.indexOf("MSIE ") > -1
-      ) {
-        return "Trident/MSIE";
-      } else {
-        return "Unknown Engine";
-      }
-    };
-
-    const updateBrowserInfo = () => {
-      const detectedBrowser = detectBrowser();
-      setBrowserName(detectedBrowser);
-
-      const detectedEngine = detectBrowserEngine();
-      setBrowserEngine(detectedEngine);
-    };
-
-    updateBrowserInfo();
-  }, []); // Empty dependency array to run only once on component mount
+    // UA is static at runtime — re-run on mount to ensure SSR/hydration correctness
+    setBrowserInfo(detectBrowserInfo());
+  }, []);
 
   return (
     <Card
@@ -207,15 +68,11 @@ const BrowserDetection = () => {
       title={<h2 className="font-heading">Browser Detection</h2>}
       subTitle={<p className="font-subHeading">(based on browser engine)</p>}
     >
-      {browserName === null ? (
-        <p>Checking...</p>
-      ) : (
-        <>
-          <p>Detected Browser: {browserName}</p>
-          <p>Detected Engine: {browserEngine}</p>
-        </>
-      )}
-      <p>User Agent: {navigator.userAgent}</p>
+      <p>Detected Browser: {browserInfo.name}</p>
+      <p>Detected Engine: {browserInfo.engine}</p>
+      <p style={{ wordBreak: "break-all", fontSize: "0.75rem" }}>
+        User Agent: {browserInfo.userAgent}
+      </p>
     </Card>
   );
 };

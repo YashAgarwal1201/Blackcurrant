@@ -1,19 +1,28 @@
 import { useState, useEffect } from "react";
-import { Card } from "primereact/card"; // Assuming PrimeReact is installed
+import { Card } from "primereact/card";
 import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
 
 const SpeechSynthesisSupport = () => {
   const [isSupported, setIsSupported] = useState<boolean | null>(null);
+  const [voiceCount, setVoiceCount] = useState<number>(0);
 
   useEffect(() => {
-    const checkSpeechSynthesisSupport = () => {
-      const isSupported = "speechSynthesis" in window;
-      setIsSupported(isSupported);
-    };
+    const supported = "speechSynthesis" in window;
+    setIsSupported(supported);
 
-    // Check for speech synthesis support when component mounts
-    checkSpeechSynthesisSupport();
-  }, []); // Empty dependency array to run only once on component mount
+    if (supported) {
+      const loadVoices = () => {
+        // getVoices() is async in Chrome — voices only populate after voiceschanged fires
+        const voices = window.speechSynthesis.getVoices();
+        setVoiceCount(voices.length);
+      };
+
+      loadVoices(); // Catches Firefox/Safari which populate synchronously
+      window.speechSynthesis.addEventListener("voiceschanged", loadVoices);
+      return () =>
+        window.speechSynthesis.removeEventListener("voiceschanged", loadVoices);
+    }
+  }, []);
 
   return (
     <Card
@@ -26,7 +35,10 @@ const SpeechSynthesisSupport = () => {
       {isSupported === null ? (
         <p>Checking...</p>
       ) : isSupported ? (
-        <p>Speech Synthesis is supported in this browser.</p>
+        <div>
+          <p>Speech Synthesis is supported in this browser.</p>
+          {voiceCount > 0 && <p>Available voices: {voiceCount}</p>}
+        </div>
       ) : (
         <p>Speech Synthesis is not supported in this browser.</p>
       )}

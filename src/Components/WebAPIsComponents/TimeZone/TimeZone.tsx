@@ -7,24 +7,17 @@ const TimeZone = () => {
   const [timezoneOffset, setTimezoneOffset] = useState<string>("");
 
   useEffect(() => {
-    const getTimezone = () => {
-      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const offsetInMinutes = new Date().getTimezoneOffset();
-      const offsetHours = Math.floor(Math.abs(offsetInMinutes) / 60)
-        .toString()
-        .padStart(2, "0");
-      const offsetMinutes = (Math.abs(offsetInMinutes) % 60)
-        .toString()
-        .padStart(2, "0");
-      const offsetSign = offsetInMinutes >= 0 ? "-" : "+";
-      setTimezone(userTimezone);
-      setTimezoneOffset(`${offsetSign}${offsetHours}:${offsetMinutes}`);
-    };
-
-    getTimezone(); // Call the function within useEffect
-  }, []); // Empty dependency array to run only once on component mount
-
-  // const cardStyle = "rounded-md"; // Card styling
+    const rawOffset = new Date().getTimezoneOffset();
+    const absMinutes = Math.abs(rawOffset);
+    const offsetHours = Math.floor(absMinutes / 60)
+      .toString()
+      .padStart(2, "0");
+    const offsetMins = (absMinutes % 60).toString().padStart(2, "0");
+    // rawOffset is NEGATIVE for east-of-UTC (e.g. IST = -330), POSITIVE for west
+    const offsetSign = rawOffset <= 0 ? "+" : "-";
+    setTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone);
+    setTimezoneOffset(`UTC ${offsetSign}${offsetHours}:${offsetMins}`);
+  }, []);
 
   return (
     <Card
