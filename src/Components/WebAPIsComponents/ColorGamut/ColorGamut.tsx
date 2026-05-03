@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { Card } from "primereact/card";
 import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
 
-// Only the three values defined in CSS Media Queries Level 4 spec.
-// sRGB ⊂ P3 ⊂ Rec.2020 — each is a strict superset of the previous.
 const GAMUTS: { query: string; label: string }[] = [
   { query: "rec2020", label: "Rec. 2020 (Ultra Wide Gamut)" },
   { query: "p3", label: "Display P3 (Wide Gamut)" },
@@ -15,11 +13,23 @@ const getSupportedGamuts = (): string[] =>
     ({ query }) => window.matchMedia(`(color-gamut: ${query})`).matches,
   ).map(({ label }) => label);
 
+const hasCompositorCaveat = (): boolean => {
+  const ua = navigator.userAgent;
+  // WebKitGTK on Linux reads colour gamut from GTK/colord stack, not EDID.
+  // Chromium/Brave read EDID directly — which is why Brave may show P3
+  // on the same hardware where Epiphany only shows sRGB.
+  return (
+    /AppleWebKit/.test(ua) &&
+    !/Chrome\//.test(ua) &&
+    (/Linux/.test(ua) || /X11/.test(ua))
+  );
+};
+
 const ColorGamutSupport = () => {
   const [colorGamuts, setColorGamuts] = useState<string[]>(getSupportedGamuts);
+  const [showCaveat] = useState<boolean>(hasCompositorCaveat);
 
   useEffect(() => {
-    // Re-evaluate when display changes (e.g. window moved to another monitor)
     const mq = window.matchMedia("(color-gamut: p3)");
     const handleChange = () => setColorGamuts(getSupportedGamuts());
     mq.addEventListener("change", handleChange);
@@ -45,6 +55,13 @@ const ColorGamutSupport = () => {
             ))}
           </ul>
         </div>
+      )}
+      {showCaveat && (
+        <p style={{ fontSize: "0.75rem", marginTop: "0.5rem", opacity: 0.8 }}>
+          Note: On Linux, gamut detection depends on the system colour
+          management stack (colord/GTK), not raw display EDID. Wide-gamut
+          displays may not be reported correctly here.
+        </p>
       )}
     </Card>
   );

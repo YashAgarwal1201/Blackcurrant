@@ -12,15 +12,12 @@ const detectBrowserInfo = (): BrowserInfo => {
   const ua = navigator.userAgent;
 
   // --- Engine detection ---
-  // Blink check must come FIRST: Chrome, Edge, Opera all have both
-  // "Chrome/" and "AppleWebKit/" in their UA strings.
   let engine = "Unknown";
   if (/Chrome\//.test(ua) && /AppleWebKit\//.test(ua)) {
     engine = "Blink";
   } else if (/Gecko\//.test(ua) && /Firefox\//.test(ua)) {
     engine = "Gecko";
   } else if (/AppleWebKit\//.test(ua) && !/Chrome\//.test(ua)) {
-    // Pure WebKit — Safari on iOS/macOS
     engine = "WebKit";
   } else if (/Trident\//.test(ua) || /MSIE /.test(ua)) {
     engine = "Trident (IE)";
@@ -33,19 +30,24 @@ const detectBrowserInfo = (): BrowserInfo => {
   } else if (/OPR\//.test(ua) || /Opera\//.test(ua)) {
     name = "Opera";
   } else if (/Edg\//.test(ua)) {
-    // Chromium Edge uses "Edg/" (not "Edge/")
     name = "Microsoft Edge";
   } else if (/SamsungBrowser\//.test(ua)) {
     name = "Samsung Internet";
   } else if (/YaBrowser\//.test(ua)) {
     name = "Yandex Browser";
   } else if ((navigator as any).brave || /Brave/.test(ua)) {
-    // navigator.brave is the reliable signal; UA sniff as fallback
     name = "Brave";
   } else if (/Chrome\//.test(ua) && /Safari\//.test(ua)) {
     name = "Google Chrome";
   } else if (/Safari\//.test(ua) && !/Chrome\//.test(ua)) {
-    name = "Apple Safari";
+    // Safari never runs on Linux. If the UA looks like Safari but
+    // reports X11/Linux, it's GNOME Web (Epiphany) — which dropped
+    // the "Epiphany" token from its UA string in v44+.
+    if (/Linux/.test(ua) || /X11/.test(ua)) {
+      name = "GNOME Web (Epiphany)";
+    } else {
+      name = "Apple Safari";
+    }
   } else if (/Trident\//.test(ua) || /MSIE /.test(ua)) {
     name = "Internet Explorer";
   }
@@ -58,7 +60,6 @@ const BrowserDetection = () => {
     useState<BrowserInfo>(detectBrowserInfo);
 
   useEffect(() => {
-    // UA is static at runtime — re-run on mount to ensure SSR/hydration correctness
     setBrowserInfo(detectBrowserInfo());
   }, []);
 
