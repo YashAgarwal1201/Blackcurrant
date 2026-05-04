@@ -30,4 +30,16 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
+
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          monaco: ["@monaco-editor/react"],
+          primereact: ["primereact"],
+          vendor: ["react", "react-dom", "react-router-dom"],
+        },
+      },
+    },
+  },
 });

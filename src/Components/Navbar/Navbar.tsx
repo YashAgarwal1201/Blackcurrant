@@ -54,6 +54,7 @@ const Navbar = () => {
 
         return (
           <Link
+            aria-current={isActive ? "page" : undefined}
             key={to}
             to={to}
             title={title}
