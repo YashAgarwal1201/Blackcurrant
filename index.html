@@ -1,23 +1,106 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://project-blackcurrant.vercel.app/" />
+
+    <!-- Favicon & PWA -->
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <link rel="apple-touch-icon" href="/logo.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- Viewport & Theme -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#312b4c" />
-    <meta name="description" content="Project Blackcurrant built using vite, reacts, tailwindcss" />
-    <meta name="robots" content="noindex">
 
-    <title>Blackcurrant | Vite + ReactJS + Tailwind</title>
-    <link rel="manifest" href="/manifest.webmanifest" />
-    <!-- <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
-    /> -->
-    <link rel="preload" href="https://fonts.bunny.net/css?family=acme|righteous|urbanist:ital,wght@0,100..900;1,100..900" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <!-- Primary Meta -->
+    <title>Blackcurrant | Developer Utility Playground</title>
+    <meta
+      name="description"
+      content="Blackcurrant is a developer utility playground for strings, numbers, browser vitals, and an online code editor."
+    />
+    <meta name="author" content="Yash Agarwal" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta
+      name="keywords"
+      content="Blackcurrant, developer tools, string utilities, number utilities, browser vitals, code editor, React, Vite"
+    />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://project-blackcurrant.vercel.app/"
+    />
+    <meta
+      property="og:title"
+      content="Blackcurrant | Developer Utility Playground"
+    />
+    <meta
+      property="og:description"
+      content="Blackcurrant is a developer utility playground for strings, numbers, browser vitals, and an online code editor."
+    />
+    <meta
+      property="og:image"
+      content="https://project-blackcurrant.vercel.app/logo.svg"
+    />
+    <meta property="og:image:alt" content="Blackcurrant logo" />
+    <meta property="og:site_name" content="Blackcurrant" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Resource hints -->
+    <link rel="dns-prefetch" href="https://fonts.bunny.net" />
+    <link rel="preconnect" href="https://fonts.bunny.net" crossorigin />
+
+    <!-- Fonts — non-blocking -->
+    <link
+      rel="preload"
+      href="https://fonts.bunny.net/css?family=acme|righteous|urbanist:ital,wght@0,100..900;1,100..900"
+      as="style"
+      onload="
+        this.onload = null;
+        this.rel = 'stylesheet';
+      "
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.bunny.net/css?family=acme|righteous|urbanist:ital,wght@0,100..900;1,100..900"
+      />
+    </noscript>
+
+    <!-- Blocking theme script: applies data-theme before first paint to avoid flash -->
+    <!-- <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem("blackcurrant-theme");
+          var resolved =
+            stored === "light" || stored === "dark"
+              ? stored
+              : window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+          document.documentElement.setAttribute("data-theme", resolved);
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta)
+            meta.setAttribute(
+              "content",
+              resolved === "dark" ? "#1c1b19" : "#f7f6f2"
+            );
+        } catch (e) {}
+      })();
+    </script> -->
   </head>
   <body>
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[9999] focus:px-4 focus:py-2 focus:rounded-lg"
+      style="background: #312b4c; color: #fff"
+    >
+      Skip to content
+    </a>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

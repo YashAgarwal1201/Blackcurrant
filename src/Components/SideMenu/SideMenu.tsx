@@ -17,6 +17,17 @@ import {
 } from "react-share";
 import useNavStore from "../../Services/Stores/navStore";
 
+declare const __APP_VERSION__: string;
+
+const TECH_STACK = [
+  { label: "React 19", color: "#61DAFB" },
+  { label: "TypeScript", color: "#3178C6" },
+  { label: "Tailwind CSS v3", color: "#38BDF8" },
+  { label: "PrimeReact", color: "#A78BFA" },
+  { label: "Vite", color: "#FFD62E" },
+  { label: "Zustand", color: "#FF6B35" },
+];
+
 const SideMenu = () => {
   const {
     isSideMenuOpen,
@@ -34,7 +45,7 @@ const SideMenu = () => {
       position="right"
       header={
         <h2 className="font-heading text-xl sm:text-2xl lg:text-3xl text-color5">
-          Settings
+          More Options
         </h2>
       }
       className="side-menu !w-full md:!w-[768px] rounded-none md:!rounded-l-xl bg-color1"
@@ -46,7 +57,7 @@ const SideMenu = () => {
         <Panel
           headerTemplate={(options) => {
             const togglePanel = (event: React.MouseEvent<HTMLElement>) => {
-              options.onTogglerClick!(event); // Trigger expand/collapse behavior
+              options.onTogglerClick!(event);
             };
 
             return (
@@ -56,21 +67,19 @@ const SideMenu = () => {
               >
                 <h3 className="font-subHeading font-medium text-lg sm:text-xl text-color1 flex items-center">
                   <span className="pi pi-palette mr-4"></span>
-                  Change Theme
+                  Appearance
                 </h3>
-                {/* <span
+                <span
                   className={`pi ${
                     options.collapsed ? "pi-chevron-down" : "pi-chevron-up"
                   }`}
-                ></span> */}
+                ></span>
               </div>
             );
           }}
           className="bg-transparent rounded-2xl"
           collapsed
           toggleable
-          // expandIcon={<span className="pi pi-chevron-down text-color2"></span>}
-          // collapseIcon={<span className="pi pi-chevron-up text-color2"></span>}
         >
           <div>
             <span>Coming Soon!</span>
@@ -95,7 +104,7 @@ const SideMenu = () => {
         <Panel
           headerTemplate={(options) => {
             const togglePanel = (event: React.MouseEvent<HTMLElement>) => {
-              options.onTogglerClick!(event); // Trigger expand/collapse behavior
+              options.onTogglerClick!(event);
             };
 
             return (
@@ -107,11 +116,11 @@ const SideMenu = () => {
                   <span className="pi pi-share-alt mr-4"></span>
                   Share
                 </h3>
-                {/* <span
+                <span
                   className={`pi ${
                     options.collapsed ? "pi-chevron-down" : "pi-chevron-up"
                   }`}
-                ></span> */}
+                ></span>
               </div>
             );
           }}
@@ -120,27 +129,22 @@ const SideMenu = () => {
           toggleable
         >
           <div className="flex justify-center items-center gap-4">
-            {/* WhatsApp */}
             <WhatsappShareButton url={shareUrl} title={shareText}>
               <WhatsappIcon size={40} round />
             </WhatsappShareButton>
 
-            {/* LinkedIn */}
             <LinkedinShareButton url={shareUrl}>
               <LinkedinIcon size={40} round />
             </LinkedinShareButton>
 
-            {/* Reddit */}
             <RedditShareButton url={shareUrl} title={shareText}>
               <RedditIcon size={40} round />
             </RedditShareButton>
 
-            {/* Telegram */}
             <TelegramShareButton url={shareUrl} title={shareText}>
               <TelegramIcon size={40} round />
             </TelegramShareButton>
 
-            {/* Email */}
             <EmailShareButton
               url={shareUrl}
               subject="Check out this site"
@@ -153,19 +157,81 @@ const SideMenu = () => {
 
         <div className="mx-2 my-1 p-0 max-w-full h-[1.5px] bg-color2" />
 
-        {import.meta.env.VITE_DEVELOPER_PROFILE && (
-          <a
-            href={import.meta.env.VITE_DEVELOPER_PROFILE ?? ""}
-            target="_blank"
-            rel="noopener"
-            className="!w-full block py-4 px-2 bg-color4 font-subHeading text-lg sm:text-xl text-color1 rounded-xl not-italic"
-          >
-            <h3 className="font-subHeading font-medium text-color1 flex items-center">
-              <span className="pi pi-github mr-4"></span>
-              Developer Profile
-            </h3>
-          </a>
-        )}
+        <a
+          href={import.meta.env.VITE_DEVELOPER_PROFILE ?? ""}
+          target="_blank"
+          rel="noopener noreferrer nofollow"
+          className="!w-full block py-4 px-2 bg-color4 font-subHeading text-lg sm:text-xl text-color1 rounded-xl not-italic"
+        >
+          <h3 className="font-subHeading font-medium text-color1 flex items-center">
+            <span className="pi pi-github mr-4"></span>
+            Developer Profile
+          </h3>
+        </a>
+
+        <div className="mx-2 my-1 p-0 max-w-full h-[1.5px] bg-color2" />
+
+        {/* About This App */}
+        <Panel
+          headerTemplate={(options) => {
+            const togglePanel = (event: React.MouseEvent<HTMLElement>) => {
+              options.onTogglerClick!(event);
+            };
+
+            return (
+              <div
+                className="cursor-pointer custom-panel-header w-full flex justify-between items-center px-2 py-4 rounded-xl"
+                onClick={togglePanel}
+              >
+                <h3 className="font-subHeading font-medium text-lg sm:text-xl text-color1 flex items-center">
+                  <span className="pi pi-info-circle mr-4"></span>
+                  About This App
+                </h3>
+                <span
+                  className={`pi ${
+                    options.collapsed ? "pi-chevron-down" : "pi-chevron-up"
+                  }`}
+                ></span>
+              </div>
+            );
+          }}
+          className="bg-transparent rounded-2xl"
+          collapsed
+          toggleable
+        >
+          <div className="flex flex-col gap-4 px-2 pb-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-color1/60 font-content">
+                Version
+              </span>
+              <span className="text-xs font-mono bg-color2/40 text-color1 px-3 py-1 rounded-full border border-color2">
+                {__APP_VERSION__}
+              </span>
+            </div>
+
+            <div className="h-px bg-color2" />
+
+            <div className="flex flex-col gap-2">
+              <span className="text-sm text-color1/60 font-content">
+                Tools used
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {TECH_STACK.map(({ label, color }) => (
+                  <span
+                    key={label}
+                    className="inline-flex items-center gap-1.5 text-xs font-content text-color1 bg-color2/40 border border-color2 px-3 py-1 rounded-full"
+                  >
+                    <span
+                      className="w-2 h-2 rounded-full shrink-0"
+                      style={{ backgroundColor: color }}
+                    />
+                    {label}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Panel>
       </div>
     </Sidebar>
   );
