@@ -1,4 +1,22 @@
-.web-apis {
+// src/Pages/WebAPIsPage/WebAPI.scss
+
+.web-apis-page {
+  // Smooth scroll for the page container
+  scroll-behavior: smooth;
+}
+
+// Search input — remove browser default search cancel button
+.web-apis-search-input {
+  &::-webkit-search-cancel-button {
+    display: none;
+  }
+  &::-webkit-search-decoration {
+    display: none;
+  }
+}
+
+// PrimeReact card overrides scoped to this page (kept for backward compat)
+.web-apis-page {
   .p-card {
     .p-card-body {
       .p-card-subtitle {

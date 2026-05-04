@@ -1,39 +1,73 @@
 import { useState, useEffect } from "react";
-import { Card } from "primereact/card"; // Assuming PrimeReact is installed
-import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
+import { ApiCard, DataRow, DetailSection } from "../Shared/ApiCard";
+
+const getTimeZoneInfo = () => {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const rawOffset = new Date().getTimezoneOffset();
+  const totalMins = Math.abs(rawOffset);
+  const sign = rawOffset <= 0 ? "+" : "-";
+  const hours = String(Math.floor(totalMins / 60)).padStart(2, "0");
+  const mins = String(totalMins % 60).padStart(2, "0");
+  const offset = `UTC ${sign}${hours}:${mins}`;
+  const locale =
+    Intl.DateTimeFormat().resolvedOptions().locale ?? navigator.language;
+  return { tz, offset, locale };
+};
 
 const TimeZone = () => {
-  const [timezone, setTimezone] = useState<string>("");
-  const [timezoneOffset, setTimezoneOffset] = useState<string>("");
+  const [info, setInfo] = useState(getTimeZoneInfo);
 
   useEffect(() => {
-    const getTimezone = () => {
-      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const offsetInMinutes = new Date().getTimezoneOffset();
-      const offsetHours = Math.floor(Math.abs(offsetInMinutes) / 60)
-        .toString()
-        .padStart(2, "0");
-      const offsetMinutes = (Math.abs(offsetInMinutes) % 60)
-        .toString()
-        .padStart(2, "0");
-      const offsetSign = offsetInMinutes >= 0 ? "-" : "+";
-      setTimezone(userTimezone);
-      setTimezoneOffset(`${offsetSign}${offsetHours}:${offsetMinutes}`);
+    const handleVisibility = () => {
+      if (!document.hidden) setInfo(getTimeZoneInfo());
     };
-
-    getTimezone(); // Call the function within useEffect
-  }, []); // Empty dependency array to run only once on component mount
-
-  // const cardStyle = "rounded-md"; // Card styling
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibility);
+  }, []);
 
   return (
-    <Card
-      className={WEB_APIS_CARDS_BASE_STYLES}
-      title={<h2 className="font-heading">Time Zone</h2>}
-      subTitle={<p className="font-subHeading">(current local time zone)</p>}
+    <ApiCard
+      title="Time Zone"
+      icon="🌍"
+      category="time-locale"
+      purpose="The IANA timezone and UTC offset reported by the browser. Use this to default datetime pickers and localise server-side timestamps without asking the user."
+      status="info"
+      mdnUrl="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/resolvedOptions"
+      detailTitle="Time Zone — Details"
+      detailContent={
+        <div>
+          <DetailSection heading="How it's detected">
+            <p className="text-sm text-color5/80 leading-relaxed">
+              The IANA timezone identifier (e.g.{" "}
+              <code className="text-xs bg-white/10 px-1 rounded">
+                Asia/Kolkata
+              </code>
+              ) comes from{" "}
+              <code className="text-xs bg-white/10 px-1 rounded">
+                Intl.DateTimeFormat().resolvedOptions().timeZone
+              </code>
+              . The UTC offset is computed from{" "}
+              <code className="text-xs bg-white/10 px-1 rounded">
+                Date.prototype.getTimezoneOffset()
+              </code>
+              , which returns minutes west of UTC (negative = east).
+            </p>
+          </DetailSection>
+          <DetailSection heading="DST note">
+            <p className="text-sm text-color5/80 leading-relaxed">
+              The offset shown is the <strong>current</strong> offset including
+              any active Daylight Saving Time adjustment. It may change when DST
+              starts or ends.
+            </p>
+          </DetailSection>
+        </div>
+      }
     >
-      {timezone} (UTC {timezoneOffset})
-    </Card>
+      <DataRow label="IANA Timezone" value={info.tz} mono copyable />
+      <DataRow label="UTC Offset" value={info.offset} copyable />
+      <DataRow label="Locale" value={info.locale} copyable />
+    </ApiCard>
   );
 };
 

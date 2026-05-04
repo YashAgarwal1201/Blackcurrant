@@ -13,6 +13,7 @@ import {
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import useToastStore from "../../Services/Stores/toastMessageStore";
+import GoBackBtn from "../../Layout/GoBackBtn";
 
 type Language = "html" | "react" | "vue";
 
@@ -263,7 +264,7 @@ export default {
     if (doc) {
       const modifiedCode = code.replace(
         "</head>",
-        getConsoleCapture() + "</head>"
+        getConsoleCapture() + "</head>",
       );
       doc.open();
       doc.write(modifiedCode);
@@ -281,7 +282,7 @@ export default {
       // Remove import statements and transform JSX
       const codeWithoutImports = code.replace(
         /import\s+.*from\s+['"]react['"];?/g,
-        ""
+        "",
       );
 
       transformedCode =
@@ -445,9 +446,12 @@ export default {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap gap-4">
         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-          <h1 className="text-2xl md:text-3xl text-color5 font-heading">
-            Coditor Playground
-          </h1>
+          <div className="flex items-center gap-x-1">
+            <GoBackBtn />
+            <h1 className="text-2xl xs:text-3xl mdl:text-4xl text-color5 font-heading select-none">
+              Coditor Playground
+            </h1>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -460,7 +464,7 @@ export default {
             ]}
             onChange={(e) => handleLanguageChange(e.target.value as Language)}
             className="flex-1 md:flex-none h-9 sm:h-10 !rounded-lg !bg-color2 border sm:border-2 !border-color4 *:py-2 *:text-color1 *:text-sm"
-            panelClassName="text-sm md:text-base font-content mt-2 rounded-lg"
+            panelClassName="!bg-color2 !border !border-white !rounded-lg !p-2"
           />
           <Button
             title="Change editor and output orientation"
@@ -605,8 +609,8 @@ export default {
                         log.type === "error"
                           ? "text-red-400 bg-red-900/20"
                           : log.type === "warn"
-                          ? "text-yellow-400 bg-yellow-900/20"
-                          : "text-green-400 bg-green-900/20"
+                            ? "text-yellow-400 bg-yellow-900/20"
+                            : "text-green-400 bg-green-900/20"
                       }`}
                     >
                       <Terminal className="w-3 h-3 mt-0.5 flex-shrink-0" />

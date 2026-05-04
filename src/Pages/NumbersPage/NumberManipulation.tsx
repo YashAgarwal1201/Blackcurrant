@@ -10,6 +10,7 @@ import Layout from "../../Layout/Layout";
 import { NUMBER_OPTIONS, numberFunctions } from "../../Services/Constants";
 import useNumberFunctionsStore from "../../Services/Stores/numberFunctionsStore";
 import useToastStore from "../../Services/Stores/toastMessageStore";
+import GoBackBtn from "../../Layout/GoBackBtn";
 
 const NumberManipulation = () => {
   const { handleSubmit, reset, watch, setValue } = useForm({
@@ -172,9 +173,12 @@ const NumberManipulation = () => {
 
       <div className="w-full h-full p-2 md:p-3 lg:p-4 flex flex-col gap-y-3 md:gap-y-4 lg:gap-y-6 portrait:overflow-hidden landscape:overflow-y-auto md:overflow-y-auto custom-scrollbar">
         <div className="flex-shrink-0 flex flex-row items-center justify-between gap-4">
-          <h1 className="text-2xl xs:text-3xl mdl:text-4xl text-color5 font-heading select-none">
-            Play with Numbers
-          </h1>
+          <div className="flex items-center gap-x-1">
+            <GoBackBtn />
+            <h1 className="text-2xl xs:text-3xl mdl:text-4xl text-color5 font-heading select-none">
+              Play with Numbers
+            </h1>
+          </div>
           <Button
             type="button"
             disabled={!inputVal1 && !inputVal2 && !outputVal}
@@ -203,7 +207,7 @@ const NumberManipulation = () => {
               filter
               filterPlaceholder="Search functions..."
               className="flex-1 md:flex-none md:w-1/2 lg:w-1/3 h-9 sm:h-10 !rounded-lg !bg-transparent border sm:border-2 !border-color4 *:py-2 *:text-color4 *:text-sm"
-              panelClassName="text-sm md:text-base font-content mt-2 rounded-lg"
+              panelClassName="!bg-color2 !border !border-white !rounded-lg !p-2"
             />
             <Button
               type="button"

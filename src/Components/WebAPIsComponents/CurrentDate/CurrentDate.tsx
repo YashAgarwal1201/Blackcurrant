@@ -1,54 +1,65 @@
 import { useState, useEffect } from "react";
-import { Card } from "primereact/card"; // Assuming PrimeReact is installed
-import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
+import { ApiCard, DetailSection } from "../Shared/ApiCard";
+
+const getOrdinal = (day: number): string => {
+  if (day >= 11 && day <= 13) return "th";
+  return ["th", "st", "nd", "rd"][day % 10] ?? "th";
+};
+
+const formatDate = () => {
+  const now = new Date();
+  const day = now.getDate();
+  const month = now.toLocaleString("en-US", { month: "long" });
+  const year = now.getFullYear();
+  const weekday = now.toLocaleString("en-US", { weekday: "long" });
+  return {
+    display: `${day}${getOrdinal(day)} ${month} ${year}`,
+    weekday,
+  };
+};
 
 const CurrentDate = () => {
-  const [currentDate, setCurrentDate] = useState<string>("");
+  const [date, setDate] = useState(formatDate);
 
   useEffect(() => {
-    const updateDate = () => {
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = now.toLocaleString("en-US", { month: "long" }); // Full month name
-      const day = now.getDate();
-      const ordinalSuffix = getOrdinalSuffix(day); // Get ordinal suffix for the day
-      setCurrentDate(`${day}${ordinalSuffix} of ${month}, ${year}`);
-    };
-
-    // Update date when component mounts
-    updateDate();
-
-    // Cleanup interval on component unmount
-    return () => {};
-  }, []); // Empty dependency array to run only once on component mount
-
-  // Function to get the ordinal suffix for the day
-  const getOrdinalSuffix = (day: number) => {
-    if (day >= 11 && day <= 13) {
-      return "th";
-    }
-    switch (day % 10) {
-      case 1:
-        return "st";
-      case 2:
-        return "nd";
-      case 3:
-        return "rd";
-      default:
-        return "th";
-    }
-  };
-
-  // const cardStyle = "rounded-md"; // Card styling
+    const id = setInterval(() => setDate(formatDate()), 60_000);
+    return () => clearInterval(id);
+  }, []);
 
   return (
-    <Card
-      className={WEB_APIS_CARDS_BASE_STYLES}
-      title={<h2 className="font-heading">Current Date</h2>}
-      subTitle={<p className="font-subHeading">(current local date)</p>}
+    <ApiCard
+      title="Current Date"
+      icon="📅"
+      category="time-locale"
+      isLive
+      purpose="The browser's local calendar date. Useful for defaulting date pickers and scheduling UIs without a server round-trip."
+      status="info"
+      mdnUrl="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+      detailTitle="Current Date — Details"
+      detailContent={
+        <div>
+          <DetailSection heading="Source">
+            <p className="text-sm text-color5/80 leading-relaxed">
+              Date is read from the browser's local system clock via{" "}
+              <code className="text-xs bg-white/10 px-1 rounded">
+                new Date()
+              </code>
+              . It reflects the device's local timezone and system clock — not a
+              network time source.
+            </p>
+          </DetailSection>
+        </div>
+      }
     >
-      <p>{currentDate}</p>
-    </Card>
+      <div
+        className="flex flex-col gap-1"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        <span className="text-xl font-semibold">{date.display}</span>
+        <span className="text-sm text-color5/60">{date.weekday}</span>
+      </div>
+    </ApiCard>
   );
 };
 
