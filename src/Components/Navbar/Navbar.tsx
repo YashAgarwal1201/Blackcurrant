@@ -26,7 +26,7 @@ const navItems = [
     to: "/browser-vitals",
     icon: Monitor,
     label: "Vitals",
-    title: "Browser VItals",
+    title: "Browser Vitals",
   },
   {
     to: "/coditor-playground",
@@ -45,7 +45,10 @@ const Navbar = () => {
   if (isHome) return null;
 
   return (
-    <div className="header-card w-full h-full p-1 grid grid-cols-6 md:flex md:flex-col md:justify-center md:items-center bg-color1 font-content select-none">
+    <nav
+      aria-label="Main navigation"
+      className="header-card w-full h-full p-1 grid grid-cols-6 md:flex md:flex-col md:justify-center md:items-center bg-color1 font-content select-none"
+    >
       {/* Nav links */}
 
       {navItems.map(({ to, icon: Icon, label, title }) => {
@@ -57,7 +60,6 @@ const Navbar = () => {
             aria-current={isActive ? "page" : undefined}
             key={to}
             to={to}
-            title={title}
             aria-label={title}
             className={`group flex flex-col justify-center items-center gap-y-1 px-2 py-1 rounded-xl ${isActive ? "pointer-events-none" : ""}`}
           >
@@ -109,7 +111,7 @@ const Navbar = () => {
           </span>
         </Button>
       </div>
-    </div>
+    </nav>
   );
 };
 

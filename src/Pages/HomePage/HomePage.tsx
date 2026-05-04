@@ -14,12 +14,11 @@ const HomePage = () => {
       <div className="custom-scrollbar w-full h-full p-2 md:p-3 lg:p-4 pb-20 md:pb-4 flex flex-col gap-y-4 sm:gap-y-6 md:gap-y-10 overflow-y-auto">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl xs:text-3xl mdl:text-4xl text-color5 font-heading select-none">
-            Welcome to blackcurrant
+            Welcome to Blackcurrant
           </h1>
 
           <Button
-            title="Open side menu"
-            aria-label="Side menu btn"
+            aria-label="Open side menu"
             onClick={toggleSideMenu}
             text
             className="!border-none flex items-center justify-center p-3"

@@ -10,7 +10,6 @@ function getBuildVersion() {
   return `v2.${year}.${month}.${day}`;
 }
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   base: "/",
@@ -18,11 +17,11 @@ export default defineConfig({
     __APP_VERSION__: JSON.stringify(getBuildVersion()),
   },
   server: {
-    host: true, // allows LAN access if you want to test on a phone
+    host: true,
     port: 5353,
   },
   preview: {
-    host: true, // allows LAN access if you want to test on a phone
+    host: true,
     port: 5353,
   },
   resolve: {
@@ -30,13 +29,12 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
-
   build: {
     rollupOptions: {
+      external: ["chart.js/auto"],
       output: {
         manualChunks: {
           monaco: ["@monaco-editor/react"],
-          primereact: ["primereact"],
           vendor: ["react", "react-dom", "react-router-dom"],
         },
       },

@@ -15,7 +15,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           <Navbar />
         </div>
       )}
-      <div className="w-full h-full overflow-hidden">
+      <main id="main-content" className="w-full h-full overflow-hidden">
         <React.Suspense
           fallback={
             <div
@@ -29,7 +29,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         >
           {children}
         </React.Suspense>
-      </div>
+      </main>
       <FeedbackDialog />
 
       <SideMenu />
