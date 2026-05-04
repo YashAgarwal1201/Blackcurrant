@@ -133,7 +133,7 @@ const CopyButton = ({ value }: { value: string }) => {
   );
 };
 
-// Main ApiCard ─
+// Main ApiCard
 
 export const ApiCard = ({
   title,

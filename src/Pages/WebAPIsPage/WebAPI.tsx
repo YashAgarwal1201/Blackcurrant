@@ -20,22 +20,9 @@ import SpeechSynthesisSupport from "../../Components/WebAPIsComponents/SpeechSyn
 import TimeZone from "../../Components/WebAPIsComponents/TimeZone/TimeZone";
 import OsDetection from "../../Components/WebAPIsComponents/UserOS/UserOS";
 import ScreenOrientation from "../../Components/WebAPIsComponents/ScreenOrientation/ScreenOrientation";
-
-// Store + categories
-import { useWebApisStore } from "../../Services/Stores/webApisStore";
-import {
-  WEB_API_CATEGORIES,
-  CARD_CATEGORY_MAP,
-  type WebApiCategory,
-} from "../../Services/webApiCategories";
-
-import "./WebAPI.scss";
-import { Button } from "primereact/button";
 import NavigatorLanguage from "../../Components/WebAPIsComponents/NavigatorLanguage/NavigatorLanguage";
 import NetworkInfo from "../../Components/WebAPIsComponents/NetworkComponent/NetworkComponent";
 import OnlineStatus from "../../Components/WebAPIsComponents/OnlineStatus/OnlineStatus";
-
-// NEW imports — add alongside existing ones
 import DeviceMemory from "../../Components/WebAPIsComponents/DeviceMemory/DeviceMemory";
 import CpuConcurrency from "../../Components/WebAPIsComponents/CpuConcurrency/CpuConcurrency";
 import TouchSupport from "../../Components/WebAPIsComponents/TouchSupport/TouchSupport";
@@ -50,15 +37,32 @@ import PageVisibility from "../../Components/WebAPIsComponents/PageVisibility/Pa
 import PrefersReducedMotion from "../../Components/WebAPIsComponents/PrefersReducedMotion/PrefersReducedMotion";
 import PrefersContrast from "../../Components/WebAPIsComponents/PrefersContrast/PrefersContrast";
 import ForcedColors from "../../Components/WebAPIsComponents/ForcedColors/ForcedColors";
-import { InputText } from "primereact/inputtext";
 
-//  Card registry
+// PrimeReact
+import { Button } from "primereact/button";
+import { InputText } from "primereact/inputtext";
+import { Dropdown } from "primereact/dropdown";
+
+// Store + categories
+import { useWebApisStore } from "../../Services/Stores/webApisStore";
+import {
+  WEB_API_CATEGORIES,
+  CARD_CATEGORY_MAP,
+  type WebApiCategory,
+} from "../../Services/webApiCategories";
+
+import GoBackBtn from "../../Layout/GoBackBtn";
+import "./WebAPI.scss";
+import { Search, X } from "lucide-react";
+
+// Card registry
 // Each entry: cardKey must match CARD_CATEGORY_MAP, searchTerms drive search.
 const CARD_REGISTRY: {
   cardKey: string;
   searchTerms: string;
   component: React.ReactNode;
 }[] = [
+  // Display & Screen
   {
     cardKey: "screenColorDepth",
     searchTerms: "screen color depth pixel bit display",
@@ -90,6 +94,13 @@ const CARD_REGISTRY: {
     component: <HdrSupportCheck />,
   },
   {
+    cardKey: "webGLInfo",
+    searchTerms: "webgl gpu renderer vendor opengl hardware acceleration",
+    component: <WebGLInfo />,
+  },
+
+  // Time & Locale
+  {
     cardKey: "currentTime",
     searchTerms: "current time local clock live",
     component: <CurrentTime />,
@@ -109,61 +120,13 @@ const CARD_REGISTRY: {
     searchTerms: "navigator language locale bcp47 i18n accept-language",
     component: <NavigatorLanguage />,
   },
+
+  // Device & Hardware
   {
     cardKey: "batteryStatus",
     searchTerms: "battery status level charging hardware",
     component: <BatteryStatus />,
   },
-  {
-    cardKey: "cookieStatus",
-    searchTerms: "cookie enabled browser storage access",
-    component: <CookieStatus />,
-  },
-  {
-    cardKey: "browserDetection",
-    searchTerms: "browser detection brave chrome engine blink user agent",
-    component: <BrowserDetection />,
-  },
-  {
-    cardKey: "osDetection",
-    searchTerms: "os operating system linux windows mac detection",
-    component: <OsDetection />,
-  },
-  {
-    cardKey: "speechRecognition",
-    searchTerms: "speech recognition voice api microphone",
-    component: <SpeechRecognitionSupport />,
-  },
-  {
-    cardKey: "speechSynthesis",
-    searchTerms: "speech synthesis voice tts text to speech",
-    component: <SpeechSynthesisSupport />,
-  },
-  {
-    cardKey: "onlineStatus",
-    searchTerms: "online offline network status connection live",
-    component: <OnlineStatus />,
-  },
-  {
-    cardKey: "networkInfo",
-    searchTerms:
-      "network info connection speed downlink rtt save data bandwidth",
-    component: <NetworkInfo />,
-  },
-  {
-    cardKey: "themePreference",
-    searchTerms: "theme dark light mode preference system",
-    component: <ThemePreference />,
-  },
-
-  // ── Display & Screen (after hdrSupport) ──
-  {
-    cardKey: "webGLInfo",
-    searchTerms: "webgl gpu renderer vendor opengl hardware acceleration",
-    component: <WebGLInfo />,
-  },
-
-  // ── Device & Hardware (after batteryStatus) ──
   {
     cardKey: "deviceMemory",
     searchTerms: "device memory ram hardware gigabytes",
@@ -180,7 +143,22 @@ const CARD_REGISTRY: {
     component: <TouchSupport />,
   },
 
-  // ── Browser & Environment (after osDetection) ──
+  // Browser & Environment
+  {
+    cardKey: "cookieStatus",
+    searchTerms: "cookie enabled browser storage access",
+    component: <CookieStatus />,
+  },
+  {
+    cardKey: "browserDetection",
+    searchTerms: "browser detection brave chrome engine blink user agent",
+    component: <BrowserDetection />,
+  },
+  {
+    cardKey: "osDetection",
+    searchTerms: "os operating system linux windows mac detection",
+    component: <OsDetection />,
+  },
   {
     cardKey: "storageQuota",
     searchTerms: "storage quota usage indexeddb cache estimate",
@@ -202,7 +180,17 @@ const CARD_REGISTRY: {
     component: <NotificationPermission />,
   },
 
-  // ── Media & Sensors (after speechSynthesis) ──
+  // Media & Sensors
+  {
+    cardKey: "speechRecognition",
+    searchTerms: "speech recognition voice api microphone",
+    component: <SpeechRecognitionSupport />,
+  },
+  {
+    cardKey: "speechSynthesis",
+    searchTerms: "speech synthesis voice tts text to speech",
+    component: <SpeechSynthesisSupport />,
+  },
   {
     cardKey: "geolocationSupport",
     searchTerms: "geolocation gps location coordinates permission",
@@ -214,14 +202,32 @@ const CARD_REGISTRY: {
     component: <VibrationApi />,
   },
 
-  // ── Performance (new section anchor) ──
+  // Network
+  {
+    cardKey: "onlineStatus",
+    searchTerms: "online offline network status connection live",
+    component: <OnlineStatus />,
+  },
+  {
+    cardKey: "networkInfo",
+    searchTerms:
+      "network info connection speed downlink rtt save data bandwidth",
+    component: <NetworkInfo />,
+  },
+
+  // Performance
   {
     cardKey: "pageVisibility",
     searchTerms: "page visibility hidden visible tab background",
     component: <PageVisibility />,
   },
 
-  // ── Theme & Accessibility (after themePreference) ──
+  // Theme & Accessibility
+  {
+    cardKey: "themePreference",
+    searchTerms: "theme dark light mode preference system",
+    component: <ThemePreference />,
+  },
   {
     cardKey: "prefersReducedMotion",
     searchTerms: "reduced motion animation accessibility vestibular",
@@ -239,8 +245,7 @@ const CARD_REGISTRY: {
   },
 ];
 
-// WebAPI.tsx — paste immediately after CARD_REGISTRY definition
-
+// DEV guard: catch unregistered card keys immediately
 if (import.meta.env.DEV) {
   CARD_REGISTRY.forEach(({ cardKey }) => {
     if (!(cardKey in CARD_CATEGORY_MAP)) {
@@ -252,7 +257,7 @@ if (import.meta.env.DEV) {
   });
 }
 
-//  Component ─
+// Component
 const WebAPI = () => {
   const {
     activeCategory,
@@ -262,7 +267,6 @@ const WebAPI = () => {
     resetFilters,
   } = useWebApisStore();
 
-  // Filter cards based on active category + search query
   const filteredCards = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return CARD_REGISTRY.filter(({ cardKey, searchTerms }) => {
@@ -274,8 +278,6 @@ const WebAPI = () => {
     });
   }, [activeCategory, searchQuery]);
 
-  // When filtering by category, group cards under their category headers.
-  // When "All" is selected, group by category so it's still structured.
   const groupedCards = useMemo(() => {
     if (activeCategory !== "all") {
       return [
@@ -286,7 +288,6 @@ const WebAPI = () => {
       ];
     }
 
-    // Group all filtered cards by their category
     const groups: Map<WebApiCategory, (typeof CARD_REGISTRY)[number][]> =
       new Map();
 
@@ -296,7 +297,6 @@ const WebAPI = () => {
       groups.get(cat)!.push(card);
     });
 
-    // Return in the same order as WEB_API_CATEGORIES (skip "all")
     return WEB_API_CATEGORIES.filter((c) => c.id !== "all")
       .map((catMeta) => ({
         category: catMeta,
@@ -313,61 +313,58 @@ const WebAPI = () => {
       <div className="web-apis-page custom-scrollbar w-full h-full py-2 md:py-3 lg:py-4 pl-2 md:pl-3 lg:pl-4 flex flex-col gap-y-4 md:gap-y-6 overflow-y-auto">
         {/* Page header */}
         <div className="flex flex-col gap-y-1 pr-2 md:pr-3 lg:pr-4">
-          <h1 className="text-2xl xs:text-3xl mdl:text-4xl text-color5 font-heading select-none">
-            Web APIs
-          </h1>
+          <div className="flex items-center gap-x-1">
+            <GoBackBtn extraHandelers={() => resetFilters()} />
+            <h1 className="text-2xl xs:text-3xl mdl:text-4xl text-color5 font-heading select-none">
+              Browser Vitals
+            </h1>
+          </div>
           <p className="text-base text-color5 font-content select-none">
             Live browser environment information powered by native Web APIs.
           </p>
         </div>
 
         {/* Search + Filter bar */}
-        <div className="web-apis-controls flex flex-col gap-3 pr-2 md:pr-3 lg:pr-4">
-          {/* Search */}
-          <div className="web-apis-search relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-color5/40 text-sm pointer-events-none select-none">
-              🔍
-            </span>
-            <InputText
-              type="search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search APIs…"
-              aria-label="Search Web API cards"
-              className="web-apis-search-input w-full bg-color2 text-color1 placeholder:text-color5 text-sm font-content rounded-lg pl-9 pr-4 py-2.5 border border-white/10 outline-none focus:border-color3 focus:bg-color2/60 transition-all"
-            />
-            {searchQuery && (
-              <Button
-                onClick={() => setSearchQuery("")}
-                aria-label="Clear search"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-color5/40 hover:text-color5 transition-colors text-sm"
-              >
-                ✕
-              </Button>
-            )}
-          </div>
+        <div className="web-apis-controls flex flex-col gap-2 pr-2 md:pr-3 lg:pr-4">
+          <div className="flex items-center gap-2">
+            {/* Search */}
+            <div className="web-apis-search relative grow">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-color5 text-sm pointer-events-none select-none">
+                <Search size={16} />
+              </span>
 
-          {/* Category filter pills */}
-          <div
-            className="web-apis-filters flex gap-2 overflow-x-auto pb-1 scrollbar-hide"
-            role="group"
-            aria-label="Filter by category"
-          >
-            {WEB_API_CATEGORIES.map((cat) => (
-              <Button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                aria-pressed={activeCategory === cat.id}
-                className={`web-apis-filter-pill shrink-0 inline-flex items-center gap-1.5 text-sm font-medium font-content px-3 py-1.5 rounded-full border transition-all ${
-                  activeCategory === cat.id
-                    ? "bg-color3 text-color5 border-color3"
-                    : "bg-color2/30 text-color5 border-color5 hover:bg-color2 hover:text-color5"
-                }`}
-              >
-                <span aria-hidden="true">{cat.icon}</span>
-                {cat.label}
-              </Button>
-            ))}
+              <InputText
+                type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search APIs…"
+                aria-label="Search Web API cards"
+                className="w-full !bg-color2 !text-color5 placeholder:text-color5 text-sm font-content rounded-lg pl-9 pr-8 py-2.5 !border !border-white/10 outline-none focus:!border-color3 transition-all"
+              />
+              {searchQuery && (
+                <Button
+                  onClick={() => setSearchQuery("")}
+                  aria-label="Clear search"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 !text-color5 hover:!text-color5 transition-colors text-sm leading-none"
+                >
+                  <X size={16} />
+                </Button>
+              )}
+            </div>
+
+            {/* Category dropdown */}
+            <Dropdown
+              value={activeCategory}
+              onChange={(e) => setActiveCategory(e.value as WebApiCategory)}
+              options={WEB_API_CATEGORIES}
+              optionLabel="label"
+              optionValue="id"
+              aria-label="Filter by category"
+              className={`shrink-0 !bg-color2 *:!text-color5 !text-sm !font-content !rounded-lg !border transition-all ${
+                activeCategory !== "all" ? "!border-color3" : "!border-color4"
+              }`}
+              panelClassName="!bg-color2 !border !border-white !rounded-lg !p-2"
+            />
           </div>
 
           {/* Results count */}
@@ -392,10 +389,8 @@ const WebAPI = () => {
                 No APIs match your search.
               </p>
               <Button
-                onClick={() => {
-                  resetFilters();
-                }}
-                className="text-sm px-3 py-1.5 text-color3 hover:text-color5 underline underline-offset-2 transition-colors font-content"
+                onClick={resetFilters}
+                className="text-sm px-3 py-1.5 !text-color3 hover:!text-color5 underline underline-offset-2 transition-colors font-content"
               >
                 Clear filters
               </Button>
@@ -403,7 +398,6 @@ const WebAPI = () => {
           ) : (
             groupedCards.map(({ category, cards }) => (
               <section key={category.id} aria-labelledby={`cat-${category.id}`}>
-                {/* Category heading — only shown in "All" view or when it adds context */}
                 {(activeCategory === "all" || groupedCards.length > 1) && (
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-base" aria-hidden="true">
@@ -425,7 +419,6 @@ const WebAPI = () => {
                   </div>
                 )}
 
-                {/* Cards grid */}
                 <div className="web-apis-grid grid gap-2 md:gap-3 lg:gap-4 grid-cols-1 sm:grid-cols-2 mdl:grid-cols-3 lg:grid-cols-4">
                   {cards.map(({ cardKey, component }) => (
                     <div key={cardKey}>{component}</div>

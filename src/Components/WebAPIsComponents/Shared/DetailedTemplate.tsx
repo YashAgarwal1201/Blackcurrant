@@ -45,12 +45,12 @@ export const DetailTemplate = ({
   extra,
 }: DetailTemplateProps) => (
   <div>
-    {/* ── What it is ── */}
+    {/* What it is */}
     <DetailSection heading="What it is">
       <p className="text-sm text-color5/80 leading-relaxed">{what}</p>
     </DetailSection>
 
-    {/* ── Code snippet ── */}
+    {/* Code snippet */}
     {codeSnippet && (
       <DetailSection heading={codeLabel ?? "Usage"}>
         <pre className="text-xs text-color5/70 font-mono bg-white/5 rounded-lg p-2 leading-relaxed overflow-x-auto">
@@ -59,7 +59,7 @@ export const DetailTemplate = ({
       </DetailSection>
     )}
 
-    {/* ── Browser support table ── */}
+    {/* Browser support table */}
     {browserSupport && browserSupport.length > 0 && (
       <DetailSection heading="Browser support">
         <div className="flex flex-col gap-1">
@@ -82,7 +82,7 @@ export const DetailTemplate = ({
       </DetailSection>
     )}
 
-    {/* ── Caveat / notes ── */}
+    {/* Caveat / notes */}
     {caveat && (
       <DetailSection heading="Caveats & notes">
         {typeof caveat === "string" ? (
@@ -93,7 +93,7 @@ export const DetailTemplate = ({
       </DetailSection>
     )}
 
-    {/* ── Any extra sections ── */}
+    {/* Any extra sections */}
     {extra}
   </div>
 );

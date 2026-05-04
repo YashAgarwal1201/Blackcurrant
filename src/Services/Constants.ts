@@ -149,6 +149,6 @@ export const NAV_OPTIONS = [
   { title: "Play with Strings", link: "/play-with-strings" },
   { title: "Play with Numbers", link: "/play-with-numbers" },
   // { title: "Play with JS Dates", link: "/play-with-dates" },
-  { title: "Web APIs", link: "/web-apis" },
+  { title: "Browser Vitals", link: "/browser-vitals" },
   { title: "Coditor Playground", link: "/coditor-playground" },
 ];

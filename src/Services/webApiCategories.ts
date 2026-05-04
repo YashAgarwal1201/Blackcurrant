@@ -78,7 +78,7 @@ export const WEB_API_CATEGORIES: WebApiCategoryMeta[] = [
 // Maps each card's unique key to its category.
 // This is the single place to register a card's category.
 export const CARD_CATEGORY_MAP: Record<string, WebApiCategory> = {
-  // ── Display & Screen ──────────────────────────────────────────────────
+  // Display & Screen
   screenColorDepth: "display",
   screenResolution: "display",
   screenOrientation: "display",
@@ -87,19 +87,19 @@ export const CARD_CATEGORY_MAP: Record<string, WebApiCategory> = {
   hdrSupport: "display",
   webGLInfo: "display",
 
-  // ── Time & Locale ─────────────────────────────────────────────────────
+  // Time & Locale
   currentTime: "time-locale",
   currentDate: "time-locale",
   timeZone: "time-locale",
   navigatorLanguage: "time-locale", // FIX: was missing
 
-  // ── Device & Hardware ─────────────────────────────────────────────────
+  // Device & Hardware
   batteryStatus: "device-hardware",
   deviceMemory: "device-hardware",
   cpuConcurrency: "device-hardware",
   touchSupport: "device-hardware",
 
-  // ── Browser & Environment ─────────────────────────────────────────────
+  // Browser & Environment
   cookieStatus: "browser-environment",
   browserDetection: "browser-environment",
   osDetection: "browser-environment",
@@ -108,20 +108,20 @@ export const CARD_CATEGORY_MAP: Record<string, WebApiCategory> = {
   clipboardApi: "browser-environment",
   notificationPermission: "browser-environment",
 
-  // ── Media & Sensors ───────────────────────────────────────────────────
+  // Media & Sensors
   speechRecognition: "media-sensors",
   speechSynthesis: "media-sensors",
   geolocationSupport: "media-sensors",
   vibrationApi: "media-sensors",
 
-  // ── Network ───────────────────────────────────────────────────────────
+  // Network
   onlineStatus: "network", // FIX: was missing
   networkInfo: "network", // FIX: was missing
 
-  // ── Performance ───────────────────────────────────────────────────────
+  // Performance
   pageVisibility: "performance",
 
-  // ── Theme & Accessibility ─────────────────────────────────────────────
+  // Theme & Accessibility
   themePreference: "theme-accessibility",
   prefersReducedMotion: "theme-accessibility",
   prefersContrast: "theme-accessibility",

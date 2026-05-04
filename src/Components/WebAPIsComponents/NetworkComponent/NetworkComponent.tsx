@@ -1,3 +1,5 @@
+// src/Components/WebAPIsComponents/NetworkComponent/NetworkComponent.tsx
+
 import { useState, useEffect } from "react";
 import { ApiCard, DataRow, CaveatNote, DetailSection } from "../Shared/ApiCard";
 
@@ -7,7 +9,10 @@ interface NetInfo {
   rtt: number | null;
   saveData: boolean;
   supported: boolean;
+  bravedDisabled: boolean;
 }
+
+const isBraveBrowser = (): boolean => !!(navigator as any).brave;
 
 const getNetInfo = (): NetInfo => {
   const conn =
@@ -22,6 +27,7 @@ const getNetInfo = (): NetInfo => {
       rtt: null,
       saveData: false,
       supported: false,
+      bravedDisabled: isBraveBrowser(),
     };
 
   return {
@@ -30,6 +36,7 @@ const getNetInfo = (): NetInfo => {
     rtt: typeof conn.rtt === "number" ? conn.rtt : null,
     saveData: !!conn.saveData,
     supported: true,
+    bravedDisabled: false,
   };
 };
 
@@ -62,6 +69,15 @@ const NetworkInfo = () => {
     EFFECTIVE_TYPE_LABELS[info.effectiveType] ??
     EFFECTIVE_TYPE_LABELS["unknown"];
 
+  // Derive status badge
+  const statusLabel = !info.supported
+    ? info.bravedDisabled
+      ? "Disabled by Brave"
+      : "Not Available"
+    : info.effectiveType.toUpperCase();
+
+  const statusQuality = !info.supported ? "unsupported" : typeInfo.quality;
+
   return (
     <ApiCard
       title="Network Info"
@@ -69,10 +85,8 @@ const NetworkInfo = () => {
       category="network"
       isLive
       purpose="Exposes connection speed tier and data-saver preference. Use this to serve lighter assets or disable auto-play video on slow or metered connections."
-      status={!info.supported ? "unsupported" : typeInfo.quality}
-      statusLabel={
-        !info.supported ? "Not Available" : info.effectiveType.toUpperCase()
-      }
+      status={statusQuality}
+      statusLabel={statusLabel}
       mdnUrl="https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation"
       detailTitle="Network Information API — Details"
       detailContent={
@@ -82,20 +96,22 @@ const NetworkInfo = () => {
               <li>
                 <strong>effectiveType</strong> — inferred connection quality
                 tier:{" "}
-                <code className="text-xs bg-white/10 px-1 rounded">
-                  slow-2g
-                </code>
-                , <code className="text-xs bg-white/10 px-1 rounded">2g</code>,{" "}
-                <code className="text-xs bg-white/10 px-1 rounded">3g</code>,{" "}
-                <code className="text-xs bg-white/10 px-1 rounded">4g</code>
+                {["slow-2g", "2g", "3g", "4g"].map((t) => (
+                  <code
+                    key={t}
+                    className="text-xs bg-white/10 px-1 rounded mr-1"
+                  >
+                    {t}
+                  </code>
+                ))}
               </li>
               <li>
                 <strong>downlink</strong> — estimated downstream bandwidth in
-                Mbps (rounded to 25kbps to prevent fingerprinting)
+                Mbps (rounded to 25 kbps to prevent fingerprinting)
               </li>
               <li>
                 <strong>rtt</strong> — estimated round-trip time in ms (rounded
-                to 25ms)
+                to 25 ms)
               </li>
               <li>
                 <strong>saveData</strong> — user has enabled Data Saver mode in
@@ -103,11 +119,19 @@ const NetworkInfo = () => {
               </li>
             </ul>
           </DetailSection>
+
           <DetailSection heading="Browser support">
             <ul className="text-sm text-color5/80 space-y-1 list-disc list-inside leading-relaxed">
               <li>
-                <strong>Chrome / Edge / Brave</strong> — Supported since Chrome
-                61
+                <strong>Chrome / Edge</strong> — Supported since Chrome 61
+              </li>
+              <li>
+                <strong>Brave</strong> — Disabled at engine level since v1.35
+                regardless of Shields settings. Re-enable via{" "}
+                <code className="text-xs bg-white/10 px-1 rounded">
+                  brave://flags
+                </code>{" "}
+                → search "Network Information API"
               </li>
               <li>
                 <strong>Firefox</strong> — Not implemented
@@ -117,6 +141,7 @@ const NetworkInfo = () => {
               </li>
             </ul>
           </DetailSection>
+
           <DetailSection heading="Adaptive loading pattern">
             <pre className="text-xs text-color5/70 font-mono bg-white/5 rounded-lg p-2 leading-relaxed overflow-x-auto">
               {`const conn = navigator.connection;
@@ -135,10 +160,22 @@ if (conn?.saveData || conn?.effectiveType === '2g') {
           <p className="text-sm text-color5/60">
             Network Information API is not available in this browser.
           </p>
-          <CaveatNote>
-            This API is a Chrome/Edge-only feature. Firefox and Safari have not
-            implemented it.
-          </CaveatNote>
+          {info.bravedDisabled ? (
+            <CaveatNote>
+              Brave disables this API at the engine level (since v1.35)
+              regardless of Shields settings. To re-enable, go to{" "}
+              <code className="text-xs bg-white/10 px-1 rounded">
+                brave://flags
+              </code>{" "}
+              and search for "Network Information API". Firefox and Safari have
+              also not implemented this API.
+            </CaveatNote>
+          ) : (
+            <CaveatNote>
+              Supported in Chrome and Edge (since v61). Firefox, Safari, and
+              Brave do not expose this API.
+            </CaveatNote>
+          )}
         </div>
       ) : (
         <div className="flex flex-col gap-2">

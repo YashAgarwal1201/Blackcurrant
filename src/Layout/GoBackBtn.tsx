@@ -1,8 +1,9 @@
 import { ChevronLeft } from "lucide-react";
 import { Button } from "primereact/button";
 
-const GoBackBtn = () => {
+const GoBackBtn = ({ extraHandelers }: { extraHandelers?: () => void }) => {
   const goBackBtn = () => {
+    extraHandelers?.();
     window.history.back();
   };
   return (
