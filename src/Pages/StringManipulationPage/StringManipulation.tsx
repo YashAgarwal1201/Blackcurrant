@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { STRING_OPTIONS, stringFunctions } from "../../Services/Constants";
 import useStringFunctionsStore from "../../Services/Stores/stringFunctionsStore";
 import useToastStore from "../../Services/Stores/toastMessageStore";
+import GoBackBtn from "../../Layout/GoBackBtn";
 
 const StringManipulation = () => {
   const { register, handleSubmit, reset, watch, setValue } = useForm();
@@ -270,10 +271,13 @@ const StringManipulation = () => {
       </Dialog>
 
       <div className="w-full h-full p-2 md:p-3 lg:p-4 flex flex-col gap-y-3 md:gap-y-4 lg:gap-y-6 portrait:overflow-hidden landscape:overflow-y-auto md:overflow-y-auto custom-scrollbar">
-        <div className="flex-shrink-0 flex flex-row items-center justify-between gap-4">
-          <h1 className="text-2xl xs:text-3xl mdl:text-4xl text-color5 font-heading select-none">
-            Play with Strings
-          </h1>
+        <div className="w-full flex-shrink-0 flex flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-x-1">
+            <GoBackBtn />
+            <h1 className="text-2xl xs:text-3xl mdl:text-4xl text-color5 font-heading select-none">
+              Play with Strings
+            </h1>
+          </div>
           <Button
             type="button"
             disabled={!inputText && !outputString}

@@ -1,46 +1,86 @@
 import { useEffect, useState } from "react";
-import { Card } from "primereact/card"; // Assuming PrimeReact is installed
-import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
+import { ApiCard, DataRow, DetailSection } from "../Shared/ApiCard";
+
+const checkCookies = (): boolean => {
+  if (typeof navigator.cookieEnabled === "boolean")
+    return navigator.cookieEnabled;
+  try {
+    document.cookie = "__bc_test=1; path=/; SameSite=Lax";
+    const enabled = document.cookie.includes("__bc_test");
+    document.cookie =
+      "__bc_test=; path=/; SameSite=Lax; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+    return enabled;
+  } catch {
+    return false;
+  }
+};
 
 const CookieStatus = () => {
-  const [cookiesEnabled, setCookiesEnabled] = useState<boolean | null>(null);
+  const [enabled, setEnabled] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const checkCookiesEnabled = () => {
-      // Attempt to set a test cookie
-      document.cookie = "testCookie=1";
+    setEnabled(checkCookies());
+  }, []);
 
-      // Check if the test cookie was set
-      const cookieEnabled = document.cookie.indexOf("testCookie") !== -1;
-
-      // Delete the test cookie
-      document.cookie =
-        "testCookie=1; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-      setCookiesEnabled(cookieEnabled);
-    };
-
-    checkCookiesEnabled(); // Call the function within useEffect
-  }, []); // Empty dependency array to run only once on component mount
-
-  // const cardStyle = "rounded-md"; // Card styling
+  const status =
+    enabled === null ? undefined : enabled ? "supported" : "unsupported";
+  const statusLabel =
+    enabled === null ? undefined : enabled ? "Enabled" : "Disabled";
 
   return (
-    <Card
-      className={WEB_APIS_CARDS_BASE_STYLES}
-      title={<h2 className="font-heading">Cookie Status</h2>}
-      subTitle={
-        <p className="font-subHeading">(can be wrong for some browsers)</p>
+    <ApiCard
+      title="Cookie Status"
+      icon="🍪"
+      category="browser-environment"
+      purpose="Checks whether the browser permits reading and writing cookies in this context. Sandboxed iframes may block them even when the browser allows them."
+      status={status}
+      statusLabel={statusLabel}
+      mdnUrl="https://developer.mozilla.org/en-US/docs/Web/API/Navigator/cookieEnabled"
+      detailTitle="Cookie Status — Details"
+      detailContent={
+        <div>
+          <DetailSection heading="What cookies are">
+            <p className="text-sm text-color5/80 leading-relaxed">
+              Cookies are small key-value pairs stored in the browser, used for
+              sessions, preferences, and tracking.
+              <code className="text-xs bg-white/10 px-1 rounded">
+                navigator.cookieEnabled
+              </code>{" "}
+              checks whether the browser permits writing cookies in the current
+              context.
+            </p>
+          </DetailSection>
+          <DetailSection heading="When this can be wrong">
+            <ul className="text-sm text-color5/80 space-y-1 list-disc list-inside leading-relaxed">
+              <li>
+                Private/Incognito mode may allow cookies for the session only
+              </li>
+              <li>
+                Sandboxed iframes may block cookies even if the browser allows
+                them
+              </li>
+              <li>
+                Third-party cookie restrictions don't affect this top-level
+                check
+              </li>
+            </ul>
+          </DetailSection>
+        </div>
       }
     >
-      {cookiesEnabled === null ? (
-        <p>Checking cookie status...</p>
-      ) : cookiesEnabled ? (
-        <p>Cookies are enabled</p>
+      {enabled === null ? (
+        <p className="text-sm text-color5/50">Checking…</p>
       ) : (
-        <p>Cookies are disabled</p>
+        <DataRow
+          label="Cookie access"
+          value={
+            enabled
+              ? "Cookies can be read and written"
+              : "Cookies are blocked in this context"
+          }
+        />
       )}
-    </Card>
+    </ApiCard>
   );
 };
 

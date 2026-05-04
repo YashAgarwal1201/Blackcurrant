@@ -10,10 +10,10 @@
   "icons": [{ "src": "./logo.svg", "sizes": "any", "type": "image/svg+xml" }],
   "shortcuts": [
     {
-      "name": "Play with Dates",
-      "short_name": "Play with Dates",
-      "description": "Play with Dates",
-      "url": "/play-with-dates",
+      "name": "Browser Vitals",
+      "short_name": "Browser Vitals",
+      "description": "Browser Vitals",
+      "url": "/browser-vitals",
       "icons": [
         { "src": "./logo.svg", "sizes": "any", "type": "image/svg+xml" }
       ]

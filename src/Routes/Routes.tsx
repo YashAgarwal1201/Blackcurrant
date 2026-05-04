@@ -12,17 +12,17 @@ import App from "./../App";
 const LandingPage = lazy(() => import("./../Pages/LandingPage/LandingPage"));
 const HomePage = lazy(() => import("./../Pages/HomePage/HomePage"));
 const StringManipulation = lazy(
-  () => import("../Pages/StringManipulationPage/StringManipulation")
+  () => import("../Pages/StringManipulationPage/StringManipulation"),
 );
 const NumberManipulation = lazy(
-  () => import("../Pages/NumbersPage/NumberManipulation")
+  () => import("../Pages/NumbersPage/NumberManipulation"),
 );
 const PlayWithJsDates = lazy(
-  () => import("./../Pages/DatesPage/PlayWithDatesPage")
+  () => import("./../Pages/DatesPage/PlayWithDatesPage"),
 );
 const WebAPI = lazy(() => import("../Pages/WebAPIsPage/WebAPI"));
 const Playground = lazy(
-  () => import("../Pages/CoditorPlayground/PlaygroundPage")
+  () => import("../Pages/CoditorPlayground/PlaygroundPage"),
 );
 const PageNotFound = lazy(() => import("../Pages/PageNotFound/PageNotFound"));
 
@@ -34,11 +34,11 @@ const Router = createBrowserRouter(
       <Route path="/play-with-strings" element={<StringManipulation />} />
       <Route path="/play-with-numbers" element={<NumberManipulation />} />
       <Route path="/play-with-dates" element={<PlayWithJsDates />} />
-      <Route path="/web-apis" element={<WebAPI />} />
+      <Route path="/browser-vitals" element={<WebAPI />} />
       <Route path="/coditor-playground" element={<Playground />} />
       <Route path="*" element={<PageNotFound />} />
-    </Route>
-  )
+    </Route>,
+  ),
 );
 
 export default Router;

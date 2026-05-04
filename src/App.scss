@@ -66,6 +66,16 @@
   backdrop-filter: blur(8px);
 }
 
+.p-dropdown-item {
+  border-radius: 0.5rem;
+  color: var(--color5);
+}
+
+.p-dropdown-item + .p-highlight {
+  background-color: var(--color1);
+  color: var(--color4);
+}
+
 a {
   font-style: oblique;
 }
@@ -82,6 +92,10 @@ ul:not(.p-contextmenu ul) {
     color: var(--color5) !important;
     background-color: var(--color3) !important;
     border-color: var(--color3) !important;
+  }
+
+  .p-dropdown-item:hover {
+    background-color: var(--color1);
   }
 }
 

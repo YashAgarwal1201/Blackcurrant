@@ -1,36 +1,146 @@
 import { useState, useEffect } from "react";
-import { Card } from "primereact/card"; // Assuming PrimeReact is installed
-import { WEB_APIS_CARDS_BASE_STYLES } from "../../../Services/Constants";
+import { ApiCard, DataRow, CaveatNote, DetailSection } from "../Shared/ApiCard";
+
+type SynthStatus = "checking" | "unsupported" | "no-voices" | "supported";
 
 const SpeechSynthesisSupport = () => {
-  const [isSupported, setIsSupported] = useState<boolean | null>(null);
+  const [status, setStatus] = useState<SynthStatus>("checking");
+  const [voiceCount, setVoiceCount] = useState(0);
 
   useEffect(() => {
-    const checkSpeechSynthesisSupport = () => {
-      const isSupported = "speechSynthesis" in window;
-      setIsSupported(isSupported);
+    if (!("speechSynthesis" in window)) {
+      setStatus("unsupported");
+      return;
+    }
+
+    const updateVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      setVoiceCount(voices.length);
+      setStatus(voices.length > 0 ? "supported" : "no-voices");
     };
 
-    // Check for speech synthesis support when component mounts
-    checkSpeechSynthesisSupport();
-  }, []); // Empty dependency array to run only once on component mount
+    updateVoices();
+    window.speechSynthesis.addEventListener("voiceschanged", updateVoices);
+    const timeout = setTimeout(updateVoices, 2000);
+
+    return () => {
+      window.speechSynthesis.removeEventListener("voiceschanged", updateVoices);
+      clearTimeout(timeout);
+    };
+  }, []);
+
+  const cardStatus =
+    status === "supported"
+      ? "supported"
+      : status === "no-voices"
+        ? "partial"
+        : status === "unsupported"
+          ? "unsupported"
+          : undefined;
+
+  const statusLabel =
+    status === "supported"
+      ? "Supported"
+      : status === "no-voices"
+        ? "No Voices"
+        : status === "unsupported"
+          ? "Not Supported"
+          : undefined;
 
   return (
-    <Card
-      className={WEB_APIS_CARDS_BASE_STYLES}
-      title={<h2 className="font-heading">Speech Synthesis Support</h2>}
-      subTitle={
-        <p className="font-subHeading">(browser compatibility check)</p>
+    <ApiCard
+      title="Speech Synthesis"
+      icon="🔊"
+      category="media-sensors"
+      purpose="Text-to-speech via the browser's built-in voice engine. Voice availability depends on OS-installed TTS packages, not just browser support."
+      status={cardStatus}
+      statusLabel={statusLabel}
+      mdnUrl="https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis"
+      detailTitle="Speech Synthesis — Details"
+      detailContent={
+        <div>
+          <DetailSection heading="What it does">
+            <p className="text-sm text-color5/80 leading-relaxed">
+              The{" "}
+              <code className="text-xs bg-white/10 px-1 rounded">
+                speechSynthesis
+              </code>{" "}
+              API converts text to spoken audio using voice engines installed on
+              the device or browser. Available voices are returned by{" "}
+              <code className="text-xs bg-white/10 px-1 rounded">
+                getVoices()
+              </code>
+              .
+            </p>
+          </DetailSection>
+          <DetailSection heading="Browser support">
+            <ul className="text-sm text-color5/80 space-y-1 list-disc list-inside leading-relaxed">
+              <li>
+                <strong>Chrome / Edge / Brave / Vivaldi</strong> — Supported. On
+                Linux, requires{" "}
+                <code className="text-xs bg-white/10 px-1 rounded">
+                  espeak-ng
+                </code>{" "}
+                or{" "}
+                <code className="text-xs bg-white/10 px-1 rounded">
+                  speech-dispatcher
+                </code>{" "}
+                for voices to load.
+              </li>
+              <li>
+                <strong>Firefox</strong> — Supported since v49. On Linux, reads
+                voices from{" "}
+                <code className="text-xs bg-white/10 px-1 rounded">
+                  speech-dispatcher
+                </code>{" "}
+                synchronously.
+              </li>
+              <li>
+                <strong>Safari</strong> — Supported since v7.
+              </li>
+              <li>
+                <strong>Epiphany (WebKitGTK)</strong> — API may be present but
+                non-functional without a system TTS backend.
+              </li>
+            </ul>
+          </DetailSection>
+        </div>
       }
     >
-      {isSupported === null ? (
-        <p>Checking...</p>
-      ) : isSupported ? (
-        <p>Speech Synthesis is supported in this browser.</p>
-      ) : (
-        <p>Speech Synthesis is not supported in this browser.</p>
+      {status === "checking" && (
+        <p className="text-sm text-color5/50">Checking voices…</p>
       )}
-    </Card>
+      {status === "unsupported" && (
+        <DataRow
+          label="API availability"
+          value="Speech Synthesis is not supported in this browser"
+        />
+      )}
+      {status === "supported" && (
+        <div className="flex flex-col gap-2">
+          <DataRow
+            label="API availability"
+            value="Speech Synthesis is available"
+          />
+          <DataRow
+            label="Available voices"
+            value={voiceCount.toLocaleString()}
+          />
+        </div>
+      )}
+      {status === "no-voices" && (
+        <div className="flex flex-col gap-2">
+          <DataRow
+            label="API availability"
+            value="API is present but no voices loaded"
+          />
+          <CaveatNote>
+            On Linux, install <strong>espeak-ng</strong> or{" "}
+            <strong>speech-dispatcher</strong> to enable voices.
+          </CaveatNote>
+        </div>
+      )}
+    </ApiCard>
   );
 };
 
