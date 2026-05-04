@@ -4,7 +4,7 @@ import FeedbackDialog from "../Components/FeedbackDialog/FeedbackDialog";
 
 const Layout = ({ children }: { children: any }) => {
   return (
-    <div className="w-full h-full bg-color1 relative flex flex-col md:flex-row">
+    <div className="w-full h-full bg-color1 relative flex flex-col-reverse md:flex-row">
       <div className="w-full md:w-20 h-16 md:h-full flex-shrink-0">
         <Navbar />
       </div>

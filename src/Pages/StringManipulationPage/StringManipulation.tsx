@@ -306,7 +306,7 @@ const StringManipulation = () => {
               filter
               filterPlaceholder="Search functions..."
               className="flex-1 md:flex-none md:w-1/2 lg:w-1/3 h-9 sm:h-10 !rounded-lg !bg-color2 border sm:border-2 !border-color4 *:py-2 *:text-color5 *:text-sm"
-              panelClassName="text-sm md:text-base font-content mt-2 rounded-lg"
+              panelClassName="!bg-color2 !border !border-white !rounded-lg !p-2"
             />
             <Button
               type="button"
