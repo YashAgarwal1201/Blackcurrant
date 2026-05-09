@@ -38,7 +38,7 @@ function App() {
   // }, [state]);
 
   return (
-    <div className="w-screen h-[100dvh] bg-color1">
+    <div className="w-screen h-dvh bg-color1">
       <DocumentTitleUpdater />
       <Toast ref={toastRef} />
       <Outlet />
