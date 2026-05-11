@@ -90,7 +90,7 @@ const Navbar = () => {
           title="Open side menu"
           aria-label="Side menu btn"
           onClick={toggleSideMenu}
-          className="group flex flex-col justify-center items-center gap-y-1 px-2 py-1 !bg-transparent border-none rounded-xl"
+          className="group flex flex-col justify-center items-center gap-y-1 px-2 py-1 bg-transparent! border-none rounded-xl"
         >
           <span
             className={`px-3 py-1 rounded-full transition-colors duration-200 ${isSideMenuOpen ? "bg-color5" : "bg-transparent"}`}

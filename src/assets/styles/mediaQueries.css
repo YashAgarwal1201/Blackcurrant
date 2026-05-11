@@ -1,0 +1,66 @@
+/* @media (hover: hover) and (pointer: fine) {
+  .p-button:hover,
+  a:hover,
+  .feedback-form .form-section:hover,
+  .p-accordion .p-accordion-tab .p-accordion-header:hover,
+  .custom-panel-header:hover {
+    color: var(--color1) !important;
+    background-color: var(--color3);
+    border-color: var(--color3);
+  }
+}
+
+@media only screen and (max-width: 520px) {
+  .p-toast {
+    width: 80%;
+    max-width: 80%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+} */
+
+/* v2 */
+/* ─── Hover interactions - pointer devices only ──────────────────────────────── */
+@media (hover: hover) and (pointer: fine) {
+  .p-button:hover,
+  a:hover,
+  .feedback-form .form-section:hover,
+  .p-accordion .p-accordion-tab .p-accordion-header:hover,
+  .custom-panel-header:hover {
+    color: var(--base-100) !important;
+    background-color: var(--neutral);
+    border-color: var(--neutral);
+  }
+}
+
+/* ─── Toast width on small screens ───────────────────────────────────────────── */
+@media only screen and (max-width: 520px) {
+  .p-toast {
+    width: 80%;
+    max-width: 80%;
+  }
+}
+
+/* ─── Scrollbar sizing on mobile ─────────────────────────────────────────────── */
+@media screen and (max-width: 768px) {
+  .contentBody::-webkit-scrollbar {
+    width: 6px;
+  }
+  .contentBody::-webkit-scrollbar-thumb {
+    width: 6px;
+    border-radius: 6px;
+  }
+}
+
+/* ─── Reduced motion - accessibility ─────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

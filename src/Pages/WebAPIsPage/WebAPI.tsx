@@ -339,13 +339,13 @@ const WebAPI = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search APIs…"
                 aria-label="Search Web API cards"
-                className="w-full !bg-color2 !text-color5 placeholder:text-color5 text-sm font-content rounded-lg pl-9 pr-8 py-2.5 !border !border-white/10 outline-none focus:!border-color3 transition-all"
+                className="w-full bg-color2! text-color5! placeholder:text-color5 text-sm font-content rounded-lg pl-9 pr-8 py-2.5 border! border-white! outline-none focus:border-color3! transition-all"
               />
               {searchQuery && (
                 <Button
                   onClick={() => setSearchQuery("")}
                   aria-label="Clear search"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 !text-color5 hover:!text-color5 transition-colors text-sm leading-none"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-color5! hover:text-color5! transition-colors text-sm leading-none"
                 >
                   <X size={16} />
                 </Button>
@@ -360,10 +360,10 @@ const WebAPI = () => {
               optionLabel="label"
               optionValue="id"
               aria-label="Filter by category"
-              className={`shrink-0 !bg-color2 *:!text-color5 !text-sm !font-content !rounded-lg !border transition-all ${
-                activeCategory !== "all" ? "!border-color3" : "!border-color4"
+              className={`shrink-0 bg-color2! *:text-color5! text-sm! font-content! rounded-lg! border! transition-all ${
+                activeCategory !== "all" ? "border-color3!" : "border-color4!"
               }`}
-              panelClassName="!bg-color2 !border !border-white !rounded-lg !p-2"
+              panelClassName="bg-color2! border! border-white! rounded-lg! !p-2"
             />
           </div>
 
@@ -390,7 +390,7 @@ const WebAPI = () => {
               </p>
               <Button
                 onClick={resetFilters}
-                className="text-sm px-3 py-1.5 !text-color3 hover:!text-color5 underline underline-offset-2 transition-colors font-content"
+                className="text-sm px-3 py-1.5 text-color3! hover:text-color5! underline underline-offset-2 transition-colors font-content"
               >
                 Clear filters
               </Button>

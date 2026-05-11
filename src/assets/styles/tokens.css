@@ -1,0 +1,119 @@
+/* ─── Surface tokens ─────────────────────────────────────────────────────────── */
+
+html[data-theme="light"] {
+  --base-100: #fcfafc;
+  --base-200: #f5f1f7;
+  --base-300: #e6dde9;
+
+  --base-content: #231826;
+
+  --neutral: #ddd2e1;
+  --neutral-content: #594962;
+}
+
+html[data-theme="dark"] {
+  --base-100: #0d0a10;
+  --base-200: #17111c;
+  --base-300: #24182b;
+
+  --base-content: #f4edf7;
+
+  --neutral: #45344c;
+  --neutral-content: #dccfe2;
+}
+
+/* ─── Accent tokens - dark defaults ─────────────────────────────────────────── */
+
+/* Graphite */
+[data-accent="graphite"] {
+  --primary: #a8a1ad;
+  --primary-content: #0d0a10;
+}
+
+/* Currant (main brand) */
+[data-accent="currant"] {
+  --primary: #b46cff;
+  --primary-content: #14081d;
+}
+
+/* Plum */
+[data-accent="plum"] {
+  --primary: #8b5cf6;
+  --primary-content: #12071a;
+}
+
+/* Berry */
+[data-accent="berry"] {
+  --primary: #d86b8a;
+  --primary-content: #22070d;
+}
+
+/* Wine */
+[data-accent="wine"] {
+  --primary: #b24b6a;
+  --primary-content: #22070d;
+}
+
+/* Leaf */
+[data-accent="leaf"] {
+  --primary: #6f8f3a;
+  --primary-content: #111a06;
+}
+
+/* ─── Accent tokens - light overrides ───────────────────────────────────────── */
+
+/* Graphite */
+[data-theme="light"][data-accent="graphite"] {
+  --primary: #5f5666;
+  --primary-content: #ffffff;
+}
+
+/* Currant */
+[data-theme="light"][data-accent="currant"] {
+  --primary: #7f2ee6;
+  --primary-content: #ffffff;
+}
+
+/* Plum */
+[data-theme="light"][data-accent="plum"] {
+  --primary: #6d28d9;
+  --primary-content: #ffffff;
+}
+
+/* Berry */
+[data-theme="light"][data-accent="berry"] {
+  --primary: #c23d64;
+  --primary-content: #ffffff;
+}
+
+/* Wine */
+[data-theme="light"][data-accent="wine"] {
+  --primary: #a53a59;
+  --primary-content: #ffffff;
+}
+
+/* Leaf */
+[data-theme="light"][data-accent="leaf"] {
+  --primary: #5f7f2f;
+  --primary-content: #ffffff;
+}
+
+/* ─── PrimeReact token sync ──────────────────────────────────────────────────── */
+
+:root {
+  --p-primary-color: var(--primary);
+  --p-primary-contrast-color: var(--primary-content);
+  --p-primary-hover-color: var(--primary);
+  --p-focus-ring-color: var(--primary);
+}
+
+/* ─── Legacy bridge ──────────────────────────────────────────────────────────── */
+
+html[data-theme="light"],
+html[data-theme="dark"] {
+  --color1: var(--base-100);
+  --color2: var(--base-200);
+  --color3: var(--neutral);
+  --color4: var(--neutral-content);
+  --color5: var(--base-content);
+}

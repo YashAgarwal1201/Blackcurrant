@@ -463,8 +463,8 @@ export default {
               { value: "vue", label: "Vue" },
             ]}
             onChange={(e) => handleLanguageChange(e.target.value as Language)}
-            className="flex-1 md:flex-none h-9 sm:h-10 !rounded-lg !bg-color2 border sm:border-2 !border-color4 *:py-2 *:text-color1 *:text-sm"
-            panelClassName="!bg-color2 !border !border-white !rounded-lg !p-2"
+            className="flex-1 md:flex-none h-9 sm:h-10 rounded-lg! bg-color2! border sm:border-2 border-color4! *:py-2 *:text-color1 *:text-sm"
+            panelClassName="bg-color2! border! border-white! rounded-lg! !p-2"
           />
           <Button
             title="Change editor and output orientation"
@@ -538,7 +538,7 @@ export default {
                 lineNumbers: "on",
                 padding: { top: 16 },
               }}
-              className="!rounded-2xl"
+              className="rounded-2xl!"
             />
           </div>
         </div>
@@ -600,7 +600,7 @@ export default {
 
             {/* Console */}
             {consoleLogs.length > 0 && (
-              <div className="h-32 border-t border-color2/30 bg-color1/50 overflow-y-auto flex-shrink-0">
+              <div className="h-32 border-t border-color2/30 bg-color1/50 overflow-y-auto shrink-0">
                 <div className="p-2 space-y-1">
                   {consoleLogs.map((log, index) => (
                     <div
@@ -613,7 +613,7 @@ export default {
                             : "text-green-400 bg-green-900/20"
                       }`}
                     >
-                      <Terminal className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                      <Terminal className="w-3 h-3 mt-0.5 shrink-0" />
                       <span className="break-all">{log.message}</span>
                     </div>
                   ))}

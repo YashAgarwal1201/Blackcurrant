@@ -1,8 +1,8 @@
 import { Sidebar } from "primereact/sidebar";
-import { Panel } from "primereact/panel";
+import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
 import { Button } from "primereact/button";
 // import { Divider } from "primereact/divider";
-import "./SideMenu.scss";
+
 import {
   WhatsappShareButton,
   WhatsappIcon,
@@ -16,6 +16,10 @@ import {
   TelegramShareButton,
 } from "react-share";
 import useNavStore from "../../Services/Stores/navStore";
+import { BASE_THEMES, ACCENT_COLORS } from "@/Services/Data/ThemesConstants";
+import { Dropdown } from "primereact/dropdown";
+import { Info, Monitor, Moon, Palette, Share2, Sun, X } from "lucide-react";
+import "./SideMenu.scss";
 
 declare const __APP_VERSION__: string;
 
@@ -28,12 +32,62 @@ const TECH_STACK = [
   { label: "Zustand", color: "#FF6B35" },
 ];
 
+// ── Shared panel header - extracted to avoid 5x duplication ──────────────
+const PanelHeader = ({
+  options,
+  icon,
+  label,
+  isOpen,
+  children,
+}: {
+  options: PanelHeaderTemplateOptions;
+  icon: React.ReactNode;
+  label: string;
+  isOpen: boolean;
+  children?: React.ReactNode;
+}) => (
+  <div
+    role="button"
+    tabIndex={0}
+    aria-expanded={isOpen}
+    className="cursor-pointer custom-panel-header w-full flex justify-between items-center px-2 py-4 rounded-xl"
+    onClick={(e) => options.onTogglerClick!(e)}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        options.onTogglerClick!(e as unknown as React.MouseEvent<HTMLElement>);
+      }
+    }}
+  >
+    <h3 className="font-subHeading font-medium text-lg sm:text-xl text-base-content flex items-center">
+      <span
+        className={`mr-4 text-primary transition-transform ${
+          isOpen ? "animate-icon-expand-nudge" : ""
+        }`}
+        aria-hidden="true"
+      >
+        {icon}
+      </span>
+      {label}
+    </h3>
+    {children}
+    <span
+      aria-hidden="true"
+      className={`pi ${options.collapsed ? "pi-chevron-down" : "pi-chevron-up"} mr-1`}
+    />
+  </div>
+);
+
 const SideMenu = () => {
   const {
     isSideMenuOpen,
     isFeedbackDialogOpen,
+    baseTheme,
+    accentColor,
     toggleSideMenu,
     openFeedbackDialog,
+    setBaseTheme,
+    setAccentColor,
   } = useNavStore();
   const shareUrl = window.location.href;
   const shareText = "Check out this website!";
@@ -42,88 +96,154 @@ const SideMenu = () => {
     <Sidebar
       visible={isSideMenuOpen && !isFeedbackDialogOpen}
       onHide={() => toggleSideMenu()}
-      position="right"
+      role="region"
+      aria-label="Settings and options"
+      dismissable
+      draggable={false}
       header={
-        <h2 className="font-heading text-xl sm:text-2xl lg:text-3xl text-color5">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-heading font-normal text-base-content">
           More Options
         </h2>
       }
-      className="side-menu !w-full md:!w-[768px] rounded-none md:!rounded-l-xl bg-color1"
-      closeIcon={<span className="pi pi-times text-color5"></span>}
-      maskClassName="backdrop-blur"
-      dismissable
+      className="side-menu w-full md:w-[768px] rounded-l-none md:rounded-l-2xl bg-base-100 shadow-none"
+      closeIcon={
+        <X size={24} aria-hidden="true" className="text-base-content" />
+      }
+      maskClassName="backdrop-blur bg-transparent!"
+      position="right"
     >
-      <div className="w-full bg-color4 rounded-3xl py-4 px-4">
+      <div className="w-full px-4 py-4 text-base-content bg-base-200 rounded-3xl overflow-y-auto">
         <Panel
-          headerTemplate={(options) => {
-            const togglePanel = (event: React.MouseEvent<HTMLElement>) => {
-              options.onTogglerClick!(event);
-            };
+          // headerTemplate={(options) => {
+          //   const togglePanel = (event: React.MouseEvent<HTMLElement>) => {
+          //     options.onTogglerClick!(event);
+          //   };
 
-            return (
-              <div
-                className="cursor-pointer custom-panel-header w-full flex justify-between items-center px-2 py-4 rounded-xl"
-                onClick={togglePanel}
-              >
-                <h3 className="font-subHeading font-medium text-lg sm:text-xl text-color1 flex items-center">
-                  <span className="pi pi-palette mr-4"></span>
-                  Appearance
-                </h3>
-                <span
-                  className={`pi ${
-                    options.collapsed ? "pi-chevron-down" : "pi-chevron-up"
-                  }`}
-                ></span>
-              </div>
-            );
-          }}
+          //   return (
+          //     <div
+          //       className="cursor-pointer custom-panel-header w-full flex justify-between items-center px-2 py-4 rounded-xl"
+          //       onClick={togglePanel}
+          //     >
+          //       <h3 className="font-subHeading font-medium text-lg sm:text-xl text-color1 flex items-center">
+          //         <span className="pi pi-palette mr-4"></span>
+          //         Appearance
+          //       </h3>
+          //       <span
+          //         className={`pi ${
+          //           options.collapsed ? "pi-chevron-down" : "pi-chevron-up"
+          //         }`}
+          //       ></span>
+          //     </div>
+          //   );
+          // }}
+
+          headerTemplate={(options) => (
+            <PanelHeader
+              options={options}
+              icon={<Palette size={20} />}
+              label="Appearance"
+              isOpen={false}
+            >
+              {/* Collapsed preview: theme icon + accent swatch */}
+              {options.collapsed && (
+                <div className="ml-auto mr-4 flex items-center gap-x-3">
+                  <span aria-hidden="true">
+                    {baseTheme === "system" ? (
+                      <Monitor size={20} className="mr-3" />
+                    ) : baseTheme === "light" ? (
+                      <Sun size={16} className="mr-3" />
+                    ) : (
+                      <Moon size={16} className="mr-3" />
+                    )}
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className="w-5 h-5 rounded-full ring-2 ring-offset-1 ring-base-content ring-offset-base-200"
+                    style={{
+                      backgroundColor: ACCENT_COLORS.find(
+                        (ac) => ac.value === accentColor,
+                      )?.swatch,
+                    }}
+                  />
+                </div>
+              )}
+            </PanelHeader>
+          )}
           className="bg-transparent rounded-2xl"
           collapsed
           toggleable
         >
-          <div>
-            <span>Coming Soon!</span>
+          <div className="flex flex-col gap-y-5 px-1">
+            <div className="flex flex-wrap justify-between items-center gap-3">
+              <span className="font-content text-base-content">Theme</span>
+
+              <Dropdown
+                value={baseTheme}
+                options={BASE_THEMES}
+                onChange={(e) => setBaseTheme(e.value)}
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Select theme"
+                className="min-w-[160px] h-10 *:py-2 *:px-3 rounded-xl! bg-primary *:text-primary-content *:font-content border-none"
+                panelClassName="mt-1 rounded-xl *:rounded-xl *:font-content"
+              />
+            </div>
+
+            <div className="flex flex-wrap justify-between items-center gap-3">
+              <span className="font-content text-base-content">
+                Accent color
+              </span>
+
+              <div
+                className="flex items-center gap-x-2"
+                role="group"
+                aria-label="Accent color options"
+              >
+                {ACCENT_COLORS.map((ac) => (
+                  <button
+                    key={ac.value}
+                    type="button"
+                    aria-label={`${ac.label} accent${accentColor === ac.value ? " (selected)" : ""}`}
+                    aria-pressed={accentColor === ac.value}
+                    onClick={() => setAccentColor(ac.value)}
+                    className={`w-7 h-7 rounded-full transition-all ${
+                      accentColor === ac.value
+                        ? "ring-2 ring-offset-2 ring-base-content ring-offset-base-200 scale-110"
+                        : "opacity-60 hover:opacity-100"
+                    }`}
+                    style={{ backgroundColor: ac.swatch }}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </Panel>
 
-        <div className="mx-2 my-1 p-0 max-w-full h-[1.5px] bg-color2" />
+        <hr className="mx-2 my-1 border-none h-[1.5px] bg-base-300" />
 
         <Button
           title="Give feedback"
-          className="w-full py-4 px-2 bg-color4 font-subHeading text-lg sm:text-xl text-color1 rounded-xl"
+          className="cursor-pointer custom-panel-header text-lg sm:text-xl w-full flex justify-between items-center px-2 py-4 rounded-xl bg-transparent border-transparent"
+          // className="w-full py-4 px-2 bg-color4 font-subHeading text-lg sm:text-xl text-color1 rounded-xl"
           onClick={() => openFeedbackDialog()}
         >
-          <h3 className="font-subHeading font-medium text-color1 flex items-center">
-            <span className="pi pi-comment mr-4"></span>
+          <h3 className="font-subHeading font-medium text-lg sm:text-xl text-base-content flex items-center">
+            <span className="pi pi-comment mr-4 text-primary"></span>
             Feedback
           </h3>
         </Button>
 
-        <div className="mx-2 my-1 p-0 max-w-full h-[1.5px] bg-color2" />
+        <hr className="mx-2 my-1 border-none h-[1.5px] bg-base-300" />
 
         <Panel
-          headerTemplate={(options) => {
-            const togglePanel = (event: React.MouseEvent<HTMLElement>) => {
-              options.onTogglerClick!(event);
-            };
-
-            return (
-              <div
-                className="cursor-pointer custom-panel-header w-full flex justify-between items-center px-2 py-4 rounded-xl"
-                onClick={togglePanel}
-              >
-                <h3 className="font-subHeading font-medium text-lg sm:text-xl text-color1 flex items-center">
-                  <span className="pi pi-share-alt mr-4"></span>
-                  Share
-                </h3>
-                <span
-                  className={`pi ${
-                    options.collapsed ? "pi-chevron-down" : "pi-chevron-up"
-                  }`}
-                ></span>
-              </div>
-            );
-          }}
+          headerTemplate={(options) => (
+            <PanelHeader
+              options={options}
+              icon={<Share2 size={20} />}
+              label="Share"
+              isOpen={false}
+            />
+          )}
           className="bg-transparent rounded-2xl"
           collapsed
           toggleable
@@ -155,77 +275,63 @@ const SideMenu = () => {
           </div>
         </Panel>
 
-        <div className="mx-2 my-1 p-0 max-w-full h-[1.5px] bg-color2" />
+        <hr className="mx-2 my-1 border-none h-[1.5px] bg-base-300" />
 
         <a
           href={import.meta.env.VITE_DEVELOPER_PROFILE ?? ""}
           target="_blank"
           rel="noopener noreferrer nofollow"
-          className="!w-full block py-4 px-2 bg-color4 font-subHeading text-lg sm:text-xl text-color1 rounded-xl not-italic"
+          className="cursor-pointer custom-panel-header text-lg sm:text-xl w-full flex justify-between items-center px-2 py-4 rounded-xl"
+          // className="w-full! block py-4 px-2 bg-color4 font-subHeading text-lg sm:text-xl text-color1 rounded-xl not-italic"
         >
-          <h3 className="font-subHeading font-medium text-color1 flex items-center">
-            <span className="pi pi-github mr-4"></span>
+          <h3 className="font-subHeading font-medium text-lg sm:text-xl text-base-content flex items-center">
+            <span className="pi pi-github mr-4 text-primary"></span>
             Developer Profile
           </h3>
         </a>
 
-        <div className="mx-2 my-1 p-0 max-w-full h-[1.5px] bg-color2" />
+        <hr className="mx-2 my-1 border-none h-[1.5px] bg-base-300" />
 
-        {/* About This App */}
+        {/* ── About This App ── */}
         <Panel
-          headerTemplate={(options) => {
-            const togglePanel = (event: React.MouseEvent<HTMLElement>) => {
-              options.onTogglerClick!(event);
-            };
-
-            return (
-              <div
-                className="cursor-pointer custom-panel-header w-full flex justify-between items-center px-2 py-4 rounded-xl"
-                onClick={togglePanel}
-              >
-                <h3 className="font-subHeading font-medium text-lg sm:text-xl text-color1 flex items-center">
-                  <span className="pi pi-info-circle mr-4"></span>
-                  About This App
-                </h3>
-                <span
-                  className={`pi ${
-                    options.collapsed ? "pi-chevron-down" : "pi-chevron-up"
-                  }`}
-                ></span>
-              </div>
-            );
-          }}
+          headerTemplate={(options) => (
+            <PanelHeader
+              options={options}
+              icon={<Info size={20} />}
+              label="About This App"
+              isOpen={false}
+            />
+          )}
           className="bg-transparent rounded-2xl"
-          collapsed
           toggleable
         >
-          <div className="flex flex-col gap-4 px-2 pb-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-color1/60 font-content">
-                Version
-              </span>
-              <span className="text-xs font-mono bg-color2/40 text-color1 px-3 py-1 rounded-full border border-color2">
-                {__APP_VERSION__}
-              </span>
+          <div className="flex flex-col gap-y-4 px-1 font-content">
+            <div className="w-full flex flex-col gap-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-neutral-content">Version</span>
+                <span className="px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 font-heading">
+                  {__APP_VERSION__}
+                </span>
+              </div>
             </div>
 
-            <div className="h-px bg-color2" />
+            <hr className="border-none h-[1.5px] bg-base-300" />
 
-            <div className="flex flex-col gap-2">
-              <span className="text-sm text-color1/60 font-content">
-                Tools used
-              </span>
+            <div className="flex flex-col gap-y-2">
+              <span className="text-neutral-content">Tools used</span>
               <div className="flex flex-wrap gap-2">
-                {TECH_STACK.map(({ label, color }) => (
+                {TECH_STACK?.map((tech) => (
                   <span
-                    key={label}
-                    className="inline-flex items-center gap-1.5 text-xs font-content text-color1 bg-color2/40 border border-color2 px-3 py-1 rounded-full"
+                    key={tech.label}
+                    className="flex items-center gap-x-2 px-3 py-1 rounded-full bg-neutral text-neutral-content"
+                    style={{ border: `1px solid ${tech.color}40` }}
                   >
                     <span
+                      aria-hidden="true"
                       className="w-2 h-2 rounded-full shrink-0"
-                      style={{ backgroundColor: color }}
+                      style={{ backgroundColor: tech.color }}
                     />
-                    {label}
+                    <span>{tech.label}</span>
                   </span>
                 ))}
               </div>

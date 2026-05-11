@@ -1,0 +1,20 @@
+/* ─── Inter (PrimeReact Mira override - adds font-display: swap) ─────────────── */
+@layer base {
+  @font-face {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/node_modules/primereact/resources/themes/mira/fonts/Inter-Regular.woff2")
+      format("woff2");
+  }
+
+  @font-face {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url("/node_modules/primereact/resources/themes/mira/fonts/Inter-Medium.woff2")
+      format("woff2");
+  }
+}

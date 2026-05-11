@@ -1,0 +1,35 @@
+/* ─── Base resets ────────────────────────────────────────────────────────────── */
+@layer base {
+  * {
+    scroll-behavior: smooth;
+  }
+
+  a {
+    font-style: normal;
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+
+  li {
+    list-style-position: inside;
+  }
+
+  body {
+    font-display: swap;
+  }
+
+  input:focus-visible,
+  textarea:focus-visible {
+    outline: none;
+  }
+
+  /* Suppress all focus rings globally - handled per-component */
+  input:enabled:focus,
+  *:focus,
+  .p-focus {
+    box-shadow: none !important;
+    border-color: transparent !important;
+  }
+}

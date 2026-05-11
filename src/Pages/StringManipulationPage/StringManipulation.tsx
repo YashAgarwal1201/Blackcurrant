@@ -6,10 +6,11 @@ import { Dropdown } from "primereact/dropdown";
 
 import { Dialog } from "primereact/dialog";
 import { useForm } from "react-hook-form";
-import { STRING_OPTIONS, stringFunctions } from "../../Services/Constants";
+import { STRING_OPTIONS, stringFunctions } from "../../Services/Data/Constants";
 import useStringFunctionsStore from "../../Services/Stores/stringFunctionsStore";
 import useToastStore from "../../Services/Stores/toastMessageStore";
 import GoBackBtn from "../../Layout/GoBackBtn";
+import { X } from "lucide-react";
 
 const StringManipulation = () => {
   const { register, handleSubmit, reset, watch, setValue } = useForm();
@@ -23,14 +24,12 @@ const StringManipulation = () => {
 
   const inputText = watch("inputText");
 
-  // Auto-process when selection or input changes
   useEffect(() => {
     if (inputText && selectedStringFunction) {
       processString(inputText);
     }
   }, [selectedStringFunction, inputText]);
 
-  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
@@ -80,9 +79,7 @@ const StringManipulation = () => {
 
   const getFunctionDefinition = () => {
     if (!selectedStringFunction) return null;
-
-    const functionCode = stringFunctions[selectedStringFunction].toString();
-    return functionCode;
+    return stringFunctions[selectedStringFunction].toString();
   };
 
   const getFunctionDescription = () => {
@@ -90,142 +87,132 @@ const StringManipulation = () => {
       [key: string]: { desc: string; example: string; result: string };
     } = {
       Reverse: {
-        desc: "Reverses the order of characters in the string",
-        example: "hello world",
-        result: "dlrow olleh",
+        desc: "Reverses the order of characters",
+        example: "hello",
+        result: "olleh",
       },
       Uppercase: {
-        desc: "Converts all characters to uppercase letters",
-        example: "hello World",
-        result: "HELLO WORLD",
+        desc: "Converts to uppercase",
+        example: "hello",
+        result: "HELLO",
       },
       Lowercase: {
-        desc: "Converts all characters to lowercase letters",
-        example: "Hello WORLD",
-        result: "hello world",
+        desc: "Converts to lowercase",
+        example: "HELLO",
+        result: "hello",
       },
       "Title Case": {
-        desc: "Capitalizes the first letter of each word",
-        example: "hello world example",
-        result: "Hello World Example",
+        desc: "Capitalizes first letter of words",
+        example: "hello world",
+        result: "Hello World",
       },
       "Sentence Case": {
-        desc: "Capitalizes only the first letter of the first word",
-        example: "hello world example",
-        result: "Hello world example",
+        desc: "Capitalizes first letter of string",
+        example: "hello world",
+        result: "Hello world",
       },
       camelCase: {
-        desc: "Converts string to camelCase (first letter lowercase, no spaces)",
-        example: "hello world example",
-        result: "helloWorldExample",
+        desc: "lowerCamelCase format",
+        example: "hello world",
+        result: "helloWorld",
       },
       PascalCase: {
-        desc: "Converts string to PascalCase (first letter uppercase, no spaces)",
-        example: "hello world example",
-        result: "HelloWorldExample",
+        desc: "UpperCamelCase format",
+        example: "hello world",
+        result: "HelloWorld",
       },
       "kebab-case": {
-        desc: "Converts string to kebab-case (lowercase with hyphens)",
-        example: "Hello World Example",
-        result: "hello-world-example",
+        desc: "Hyphenated lowercase",
+        example: "Hello World",
+        result: "hello-world",
       },
       snake_case: {
-        desc: "Converts string to snake_case (lowercase with underscores)",
-        example: "Hello World Example",
-        result: "hello_world_example",
+        desc: "Underscored lowercase",
+        example: "Hello World",
+        result: "hello_world",
       },
       SCREAMING_SNAKE_CASE: {
-        desc: "Converts string to SCREAMING_SNAKE_CASE (uppercase with underscores)",
-        example: "Hello World Example",
-        result: "HELLO_WORLD_EXAMPLE",
+        desc: "Underscored uppercase",
+        example: "Hello World",
+        result: "HELLO_WORLD",
       },
       "Alternate Case": {
-        desc: "Alternates between uppercase and lowercase for each letter",
-        example: "hello world",
-        result: "HeLlO WoRlD",
+        desc: "Alternates casing",
+        example: "hello",
+        result: "HeLlO",
       },
       "Randomize Case": {
-        desc: "Randomly converts each character to uppercase or lowercase",
-        example: "hello world",
-        result: "HeLLo WOrLd (random each time)",
+        desc: "Randomizes casing",
+        example: "hello",
+        result: "hElLo",
       },
       "Remove Spaces": {
-        desc: "Removes all whitespace characters from the string",
-        example: "hello   world  example",
-        result: "helloworldexample",
+        desc: "Removes all whitespace",
+        example: "a b c",
+        result: "abc",
       },
       Trim: {
-        desc: "Removes leading and trailing whitespace only",
-        example: "  hello world  ",
-        result: "hello world",
+        desc: "Removes leading/trailing whitespace",
+        example: "  a  ",
+        result: "a",
       },
       "String to Binary": {
-        desc: "Converts each character to its 8-bit binary representation",
-        example: "ABC",
-        result: "01000001 01000010 01000011",
+        desc: "Binary representation",
+        example: "A",
+        result: "01000001",
       },
       "String to ASCII": {
-        desc: "Converts each character to its ASCII code value",
-        example: "ABC",
-        result: "65, 66, 67",
+        desc: "ASCII code values",
+        example: "A",
+        result: "65",
       },
       "Remove Duplicates": {
-        desc: "Removes consecutive duplicate characters",
-        example: "helllo woorrld",
-        result: "helo world",
+        desc: "Removes consecutive duplicates",
+        example: "aaabb",
+        result: "ab",
       },
       "Count Characters": {
-        desc: "Returns the total number of characters in the string",
-        example: "hello world",
-        result: "11",
-      },
-      "Count Words": {
-        desc: "Returns the total number of words in the string",
-        example: "hello world example",
+        desc: "Total character count",
+        example: "abc",
         result: "3",
       },
-      "Encode Base64": {
-        desc: "Encodes the string to Base64 format",
+      "Count Words": {
+        desc: "Total word count",
         example: "hello world",
-        result: "aGVsbG8gd29ybGQ=",
+        result: "2",
+      },
+      "Encode Base64": {
+        desc: "Base64 encoding",
+        example: "hello",
+        result: "aGVsbG8=",
       },
       "Decode Base64": {
-        desc: "Decodes a Base64 encoded string back to normal text",
-        example: "aGVsbG8gd29ybGQ=",
-        result: "hello world",
+        desc: "Base64 decoding",
+        example: "aGVsbG8=",
+        result: "hello",
       },
       "URL Encode": {
-        desc: "Encodes the string for safe use in URLs",
-        example: "hello world!",
-        result: "hello%20world%21",
+        desc: "URL safe encoding",
+        example: "a b",
+        result: "a%20b",
       },
-      "URL Decode": {
-        desc: "Decodes a URL encoded string back to normal text",
-        example: "hello%20world%21",
-        result: "hello world!",
-      },
+      "URL Decode": { desc: "URL decoding", example: "a%20b", result: "a b" },
     };
 
     const selected = descriptions[selectedStringFunction];
-
     return selected
       ? {
           description: selected.desc,
           example: `Example: "${selected.example}" → "${selected.result}"`,
         }
-      : {
-          description:
-            "Transforms the input string based on the selected function",
-          example: "",
-        };
+      : { description: "Transforms the input string", example: "" };
   };
 
   return (
     <Layout>
-      {/* Function Info Dialog */}
       <Dialog
         header={
-          <h2 className="font-heading text-xl sm:text-2xl lg:text-3xl text-color5">
+          <h2 className="font-heading text-xl sm:text-2xl lg:text-3xl text-base-content">
             Selected Function: {selectedStringFunction}
           </h2>
         }
@@ -234,202 +221,184 @@ const StringManipulation = () => {
         dismissableMask
         draggable={false}
         resizable={false}
-        className="!absolute !bottom-0 sm:!bottom-auto w-full max-w-md !bg-color1 !rounded-3xl "
-        headerClassName="!bg-transparent font-heading"
-        contentClassName="!bg-transparent font-content"
+        className="absolute! bottom-0! sm:bottom-auto! w-full max-w-md bg-base-100 rounded-3xl!"
+        headerClassName="bg-transparent! font-heading"
+        contentClassName="bg-transparent! font-content"
+        closeIcon={<X size={24} className="text-base-content" />}
       >
-        <div className="flex flex-col gap-y-4 bg-transparent">
+        <div className="flex flex-col gap-y-4 text-base-content bg-base-200 rounded-3xl p-4">
           <div>
-            <h3 className="text-lg font-semibold text-color5 mb-2">
+            <h3 className="text-lg font-semibold text-base-content mb-2">
               Description
             </h3>
-            <p className="text-base text-color4 font-content">
+            <p className="text-base text-neutral-content font-content">
               {getFunctionDescription().description}
             </p>
           </div>
-
           {getFunctionDescription().example && (
             <div>
-              <h3 className="text-lg font-semibold text-color5 mb-2">
+              <h3 className="text-lg font-semibold text-base-content mb-2">
                 Example
               </h3>
-              <p className="text-base text-color4 font-content bg-color2 p-3 rounded-lg border border-color3">
+              <p className="text-base text-neutral-content font-content bg-base-300 p-3 rounded-lg border border-base-300">
                 {getFunctionDescription().example}
               </p>
             </div>
           )}
-
           <div>
-            <h3 className="text-lg font-semibold text-color5 mb-2">
+            <h3 className="text-lg font-semibold text-base-content mb-2">
               Function Code
             </h3>
-            <pre className="p-4 bg-color2 border-2 border-color3 rounded-lg overflow-x-auto text-sm text-color5 ">
+            <pre className="p-4 bg-base-100 border-2 border-base-300 rounded-lg overflow-x-auto text-sm text-base-content">
               {getFunctionDefinition()}
             </pre>
           </div>
         </div>
       </Dialog>
 
-      <div className="w-full h-full p-2 md:p-3 lg:p-4 flex flex-col gap-y-3 md:gap-y-4 lg:gap-y-6 portrait:overflow-hidden landscape:overflow-y-auto md:overflow-y-auto custom-scrollbar">
-        <div className="w-full flex-shrink-0 flex flex-row items-center justify-between gap-4">
+      <div className="w-full h-full p-2 md:p-3 lg:p-4 flex flex-col gap-y-3 md:gap-y-4 lg:gap-y-6">
+        <div className="w-full shrink-0 flex flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-x-1">
             <GoBackBtn />
-            <h1 className="text-2xl xs:text-3xl mdl:text-4xl text-color5 font-heading select-none">
+            <h1 className="text-2xl xs:text-3xl mdl:text-4xl text-base-content font-heading select-none">
               Play with Strings
             </h1>
           </div>
           <Button
             type="button"
             disabled={!inputText && !outputString}
-            title="Clear everything (Ctrl/Cmd + Shift + X)"
-            icon={"pi pi-times"}
-            label={"Clear All"}
-            className="w-fit h-9 md:h-10 px-4 py-2 text-color4 text-sm md:text-base bg-transparent font-content border sm:border-2 border-color4 rounded-full"
+            icon="pi pi-times"
+            label="Clear All"
+            className="h-9 md:h-10 px-4 text-neutral-content bg-transparent border-2 border-base-300 rounded-full hover:bg-base-200 transition-colors"
             onClick={handleClearAll}
           />
         </div>
 
-        <div className="flex-shrink-0 w-full flex flex-col gap-y-2">
-          <label
-            htmlFor="stringFunction"
-            className="text-lg xs:text-xl text-color4 font-subHeading select-none"
-          >
+        <div className="shrink-0 w-full flex flex-col gap-y-2">
+          <label className="text-lg xs:text-xl text-neutral-content font-subHeading">
             Choose a function
           </label>
           <div className="flex items-center gap-2">
             <Dropdown
-              name="stringFunction"
               value={selectedStringFunction}
               onChange={(e) => setSelectedStringFunction(e.value)}
               options={STRING_OPTIONS}
               placeholder="Select a string function"
               filter
-              filterPlaceholder="Search functions..."
-              className="flex-1 md:flex-none md:w-1/2 lg:w-1/3 h-9 sm:h-10 !rounded-lg !bg-color2 border sm:border-2 !border-color4 *:py-2 *:text-color5 *:text-sm"
-              panelClassName="!bg-color2 !border !border-white !rounded-lg !p-2"
+              className="flex-1 md:flex-none md:w-1/2 lg:w-1/3 h-10 bg-base-200! border-base-300! rounded-lg! text-base-content"
+              panelClassName="bg-base-200 border-base-300 rounded-lg"
             />
             <Button
               type="button"
               icon="pi pi-info-circle"
               disabled={!selectedStringFunction}
-              tooltip="View function details"
-              tooltipOptions={{ position: "top" }}
-              className="h-9 sm:h-10 w-9 sm:w-10 p-0 flex items-center justify-center text-color4 bg-transparent border sm:border-2 border-color4 rounded-lg"
+              className="h-10 w-10 text-neutral-content bg-base-200 border-base-300 rounded-lg"
               onClick={() => setShowFunctionInfo(true)}
             />
           </div>
         </div>
 
-        <div className="portrait:flex-1 portrait:min-h-0 landscape:flex-none grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 lg:gap-6 xl:gap-8 portrait:overflow-hidden landscape:overflow-visible md:overflow-visible">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          {/* Input Section */}
           <form
-            className="flex flex-col gap-y-3 md:gap-y-4 portrait:min-h-0 landscape:min-h-0"
+            className="flex flex-col gap-y-3"
             onSubmit={handleSubmit(onSubmit)}
           >
-            <div className="flex flex-col gap-y-2 md:gap-y-3 portrait:flex-1 portrait:min-h-0 landscape:flex-none">
-              <div className="flex-shrink-0 flex items-center justify-between">
-                <label className="text-lg xs:text-xl text-color4 font-subHeading select-none">
-                  Enter Input String
+            <div className="flex flex-col gap-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-lg text-neutral-content font-subHeading">
+                  Input String
                 </label>
-                <p className="text-sm xs:text-base text-color2 font-content select-none">
-                  {inputText?.length ? inputText.length : "0"}/3500
+                <p className="text-sm text-neutral-content">
+                  {inputText?.length || 0}/3500
                 </p>
               </div>
               <InputTextarea
-                disabled={selectedStringFunction === ""}
-                className="custom-scrollbar portrait:flex-1 portrait:min-h-0 portrait:h-full landscape:min-h-[180px] landscape:h-auto md:h-auto md:min-h-[250px] p-4 text-base xs:text-lg mdl:text-xl text-color5 font-content border-2 border-color3 bg-color2 rounded-xl mdl:rounded-2xl resize-none"
-                maxLength={3500}
+                disabled={!selectedStringFunction}
+                className="min-h-[200px] p-4 text-base-content bg-base-200 border-2 border-base-300 rounded-2xl focus:border-primary transition-all"
                 placeholder={
-                  selectedStringFunction === ""
-                    ? "Select a function from dropdown first to continue"
-                    : "Enter your text here..."
+                  selectedStringFunction
+                    ? "Enter text..."
+                    : "Select function first..."
                 }
-                {...register("inputText", { required: true })}
+                {...register("inputText")}
               />
             </div>
-            <div className="flex-shrink-0 h-9 md:h-10 flex items-center gap-x-3">
+            <div className="flex items-center gap-x-3">
               <Button
                 type="button"
                 disabled={!inputText}
-                title="Click to remove input text"
-                icon={"pi pi-trash"}
-                label={"Discard"}
-                className="h-full px-4 text-sm md:text-base text-color4 bg-transparent font-content border sm:border-2 border-color4 rounded-full"
+                label="Discard"
+                icon="pi pi-trash"
+                className="h-10 px-4 text-neutral-content bg-transparent border-2 border-base-300 rounded-full"
                 onClick={() => reset()}
               />
               <Button
                 type="submit"
                 disabled={!inputText || !selectedStringFunction}
-                title="Click to process (Ctrl/Cmd + Enter)"
-                icon={"pi pi-check"}
-                label={"Continue"}
-                className="h-full px-4 text-sm md:text-base text-color1 bg-color4 font-content rounded-full"
+                label="Continue"
+                icon="pi pi-check"
+                className="h-10 px-6 text-primary-content bg-primary rounded-full font-bold shadow-lg shadow-primary/20"
               />
             </div>
           </form>
 
-          <form className="flex flex-col gap-y-3 md:gap-y-4 portrait:min-h-0 landscape:min-h-0">
-            <div className="flex flex-col gap-y-2 md:gap-y-3 portrait:flex-1 portrait:min-h-0 landscape:flex-none">
-              <div className="flex-shrink-0 flex items-center justify-between">
-                <label className="text-lg xs:text-xl text-color4 font-subHeading select-none">
-                  Your Output String
+          {/* Output Section */}
+          <div className="flex flex-col gap-y-3">
+            <div className="flex flex-col gap-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-lg text-neutral-content font-subHeading">
+                  Output String
                 </label>
-                <p className="text-sm xs:text-base text-color2 font-content select-none">
-                  {outputString?.length}/3500
+                <p className="text-sm text-neutral-content">
+                  {outputString?.length || 0}/3500
                   {getCharacterDifference() !== null && (
                     <span
                       className={
-                        getCharacterDifference()! > 0
-                          ? "text-green-500 ml-1"
-                          : "text-red-500 ml-1"
+                        getCharacterDifference()! >= 0
+                          ? "text-green-400 ml-1"
+                          : "text-red-400 ml-1"
                       }
                     >
-                      ({getCharacterDifference()! > 0 ? "+" : ""}
+                      ({getCharacterDifference()! >= 0 ? "+" : ""}
                       {getCharacterDifference()})
                     </span>
                   )}
                 </p>
               </div>
               <InputTextarea
-                disabled={
-                  selectedStringFunction === "" || inputText?.trim()?.length < 1
-                }
-                value={outputString}
-                className="custom-scrollbar portrait:flex-1 portrait:min-h-0 portrait:h-full landscape:min-h-[180px] landscape:h-auto md:h-auto md:min-h-[250px] p-4 text-base xs:text-lg mdl:text-xl text-color5 font-content border-2 border-color3 bg-color2 rounded-xl mdl:rounded-2xl resize-none"
-                placeholder="Output will appear here..."
                 readOnly
+                value={outputString}
+                className="min-h-[200px] p-4 text-base-content bg-base-300 border-2 border-base-300 rounded-2xl italic"
+                placeholder="Output will appear here..."
               />
             </div>
-            <div className="flex-shrink-0 h-9 md:h-10 lg:h-11 flex flex-row items-center gap-x-3">
+            <div className="flex flex-wrap items-center gap-2">
               <Button
                 type="button"
                 disabled={!outputString}
-                title="Use output as new input"
-                className="h-full px-3 md:px-4 flex items-center gap-x-2 text-sm md:text-base text-color1 bg-color4 font-content rounded-full"
+                label="Use as Input"
+                icon="pi pi-arrow-up"
+                className="h-10 px-4 text-primary-content bg-primary rounded-full font-bold"
                 onClick={handleUseAsInput}
-              >
-                <span className="pi pi-arrow-up"></span>
-                <span className="line-clamp-1">Use as Input</span>
-              </Button>
-              <Button
-                type="button"
-                disabled={!outputString}
-                title="Click to remove output"
-                icon={"pi pi-trash"}
-                label={"Discard"}
-                className="h-full px-4 text-sm md:text-base text-color4 bg-transparent font-content border sm:border-2 border-color4 rounded-full"
-                onClick={() => setOutputString("")}
               />
               <Button
                 type="button"
                 disabled={!outputString}
-                title="Copy output to clipboard"
-                icon={"pi pi-copy"}
-                label={"Copy"}
-                className="h-full px-4 text-sm md:text-base text-color4 bg-transparent font-content border sm:border-2 border-color4 rounded-full"
+                label="Copy"
+                icon="pi pi-copy"
+                className="h-10 px-4 text-neutral-content bg-transparent border-2 border-base-300 rounded-full"
                 onClick={handleCopy}
               />
+              <Button
+                type="button"
+                disabled={!outputString}
+                icon="pi pi-trash"
+                className="h-10 w-10 text-red-400 bg-transparent border-2 border-base-300 rounded-full"
+                onClick={() => setOutputString("")}
+              />
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </Layout>

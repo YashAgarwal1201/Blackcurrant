@@ -1,9 +1,10 @@
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
+import { PrimeReactProvider } from "primereact/api";
 import Router from "./Routes/Routes.tsx";
 // import { Suspense } from "react";
-import "./index.css";
-import "./assets/styles/animations.css";
+import "./assets/styles/index.css";
+import "primeicons/primeicons.css";
 
 // createRoot(document.getElementById("root")!).render(
 //   <Suspense
@@ -22,7 +23,9 @@ import "./assets/styles/animations.css";
 // );
 
 createRoot(document.getElementById("root")!).render(
-  <RouterProvider router={Router} />,
+  <PrimeReactProvider value={{ unstyled: false }}>
+    <RouterProvider router={Router} />
+  </PrimeReactProvider>,
 );
 
 if ("serviceWorker" in navigator && import.meta.env.PROD) {

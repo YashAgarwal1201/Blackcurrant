@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Layout from "../../Layout/Layout";
-import { DATE_OPTIONS, dateFunctions } from "../../Services/Constants";
+import { DATE_OPTIONS, dateFunctions } from "../../Services/Data/Constants";
 import { Button } from "primereact/button";
 import SwiperContainer from "../../Components/SwiperContainer/SwiperContainer";
 import useDateFunctionsStore from "../../Services/Stores/dateFunctionsStore";
@@ -29,7 +29,7 @@ const PlayWithDatesPage = () => {
   const [outputString, setOutputString] = useState(
     selectedDateFunction === "Current Date"
       ? dateFunctions[selectedDateFunction]
-      : ""
+      : "",
   );
 
   const inputDate = watch("inputDate");
@@ -92,7 +92,7 @@ const PlayWithDatesPage = () => {
               title={`Click to convert input string to '${value}'`}
               key={key}
               label={value}
-              className={`swiper-slide !w-auto mr-2 h-8 md:h-9 lg:h-10 px-5 text-xs sm:text-sm md:text-base lg:text-lg flex-shrink-0 font-content rounded-full border md:border-2 ${
+              className={`swiper-slide !w-auto mr-2 h-8 md:h-9 lg:h-10 px-5 text-xs sm:text-sm md:text-base lg:text-lg shrink-0 font-content rounded-full border md:border-2 ${
                 selectedDateFunction === value
                   ? "bg-color4 text-color1 border-color4 pointer-events-none"
                   : "bg-transparent text-color4 border-color4 pointer-events-auto"

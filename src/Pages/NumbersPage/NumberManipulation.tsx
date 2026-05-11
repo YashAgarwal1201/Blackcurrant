@@ -7,7 +7,7 @@ import { Dropdown } from "primereact/dropdown";
 import { Dialog } from "primereact/dialog";
 import { useForm } from "react-hook-form";
 import Layout from "../../Layout/Layout";
-import { NUMBER_OPTIONS, numberFunctions } from "../../Services/Constants";
+import { NUMBER_OPTIONS, numberFunctions } from "../../Services/Data/Constants";
 import useNumberFunctionsStore from "../../Services/Stores/numberFunctionsStore";
 import useToastStore from "../../Services/Stores/toastMessageStore";
 import GoBackBtn from "../../Layout/GoBackBtn";
@@ -146,9 +146,9 @@ const NumberManipulation = () => {
         dismissableMask
         draggable={false}
         resizable={false}
-        className="!absolute !bottom-0 sm:!bottom-auto w-full max-w-md !bg-color1 !rounded-3xl "
-        headerClassName="!bg-transparent font-heading"
-        contentClassName="!bg-transparent font-content"
+        className="absolute! bottom-0! sm:bottom-auto! w-full max-w-md bg-color1! rounded-3xl! "
+        headerClassName="bg-transparent! font-heading"
+        contentClassName="bg-transparent! font-content"
       >
         <div className="flex flex-col gap-y-4">
           <div>
@@ -172,7 +172,7 @@ const NumberManipulation = () => {
       </Dialog>
 
       <div className="w-full h-full p-2 md:p-3 lg:p-4 flex flex-col gap-y-3 md:gap-y-4 lg:gap-y-6 portrait:overflow-hidden landscape:overflow-y-auto md:overflow-y-auto custom-scrollbar">
-        <div className="flex-shrink-0 flex flex-row items-center justify-between gap-4">
+        <div className="shrink-0 flex flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-x-1">
             <GoBackBtn />
             <h1 className="text-2xl xs:text-3xl mdl:text-4xl text-color5 font-heading select-none">
@@ -190,7 +190,7 @@ const NumberManipulation = () => {
           />
         </div>
 
-        <div className="flex-shrink-0 w-full flex flex-col gap-y-2">
+        <div className="shrink-0 w-full flex flex-col gap-y-2">
           <label
             htmlFor="numberFunction"
             className="text-lg xs:text-xl text-color4 font-subHeading select-none"
@@ -206,8 +206,8 @@ const NumberManipulation = () => {
               placeholder="Select a number function"
               filter
               filterPlaceholder="Search functions..."
-              className="flex-1 md:flex-none md:w-1/2 lg:w-1/3 h-9 sm:h-10 !rounded-lg !bg-transparent border sm:border-2 !border-color4 *:py-2 *:text-color4 *:text-sm"
-              panelClassName="!bg-color2 !border !border-white !rounded-lg !p-2"
+              className="flex-1 md:flex-none md:w-1/2 lg:w-1/3 h-9 sm:h-10 rounded-lg! bg-transparent! border sm:border-2 border-color4! *:py-2 *:text-color4 *:text-sm"
+              panelClassName="bg-color2! border! border-white! rounded-lg! !p-2"
             />
             <Button
               type="button"
@@ -266,7 +266,7 @@ const NumberManipulation = () => {
               </div>
             </div>
 
-            <div className="flex-shrink-0 h-9 md:h-10 flex items-center gap-x-3">
+            <div className="shrink-0 h-9 md:h-10 flex items-center gap-x-3">
               <Button
                 type="button"
                 disabled={!inputVal1 && !inputVal2}
@@ -303,7 +303,7 @@ const NumberManipulation = () => {
               />
             </div>
 
-            <div className="flex-shrink-0 h-9 md:h-10 lg:h-11 flex flex-row items-center gap-x-3">
+            <div className="shrink-0 h-9 md:h-10 lg:h-11 flex flex-row items-center gap-x-3">
               <Button
                 type="button"
                 disabled={!outputVal && outputVal !== 0}
