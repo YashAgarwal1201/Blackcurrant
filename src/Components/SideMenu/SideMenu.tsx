@@ -303,6 +303,7 @@ const SideMenu = () => {
             />
           )}
           className="bg-transparent rounded-2xl"
+          collapsed
           toggleable
         >
           <div className="flex flex-col gap-y-4 px-1 font-content">

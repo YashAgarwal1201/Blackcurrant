@@ -1,7 +1,9 @@
 export type PortfolioContactFormType = {
-  email: string;
   name: string;
+  email: string;
   message: string;
+  website: string;
+  phone: string;
   time?: any;
 };
 
