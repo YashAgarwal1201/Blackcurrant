@@ -1,25 +1,25 @@
 /* ─── Surface tokens ─────────────────────────────────────────────────────────── */
 
 html[data-theme="light"] {
-  --base-100: #fcfafc;
-  --base-200: #f5f1f7;
-  --base-300: #e6dde9;
+  --base-100: #faf7fc;
+  --base-200: #ede5f5;
+  --base-300: #d9cce8;
 
-  --base-content: #231826;
+  --base-content: #1a0f2e;
 
-  --neutral: #ddd2e1;
-  --neutral-content: #594962;
+  --neutral: #c4b3d9;
+  --neutral-content: #5c3d80;
 }
 
 html[data-theme="dark"] {
-  --base-100: #0d0a10;
-  --base-200: #17111c;
-  --base-300: #24182b;
+  --base-100: #0a0810; /* blackcurrant skin — near-black warm purple */
+  --base-200: #150f1f; /* deep violet flesh — clearly above page bg */
+  --base-300: #221830; /* rich pulp — readable surface for textareas/dropdown */
 
-  --base-content: #f4edf7;
+  --base-content: #f0ebf8;
 
-  --neutral: #45344c;
-  --neutral-content: #dccfe2;
+  --neutral: #3d2d52; /* seed — muted purple, ghost button borders now visible */
+  --neutral-content: #c9b8e8;
 }
 
 /* ─── Accent tokens - dark defaults ─────────────────────────────────────────── */
@@ -27,37 +27,37 @@ html[data-theme="dark"] {
 /* Graphite */
 [data-accent="graphite"] {
   --primary: #a8a1ad;
-  --primary-content: #0d0a10;
+  --primary-content: #0a0810;
 }
 
 /* Currant (main brand) */
 [data-accent="currant"] {
-  --primary: #b46cff;
-  --primary-content: #14081d;
+  --primary: #c084fc; /* blackcurrant juice — vivid cool purple */
+  --primary-content: #0a0810;
 }
 
 /* Plum */
 [data-accent="plum"] {
-  --primary: #8b5cf6;
-  --primary-content: #12071a;
+  --primary: #a855f7;
+  --primary-content: #0a0810;
 }
 
 /* Berry */
 [data-accent="berry"] {
-  --primary: #d86b8a;
-  --primary-content: #22070d;
+  --primary: #e879a0;
+  --primary-content: #1a0a12;
 }
 
 /* Wine */
 [data-accent="wine"] {
-  --primary: #b24b6a;
-  --primary-content: #22070d;
+  --primary: #c2456b;
+  --primary-content: #1a0a12;
 }
 
 /* Leaf */
 [data-accent="leaf"] {
-  --primary: #6f8f3a;
-  --primary-content: #111a06;
+  --primary: #7cad3c;
+  --primary-content: #0c1a04;
 }
 
 /* ─── Accent tokens - light overrides ───────────────────────────────────────── */
@@ -70,13 +70,13 @@ html[data-theme="dark"] {
 
 /* Currant */
 [data-theme="light"][data-accent="currant"] {
-  --primary: #7f2ee6;
+  --primary: #7c22d4;
   --primary-content: #ffffff;
 }
 
 /* Plum */
 [data-theme="light"][data-accent="plum"] {
-  --primary: #6d28d9;
+  --primary: #7c3aed;
   --primary-content: #ffffff;
 }
 

@@ -21,7 +21,7 @@ const HomePage = () => {
             aria-label="Open side menu"
             onClick={toggleSideMenu}
             text
-            className="border!-none flex items-center justify-center p-3"
+            className="border-none! flex items-center justify-center p-3 rounded-2xl"
           >
             <Menu size={16} className="text-neutral-content" />
           </Button>
