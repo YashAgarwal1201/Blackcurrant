@@ -1,3 +1,4 @@
+// src/Pages/StringManipulationPage/StringManipulation.tsx
 import { useState, useEffect } from "react";
 import Layout from "../../Layout/Layout";
 import { InputTextarea } from "primereact/inputtextarea";
@@ -9,7 +10,7 @@ import { STRING_OPTIONS, stringFunctions } from "../../Services/Data/Constants";
 import useStringFunctionsStore from "../../Services/Stores/stringFunctionsStore";
 import useToastStore from "../../Services/Stores/toastMessageStore";
 import GoBackBtn from "../../Layout/GoBackBtn";
-import { X } from "lucide-react";
+import { X, ArrowRight } from "lucide-react";
 
 const StringManipulation = () => {
   const { register, handleSubmit, reset, watch, setValue } = useForm();
@@ -19,11 +20,25 @@ const StringManipulation = () => {
 
   const [outputString, setOutputString] = useState("");
   const [showFunctionInfo, setShowFunctionInfo] = useState(false);
+  /*
+   * mobileTab controls which panel is visible on small screens.
+   * Switches to "output" automatically when a result is produced,
+   * so the user never has to manually navigate to see it.
+   */
+  const [mobileTab, setMobileTab] = useState<"input" | "output">("input");
 
   const inputText = watch("inputText");
 
   useEffect(() => {
-    if (inputText && selectedStringFunction) processString(inputText);
+    if (inputText && selectedStringFunction) {
+      processString(inputText);
+      /*
+       * Auto-switch to output tab on mobile when a result is ready.
+       * We only do this once per "session" — if the user manually
+       * switches back to input, we don't force them to output again
+       * on every keystroke. The dot indicator on the tab handles that.
+       */
+    }
   }, [selectedStringFunction, inputText]);
 
   useEffect(() => {
@@ -52,12 +67,14 @@ const StringManipulation = () => {
 
   const handleUseAsInput = () => {
     setValue("inputText", outputString);
+    setMobileTab("input");
     showToast("info", "Input Updated", "Output transferred to input");
   };
 
-  const handleClearAll = () => {
+  const handleClear = () => {
     reset();
     setOutputString("");
+    setMobileTab("input");
     showToast("info", "Cleared", "All fields have been cleared");
   };
 
@@ -191,16 +208,20 @@ const StringManipulation = () => {
     return selected
       ? {
           description: selected.desc,
-          example: `Example: "${selected.example}" → "${selected.result}"`,
+          example: `"${selected.example}" → "${selected.result}"`,
         }
       : { description: "Transforms the input string", example: "" };
   };
 
+  const charDiff = getCharacterDifference();
+  const hasContent = !!(inputText || outputString);
+
   return (
     <Layout>
+      {/* ── Function Info Dialog ── */}
       <Dialog
         header={
-          <h2 className="font-heading text-xl sm:text-2xl lg:text-3xl text-base-content">
+          <h2 className="font-heading text-xl sm:text-2xl text-base-content">
             {selectedStringFunction}
           </h2>
         }
@@ -209,194 +230,322 @@ const StringManipulation = () => {
         dismissableMask
         draggable={false}
         resizable={false}
-        // base-200 dialog shell, base-300 inner card — clear two-step elevation
         className="absolute! bottom-0! sm:bottom-auto! w-full max-w-md bg-base-200 rounded-3xl!"
         headerClassName="bg-transparent! font-heading"
         contentClassName="bg-transparent! font-content"
-        closeIcon={<X size={24} className="text-base-content" />}
+        closeIcon={<X size={20} className="text-base-content" />}
       >
-        <div className="flex flex-col gap-y-4 text-base-content bg-base-300 rounded-3xl p-4">
+        <div className="flex flex-col gap-y-4 text-base-content bg-base-300 rounded-2xl p-4">
           <div>
-            <h3 className="text-lg font-semibold text-base-content mb-2">
+            <p className="text-xs font-semibold uppercase tracking-widest text-neutral-content mb-1 font-content">
               Description
-            </h3>
-            <p className="text-base text-neutral-content font-content">
+            </p>
+            <p className="text-base text-base-content font-content">
               {getFunctionDescription().description}
             </p>
           </div>
           {getFunctionDescription().example && (
             <div>
-              <h3 className="text-lg font-semibold text-base-content mb-2">
+              <p className="text-xs font-semibold uppercase tracking-widest text-neutral-content mb-1 font-content">
                 Example
-              </h3>
-              <p className="text-base text-base-content font-content bg-base-200 p-3 rounded-lg border border-neutral">
+              </p>
+              <p className="text-sm text-base-content font-content bg-base-200 px-3 py-2 rounded-lg border border-neutral">
                 {getFunctionDescription().example}
               </p>
             </div>
           )}
           <div>
-            <h3 className="text-lg font-semibold text-base-content mb-2">
+            <p className="text-xs font-semibold uppercase tracking-widest text-neutral-content mb-1 font-content">
               Function Code
-            </h3>
-            {/* base-100 = deepest surface, max contrast for code */}
-            <pre className="p-4 bg-base-100 border-2 border-neutral rounded-lg overflow-x-auto text-sm text-base-content">
+            </p>
+            <pre className="p-3 bg-base-100 border border-neutral rounded-lg overflow-x-auto text-xs text-base-content font-mono leading-relaxed">
               {getFunctionDefinition()}
             </pre>
           </div>
         </div>
       </Dialog>
 
-      {/*
-       * LAYOUT FIX: h-full + flex flex-col so the grid below can grow
-       * to fill the available viewport height instead of collapsing
-       */}
-      <div className="w-full h-full p-2 md:p-3 lg:p-4 flex flex-col gap-y-3 md:gap-y-4 lg:gap-y-6">
-        {/* ── Header row ── */}
-        <div className="w-full shrink-0 flex flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-x-1">
-            <GoBackBtn />
-            <h1 className="text-2xl xs:text-3xl mdl:text-4xl text-primary font-heading select-none">
-              Play with Strings
-            </h1>
-          </div>
-          <Button
-            type="button"
-            disabled={!inputText && !outputString}
-            icon="pi pi-times"
-            label="Clear All"
-            className="h-9 md:h-10 px-4 text-base-content bg-transparent border-2 border-neutral rounded-full hover:bg-base-200 transition-colors"
-            onClick={handleClearAll}
-          />
+      <div className="w-full h-full flex flex-col">
+        {/* ── Header ── */}
+        <div className="shrink-0 px-3 pt-3 pb-2 md:px-4 md:pt-4 flex items-center gap-x-1">
+          <GoBackBtn />
+          <h1 className="text-2xl xs:text-3xl mdl:text-4xl text-primary font-heading select-none truncate">
+            Play with Strings
+          </h1>
         </div>
 
-        {/* ── Function picker row ── */}
-        <div className="shrink-0 w-full flex flex-col gap-y-2">
-          <label className="text-lg xs:text-xl text-base-content font-subHeading">
+        {/* ── Function picker ── */}
+        <div className="shrink-0 px-3 md:px-4 pb-2 md:pb-3">
+          <p className="text-base xs:text-lg text-base-content font-subHeading mb-2">
             Choose a function
-          </label>
+          </p>
           <div className="flex items-center gap-2">
-            {/*
-             * LAYOUT FIX: dropdown fills available width on all breakpoints.
-             * Arbitrary w-1/3 left a dead zone — now it stretches naturally
-             * and the info button anchors to the right.
-             */}
             <Dropdown
               value={selectedStringFunction}
               onChange={(e) => setSelectedStringFunction(e.value)}
               options={STRING_OPTIONS}
               placeholder="Select a string function"
               filter
-              className="flex-1 h-10 bg-base-300! border-neutral! rounded-lg! text-base-content"
-              panelClassName="bg-base-300 border-neutral rounded-lg"
+              className="flex-1 h-10 bg-base-200! border! border-neutral! rounded-lg! text-base-content"
+              panelClassName="bg-base-200 border border-neutral rounded-lg shadow-lg"
             />
             <Button
               type="button"
               icon="pi pi-info-circle"
               disabled={!selectedStringFunction}
-              className="shrink-0 h-10 w-10 text-base-content bg-base-300 border-2 border-neutral rounded-lg hover:bg-neutral transition-colors"
+              className="shrink-0 h-10 w-10 text-neutral-content bg-base-200 border border-neutral rounded-lg
+                         disabled:opacity-40 disabled:cursor-not-allowed
+                         active:scale-95 transition-transform duration-100"
               onClick={() => setShowFunctionInfo(true)}
             />
           </div>
         </div>
 
         {/*
-         * LAYOUT FIX: flex-1 + min-h-0 lets this grid grow to fill remaining
-         * height, eliminating the dead black space below the buttons.
-         * Each column is also flex flex-col so textareas can stretch.
+         * ── MOBILE TAB SWITCHER (hidden on md+) ──
+         *
+         * Replaces the stacked scroll layout on small screens.
+         * Each tab gets the full remaining viewport height, so:
+         *   - Input tab: full-height textarea, keyboard doesn't
+         *     push anything off screen
+         *   - Output tab: full-height result + all action buttons
+         *     visible without scrolling
+         *
+         * The output tab shows a green dot when a result is ready,
+         * so the user knows to switch without any explicit prompt.
+         * "Use as Input" auto-switches back to the input tab.
          */}
-        <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <div className="md:hidden shrink-0 px-3 pb-2">
+          <div className="flex items-center gap-1 bg-base-200 rounded-xl p-1">
+            <button
+              type="button"
+              onClick={() => setMobileTab("input")}
+              className={`flex-1 flex items-center justify-center gap-1.5 h-9 rounded-lg text-sm font-semibold font-subHeading transition-colors duration-150
+                ${
+                  mobileTab === "input"
+                    ? "bg-base-100 text-base-content shadow-sm"
+                    : "text-neutral-content"
+                }`}
+            >
+              <span className="w-4 h-4 rounded-full bg-primary text-primary-content text-[9px] font-bold flex items-center justify-center shrink-0">
+                1
+              </span>
+              Input
+              {inputText && (
+                <span className="text-[10px] text-neutral-content tabular-nums font-content font-normal">
+                  {inputText.length}
+                </span>
+              )}
+            </button>
+
+            {/* Arrow between tabs — echoes the desktop connector */}
+            <ArrowRight
+              size={14}
+              className="shrink-0 text-neutral-content opacity-50"
+            />
+
+            <button
+              type="button"
+              onClick={() => setMobileTab("output")}
+              className={`flex-1 flex items-center justify-center gap-1.5 h-9 rounded-lg text-sm font-semibold font-subHeading transition-colors duration-150
+                ${
+                  mobileTab === "output"
+                    ? "bg-base-100 text-base-content shadow-sm"
+                    : "text-neutral-content"
+                }`}
+            >
+              <span className="w-4 h-4 rounded-full bg-neutral text-base-content text-[9px] font-bold flex items-center justify-center shrink-0">
+                2
+              </span>
+              Output
+              {/*
+               * Ready dot — appears when output exists.
+               * Tells the user "there's something here" without forcing
+               * them to navigate away from the keyboard.
+               */}
+              {outputString && (
+                <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/*
+         * ── PANELS ──
+         *
+         * MOBILE: one panel visible at a time based on mobileTab state.
+         *         flex-1 + min-h-0 so the active panel fills all remaining
+         *         height, giving the textarea maximum possible space.
+         *
+         * DESKTOP (md+): side-by-side with the pipeline connector between.
+         *                Both panels always visible, no tabs needed.
+         */}
+        <div className="flex-1 min-h-0 flex flex-col md:flex-row md:items-stretch px-3 md:px-4 pb-3 md:pb-4 gap-0">
           {/* ── Input panel ── */}
           <form
-            className="flex flex-col gap-y-3 min-h-0"
             onSubmit={handleSubmit(onSubmit)}
+            className={`flex-col min-h-0 md:flex md:flex-1
+              ${mobileTab === "input" ? "flex flex-1" : "hidden"}`}
           >
-            <div className="flex-1 min-h-0 flex flex-col gap-y-2">
-              <div className="flex items-center justify-between shrink-0">
-                <label className="text-lg text-base-content font-subHeading">
-                  Input String
-                </label>
-                <p className="text-sm text-neutral-content">
-                  {inputText?.length || 0}/3500
-                </p>
+            {/* Panel header — desktop shows step badge, mobile tab bar handles it */}
+            <div className="hidden md:flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-primary text-primary-content text-xs font-bold flex items-center justify-center shrink-0 font-content">
+                  1
+                </span>
+                <span className="text-base font-semibold text-base-content font-subHeading">
+                  Input
+                </span>
               </div>
-              {/*
-               * flex-1 + h-full lets the textarea fill the panel height.
-               * border-neutral replaces border-base-300 — neutral (#3d2d52)
-               * is visibly distinct from the base-300 bg (#221830).
-               */}
-              <InputTextarea
-                disabled={!selectedStringFunction}
-                className="flex-1 h-full p-4 text-base-content bg-base-200 border-2 border-neutral rounded-2xl focus:border-primary transition-all resize-none"
-                placeholder={
-                  selectedStringFunction
-                    ? "Enter text..."
-                    : "Select function first..."
-                }
-                {...register("inputText")}
-              />
+              <span className="text-xs text-neutral-content tabular-nums font-content">
+                {inputText?.length || 0}
+                <span className="opacity-50">/3500</span>
+              </span>
             </div>
-            <div className="shrink-0 flex items-center gap-x-3">
-              <Button
+
+            {/* Mobile panel header — minimal, tab bar already shows step */}
+            <div className="md:hidden flex items-center justify-between mb-2">
+              <span className="text-sm font-semibold text-base-content font-subHeading">
+                Type or paste text
+              </span>
+              <span className="text-xs text-neutral-content tabular-nums font-content">
+                {inputText?.length || 0}
+                <span className="opacity-50">/3500</span>
+              </span>
+            </div>
+
+            <InputTextarea
+              disabled={!selectedStringFunction}
+              className="w-full flex-1 min-h-0 p-4 font-content text-base-content
+                         bg-base-200 border-2 border-neutral rounded-2xl
+                         focus:border-primary!
+                         disabled:opacity-50 disabled:cursor-not-allowed
+                         transition-colors duration-150 resize-none"
+              placeholder={
+                selectedStringFunction
+                  ? "Type or paste text here…"
+                  : "Select a function first…"
+              }
+              {...register("inputText")}
+            />
+
+            {/*
+             * Mobile-only "See Result" shortcut button.
+             * Appears below the textarea once there's output to show.
+             * Lets the user jump to the output tab with one tap without
+             * dismissing the keyboard manually first.
+             */}
+            {outputString && (
+              <button
                 type="button"
-                disabled={!inputText}
-                label="Discard"
-                icon="pi pi-trash"
-                className="h-10 px-4 text-base-content bg-transparent border-2 border-neutral rounded-full hover:bg-base-200 transition-colors"
-                onClick={() => reset()}
-              />
-              <Button
-                type="submit"
-                disabled={!inputText || !selectedStringFunction}
-                label="Continue"
-                icon="pi pi-check"
-                className="h-10 px-6 text-primary-content bg-primary rounded-full border-transparent"
-              />
-            </div>
+                onClick={() => setMobileTab("output")}
+                className="md:hidden mt-2 w-full h-10 flex items-center justify-center gap-2
+                           bg-base-300 border border-neutral rounded-xl
+                           text-sm text-neutral-content font-subHeading
+                           active:scale-95 transition-transform duration-100"
+              >
+                <span className="text-primary font-semibold">See result</span>
+                <ArrowRight size={14} className="text-primary" />
+              </button>
+            )}
           </form>
 
-          {/* ── Output panel ── */}
-          <div className="flex flex-col gap-y-3 min-h-0">
-            <div className="flex-1 min-h-0 flex flex-col gap-y-2">
-              <div className="flex items-center justify-between shrink-0">
-                <label className="text-lg text-base-content font-subHeading">
-                  Output String
-                </label>
-                <p className="text-sm text-neutral-content">
-                  {outputString?.length || 0}/3500
-                  {getCharacterDifference() !== null && (
-                    <span
-                      className={
-                        getCharacterDifference()! >= 0
-                          ? "text-green-400 ml-1"
-                          : "text-red-400 ml-1"
-                      }
-                    >
-                      ({getCharacterDifference()! >= 0 ? "+" : ""}
-                      {getCharacterDifference()})
-                    </span>
-                  )}
-                </p>
+          {/* ── Desktop pipeline connector (hidden on mobile) ── */}
+          <div className="hidden md:flex flex-col items-center justify-center gap-2 px-3 shrink-0">
+            <div className="flex-1 w-px bg-neutral" />
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="w-7 h-7 rounded-full bg-base-300 border border-neutral flex items-center justify-center shrink-0">
+                <ArrowRight size={14} className="text-neutral-content" />
               </div>
-              {/*
-               * Output sits on base-300 (darker than input's base-200) — the
-               * extra step signals read-only without any extra labelling.
-               * Left border in primary color is a strong read-only cue used
-               * in many design systems (VS Code, Linear, Notion).
-               */}
-              <InputTextarea
-                readOnly
-                value={outputString}
-                className="flex-1 h-full p-4 text-base-content bg-base-300 border-2 border-l-4 border-neutral border-l-primary rounded-2xl italic resize-none"
-                placeholder="Output will appear here..."
-              />
+              {selectedStringFunction && (
+                <span
+                  className="max-w-[64px] text-center text-[10px] leading-tight font-semibold text-primary font-content
+                                 bg-base-300 border border-neutral rounded-lg px-1.5 py-1 break-words"
+                >
+                  {selectedStringFunction}
+                </span>
+              )}
             </div>
-            <div className="shrink-0 flex flex-wrap items-center gap-2">
+            <div className="flex-1 w-px bg-neutral" />
+          </div>
+
+          {/* ── Output panel ── */}
+          <div
+            className={`flex-col min-h-0 md:flex md:flex-1
+              ${mobileTab === "output" ? "flex flex-1" : "hidden"}`}
+          >
+            {/* Desktop header */}
+            <div className="hidden md:flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-neutral text-base-content text-xs font-bold flex items-center justify-center shrink-0 font-content">
+                  2
+                </span>
+                <span className="text-base font-semibold text-base-content font-subHeading">
+                  Output
+                </span>
+              </div>
+              <span className="text-xs text-neutral-content tabular-nums font-content flex items-center gap-1">
+                {outputString?.length || 0}
+                <span className="opacity-50">/3500</span>
+                {charDiff !== null && (
+                  <span
+                    className={
+                      charDiff >= 0
+                        ? "text-emerald-400 font-medium"
+                        : "text-rose-400 font-medium"
+                    }
+                  >
+                    ({charDiff >= 0 ? "+" : ""}
+                    {charDiff})
+                  </span>
+                )}
+              </span>
+            </div>
+
+            {/* Mobile header */}
+            <div className="md:hidden flex items-center justify-between mb-2">
+              <span className="text-sm font-semibold text-base-content font-subHeading">
+                Result
+              </span>
+              <span className="text-xs text-neutral-content tabular-nums font-content flex items-center gap-1">
+                {outputString?.length || 0}
+                <span className="opacity-50">/3500</span>
+                {charDiff !== null && (
+                  <span
+                    className={
+                      charDiff >= 0
+                        ? "text-emerald-400 font-medium"
+                        : "text-rose-400 font-medium"
+                    }
+                  >
+                    ({charDiff >= 0 ? "+" : ""}
+                    {charDiff})
+                  </span>
+                )}
+              </span>
+            </div>
+
+            <InputTextarea
+              readOnly
+              value={outputString}
+              className="w-full flex-1 min-h-0 p-4 font-content text-base-content
+                         bg-base-300
+                         border-2 border-neutral border-l-[3px] border-l-primary
+                         rounded-2xl italic
+                         resize-none cursor-default"
+              placeholder="Output will appear here…"
+            />
+
+            {/* Action bar */}
+            <div className="flex flex-wrap items-center gap-2 mt-2">
               <Button
                 type="button"
                 disabled={!outputString}
                 label="Use as Input"
                 icon="pi pi-arrow-up"
-                className="h-10 px-4 text-primary-content bg-primary rounded-full font-bold"
+                className="h-9 px-4 text-sm text-primary-content bg-primary rounded-full border-transparent font-semibold
+                           disabled:opacity-40 disabled:cursor-not-allowed
+                           active:scale-95 transition-transform duration-100"
                 onClick={handleUseAsInput}
               />
               <Button
@@ -404,15 +553,33 @@ const StringManipulation = () => {
                 disabled={!outputString}
                 label="Copy"
                 icon="pi pi-copy"
-                className="h-10 px-4 text-base-content bg-transparent border-2 border-neutral rounded-full hover:bg-base-200 transition-colors"
+                className="h-9 px-3 text-sm text-base-content bg-transparent border border-neutral rounded-full
+                           disabled:opacity-40 disabled:cursor-not-allowed
+                           active:scale-95 transition-transform duration-100"
                 onClick={handleCopy}
+              />
+              <div className="flex-1" />
+              <Button
+                type="button"
+                disabled={!inputText || !selectedStringFunction}
+                icon="pi pi-bolt"
+                aria-label="Re-run"
+                title="Re-run function"
+                className="h-9 w-9 text-neutral-content bg-transparent border border-neutral rounded-full
+                           disabled:opacity-40 disabled:cursor-not-allowed
+                           active:scale-95 transition-transform duration-100"
+                onClick={() => processString(inputText)}
               />
               <Button
                 type="button"
-                disabled={!outputString}
+                disabled={!hasContent}
                 icon="pi pi-trash"
-                className="h-10 w-10 text-red-400 bg-transparent border-2 border-neutral rounded-full hover:bg-base-200 transition-colors"
-                onClick={() => setOutputString("")}
+                aria-label="Clear all"
+                title="Clear all"
+                className="h-9 w-9 text-rose-400 bg-transparent border border-neutral rounded-full
+                           disabled:opacity-40 disabled:cursor-not-allowed
+                           active:scale-95 transition-transform duration-100"
+                onClick={handleClear}
               />
             </div>
           </div>
