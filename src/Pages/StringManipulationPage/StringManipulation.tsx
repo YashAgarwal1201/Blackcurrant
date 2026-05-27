@@ -12,6 +12,103 @@ import useToastStore from "../../Services/Stores/toastMessageStore";
 import GoBackBtn from "../../Layout/GoBackBtn";
 import { X, ArrowRight } from "lucide-react";
 
+interface StringFunctionMeta {
+  description: string;
+  example: string;
+  exampleResult: string;
+  inputNote: string;
+}
+
+const STRING_FUNCTION_META: Record<string, StringFunctionMeta> = {
+  "Alternate Case": {
+    description:
+      "Alternates the case of each letter in the string — first letter uppercase, second lowercase, and so on. Non-letter characters are kept as-is and do not affect the toggle.",
+    example: "hello world",
+    exampleResult: "HeLlO WoRlD",
+    inputNote: "Any string. Non-letter characters are ignored by the toggle.",
+  },
+  Reverse: {
+    description:
+      "Reverses the order of every character in the string, including spaces and punctuation.",
+    example: "hello",
+    exampleResult: "olleh",
+    inputNote: "Any string.",
+  },
+  "Pascal Case": {
+    description:
+      "Converts the string to PascalCase (UpperCamelCase) — each word starts with a capital letter and all separators are removed.",
+    example: "hello world",
+    exampleResult: "HelloWorld",
+    inputNote:
+      "Words separated by spaces, hyphens, underscores, or other non-alphanumeric characters.",
+  },
+  "Camel Case": {
+    description:
+      "Converts the string to camelCase — first word all lowercase, subsequent words capitalised, all separators removed.",
+    example: "hello world",
+    exampleResult: "helloWorld",
+    inputNote:
+      "Words separated by spaces, hyphens, underscores, or other non-alphanumeric characters.",
+  },
+  "Kebab Case": {
+    description:
+      "Converts the string to kebab-case — all lowercase, words separated by hyphens. Commonly used in URLs and CSS class names.",
+    example: "Hello World",
+    exampleResult: "hello-world",
+    inputNote: "Any string. Leading/trailing hyphens are trimmed from output.",
+  },
+  "Snake Case": {
+    description:
+      "Converts the string to snake_case — all lowercase, words separated by underscores. Common in Python variable names and database columns.",
+    example: "Hello World",
+    exampleResult: "hello_world",
+    inputNote:
+      "Any string. Leading/trailing underscores are trimmed from output.",
+  },
+  "Screaming Snake Case": {
+    description:
+      "Converts the string to SCREAMING_SNAKE_CASE — all uppercase, words separated by underscores. Typically used for constants.",
+    example: "Hello World",
+    exampleResult: "HELLO_WORLD",
+    inputNote:
+      "Any string. Leading/trailing underscores are trimmed from output.",
+  },
+  "Randomise Case": {
+    description:
+      "Randomly uppercases or lowercases each character in the string. Running it twice on the same input will likely produce different results.",
+    example: "hello",
+    exampleResult: "hElLo",
+    inputNote:
+      "Any string. The result is non-deterministic — output will vary between runs.",
+  },
+  "No Whitespace": {
+    description:
+      "Removes every whitespace character (spaces, tabs, newlines) from the string. Useful for normalising identifiers or compact data.",
+    example: "a b  c",
+    exampleResult: "abc",
+    inputNote:
+      "Any string. All internal and surrounding whitespace is removed.",
+  },
+  "Binary String": {
+    description:
+      "Converts each character to its binary representation using the character's Unicode code point. Standard ASCII characters produce 8-bit values; extended characters produce wider values (padded to the nearest byte boundary).",
+    example: "A",
+    exampleResult: "01000001",
+    inputNote:
+      "Any string. Output groups are space-separated, one per character.",
+  },
+  "ASCII String": {
+    description:
+      "Returns the decimal code value for each character in the string. Pure ASCII characters (0–127) produce standard ASCII codes. Characters outside that range are marked with (?) to indicate they are not standard ASCII values.",
+    example: "A",
+    exampleResult: "65",
+    inputNote:
+      "Any string. Non-ASCII characters (code > 127) are shown with a (?) suffix. Output values are comma-separated.",
+  },
+};
+
+// ── Component ────────────────────────────────────────────────────────────────
+
 const StringManipulation = () => {
   const { register, handleSubmit, reset, watch, setValue } = useForm();
   const showToast = useToastStore((state) => state.showToast);
@@ -20,11 +117,7 @@ const StringManipulation = () => {
 
   const [outputString, setOutputString] = useState("");
   const [showFunctionInfo, setShowFunctionInfo] = useState(false);
-  /*
-   * mobileTab controls which panel is visible on small screens.
-   * Switches to "output" automatically when a result is produced,
-   * so the user never has to manually navigate to see it.
-   */
+
   const [mobileTab, setMobileTab] = useState<"input" | "output">("input");
 
   const inputText = watch("inputText");
@@ -32,12 +125,6 @@ const StringManipulation = () => {
   useEffect(() => {
     if (inputText && selectedStringFunction) {
       processString(inputText);
-      /*
-       * Auto-switch to output tab on mobile when a result is ready.
-       * We only do this once per "session" — if the user manually
-       * switches back to input, we don't force them to output again
-       * on every keystroke. The dot indicator on the tab handles that.
-       */
     }
   }, [selectedStringFunction, inputText]);
 
@@ -83,136 +170,13 @@ const StringManipulation = () => {
     return outputString.length - inputText.length;
   };
 
-  const getFunctionDefinition = () => {
-    if (!selectedStringFunction) return null;
-    return stringFunctions[selectedStringFunction].toString();
+  const getFunctionCode = (): string => {
+    if (!selectedStringFunction) return "";
+    const fn = stringFunctions[selectedStringFunction];
+    return fn ? fn.toString() : "";
   };
 
-  const getFunctionDescription = () => {
-    const descriptions: {
-      [key: string]: { desc: string; example: string; result: string };
-    } = {
-      Reverse: {
-        desc: "Reverses the order of characters",
-        example: "hello",
-        result: "olleh",
-      },
-      Uppercase: {
-        desc: "Converts to uppercase",
-        example: "hello",
-        result: "HELLO",
-      },
-      Lowercase: {
-        desc: "Converts to lowercase",
-        example: "HELLO",
-        result: "hello",
-      },
-      "Title Case": {
-        desc: "Capitalizes first letter of words",
-        example: "hello world",
-        result: "Hello World",
-      },
-      "Sentence Case": {
-        desc: "Capitalizes first letter of string",
-        example: "hello world",
-        result: "Hello world",
-      },
-      camelCase: {
-        desc: "lowerCamelCase format",
-        example: "hello world",
-        result: "helloWorld",
-      },
-      PascalCase: {
-        desc: "UpperCamelCase format",
-        example: "hello world",
-        result: "HelloWorld",
-      },
-      "kebab-case": {
-        desc: "Hyphenated lowercase",
-        example: "Hello World",
-        result: "hello-world",
-      },
-      snake_case: {
-        desc: "Underscored lowercase",
-        example: "Hello World",
-        result: "hello_world",
-      },
-      SCREAMING_SNAKE_CASE: {
-        desc: "Underscored uppercase",
-        example: "Hello World",
-        result: "HELLO_WORLD",
-      },
-      "Alternate Case": {
-        desc: "Alternates casing",
-        example: "hello",
-        result: "HeLlO",
-      },
-      "Randomize Case": {
-        desc: "Randomizes casing",
-        example: "hello",
-        result: "hElLo",
-      },
-      "Remove Spaces": {
-        desc: "Removes all whitespace",
-        example: "a b c",
-        result: "abc",
-      },
-      Trim: {
-        desc: "Removes leading/trailing whitespace",
-        example: "  a  ",
-        result: "a",
-      },
-      "String to Binary": {
-        desc: "Binary representation",
-        example: "A",
-        result: "01000001",
-      },
-      "String to ASCII": {
-        desc: "ASCII code values",
-        example: "A",
-        result: "65",
-      },
-      "Remove Duplicates": {
-        desc: "Removes consecutive duplicates",
-        example: "aaabb",
-        result: "ab",
-      },
-      "Count Characters": {
-        desc: "Total character count",
-        example: "abc",
-        result: "3",
-      },
-      "Count Words": {
-        desc: "Total word count",
-        example: "hello world",
-        result: "2",
-      },
-      "Encode Base64": {
-        desc: "Base64 encoding",
-        example: "hello",
-        result: "aGVsbG8=",
-      },
-      "Decode Base64": {
-        desc: "Base64 decoding",
-        example: "aGVsbG8=",
-        result: "hello",
-      },
-      "URL Encode": {
-        desc: "URL safe encoding",
-        example: "a b",
-        result: "a%20b",
-      },
-      "URL Decode": { desc: "URL decoding", example: "a%20b", result: "a b" },
-    };
-    const selected = descriptions[selectedStringFunction];
-    return selected
-      ? {
-          description: selected.desc,
-          example: `"${selected.example}" → "${selected.result}"`,
-        }
-      : { description: "Transforms the input string", example: "" };
-  };
-
+  const meta = STRING_FUNCTION_META[selectedStringFunction];
   const charDiff = getCharacterDifference();
   const hasContent = !!(inputText || outputString);
 
@@ -235,34 +199,58 @@ const StringManipulation = () => {
         contentClassName="bg-transparent! font-content"
         closeIcon={<X size={20} className="text-base-content" />}
       >
-        <div className="flex flex-col gap-y-4 text-base-content bg-base-300 rounded-2xl p-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-neutral-content mb-1 font-content">
-              Description
-            </p>
-            <p className="text-base text-base-content font-content">
-              {getFunctionDescription().description}
-            </p>
-          </div>
-          {getFunctionDescription().example && (
+        {meta && (
+          <div className="flex flex-col gap-y-4 text-base-content bg-base-300 rounded-2xl p-4">
+            {/* Description */}
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-neutral-content mb-1 font-content">
+                Description
+              </p>
+              <p className="text-base text-base-content font-content leading-relaxed">
+                {meta.description}
+              </p>
+            </div>
+
+            {/* Example — styled input → result row, matching the numbers page */}
             <div>
               <p className="text-xs font-semibold uppercase tracking-widest text-neutral-content mb-1 font-content">
                 Example
               </p>
-              <p className="text-sm text-base-content font-content bg-base-200 px-3 py-2 rounded-lg border border-neutral">
-                {getFunctionDescription().example}
+              <div className="flex items-center gap-2 bg-base-200 border border-neutral rounded-lg px-3 py-2.5">
+                <span className="font-mono text-sm text-base-content">
+                  {meta.example}
+                </span>
+                <ArrowRight
+                  size={14}
+                  className="text-neutral-content shrink-0"
+                />
+                <span className="font-mono text-sm text-primary font-semibold">
+                  {meta.exampleResult}
+                </span>
+              </div>
+            </div>
+
+            {/* Input type / constraints */}
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-neutral-content mb-1 font-content">
+                Input
+              </p>
+              <p className="text-sm text-neutral-content font-content">
+                {meta.inputNote}
               </p>
             </div>
-          )}
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-neutral-content mb-1 font-content">
-              Function Code
-            </p>
-            <pre className="p-3 bg-base-100 border border-neutral rounded-lg overflow-x-auto text-xs text-base-content font-mono leading-relaxed">
-              {getFunctionDefinition()}
-            </pre>
+
+            {/* Function source code */}
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-neutral-content mb-1 font-content">
+                Function Code
+              </p>
+              <pre className="p-3 bg-base-100 border border-neutral rounded-lg overflow-x-auto text-xs text-base-content font-mono leading-relaxed">
+                {getFunctionCode()}
+              </pre>
+            </div>
           </div>
-        </div>
+        )}
       </Dialog>
 
       <div className="w-full h-full flex flex-col">
@@ -301,20 +289,6 @@ const StringManipulation = () => {
           </div>
         </div>
 
-        {/*
-         * ── MOBILE TAB SWITCHER (hidden on md+) ──
-         *
-         * Replaces the stacked scroll layout on small screens.
-         * Each tab gets the full remaining viewport height, so:
-         *   - Input tab: full-height textarea, keyboard doesn't
-         *     push anything off screen
-         *   - Output tab: full-height result + all action buttons
-         *     visible without scrolling
-         *
-         * The output tab shows a green dot when a result is ready,
-         * so the user knows to switch without any explicit prompt.
-         * "Use as Input" auto-switches back to the input tab.
-         */}
         <div className="md:hidden shrink-0 px-3 pb-2">
           <div className="flex items-center gap-1 bg-base-200 rounded-xl p-1">
             <button
@@ -358,11 +332,6 @@ const StringManipulation = () => {
                 2
               </span>
               Output
-              {/*
-               * Ready dot — appears when output exists.
-               * Tells the user "there's something here" without forcing
-               * them to navigate away from the keyboard.
-               */}
               {outputString && (
                 <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
               )}
@@ -370,16 +339,6 @@ const StringManipulation = () => {
           </div>
         </div>
 
-        {/*
-         * ── PANELS ──
-         *
-         * MOBILE: one panel visible at a time based on mobileTab state.
-         *         flex-1 + min-h-0 so the active panel fills all remaining
-         *         height, giving the textarea maximum possible space.
-         *
-         * DESKTOP (md+): side-by-side with the pipeline connector between.
-         *                Both panels always visible, no tabs needed.
-         */}
         <div className="flex-1 min-h-0 flex flex-col md:flex-row md:items-stretch px-3 md:px-4 pb-3 md:pb-4 gap-0">
           {/* ── Input panel ── */}
           <form
@@ -429,12 +388,6 @@ const StringManipulation = () => {
               {...register("inputText")}
             />
 
-            {/*
-             * Mobile-only "See Result" shortcut button.
-             * Appears below the textarea once there's output to show.
-             * Lets the user jump to the output tab with one tap without
-             * dismissing the keyboard manually first.
-             */}
             {outputString && (
               <button
                 type="button"
@@ -460,7 +413,7 @@ const StringManipulation = () => {
               {selectedStringFunction && (
                 <span
                   className="max-w-[64px] text-center text-[10px] leading-tight font-semibold text-primary font-content
-                                 bg-base-300 border border-neutral rounded-lg px-1.5 py-1 break-words"
+                                 bg-base-300 border border-neutral rounded-lg px-1.5 py-1 wrap-break-word"
                 >
                   {selectedStringFunction}
                 </span>

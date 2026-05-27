@@ -1,44 +1,41 @@
-// String Manipulation Functions
+// src/Services/StringFunctions.ts
 
-export function alternateCase(input) {
+export function alternateCase(input: string): string {
   let result = "";
   let toggle = true; // Start with uppercase
 
   for (let i = 0; i < input.length; i++) {
-    let char = input[i];
-
-    // Check if the character is a letter
+    const char = input[i];
     if (/[a-zA-Z]/.test(char)) {
-      if (toggle) {
-        result += char.toUpperCase();
-      } else {
-        result += char.toLowerCase();
-      }
-      toggle = !toggle; // Flip toggle between uppercase and lowercase
+      result += toggle ? char.toUpperCase() : char.toLowerCase();
+      toggle = !toggle;
     } else {
-      result += char; // If it's not a letter, just append it
+      result += char; // Non-letter characters don't affect the toggle
     }
   }
 
   return result;
 }
 
-export function toCamelCase(input) {
+export function toCamelCase(input: string): string {
   return input
     .trim()
     .toLowerCase()
-    .replace(/[^a-zA-Z0-9]+(.)/g, (chr) => chr.toUpperCase())
-    .replace(/^[A-Z]/, (match) => match.toLowerCase()); // Ensure first letter is lowercase
+    .replace(/[^a-zA-Z0-9]+(.)/g, (_, capturedChar) =>
+      capturedChar.toUpperCase(),
+    );
 }
 
-export function toPascalCase(input: string) {
+export function toPascalCase(input: string): string {
   return input
     .trim()
-    .replace(/[^a-zA-Z0-9]+(.)?/g, (chr) => (chr ? chr.toUpperCase() : ""))
-    .replace(/^[a-z]/, (match) => match.toUpperCase()); // Ensure first letter is uppercase
+    .replace(/[^a-zA-Z0-9]+(.)?/g, (_, capturedChar) =>
+      capturedChar ? capturedChar.toUpperCase() : "",
+    )
+    .replace(/^[a-z]/, (match) => match.toUpperCase());
 }
 
-export function toKebabCase(input) {
+export function toKebabCase(input: string): string {
   return input
     .trim()
     .toLowerCase()
@@ -46,7 +43,7 @@ export function toKebabCase(input) {
     .replace(/^-+|-+$/g, ""); // Remove leading/trailing dashes
 }
 
-export function toSnakeCase(input) {
+export function toSnakeCase(input: string): string {
   return input
     .trim()
     .toLowerCase()
@@ -54,7 +51,7 @@ export function toSnakeCase(input) {
     .replace(/^_+|_+$/g, ""); // Remove leading/trailing underscores
 }
 
-export function toScreamingSnakeCase(input) {
+export function toScreamingSnakeCase(input: string): string {
   return input
     .trim()
     .toUpperCase()
@@ -62,40 +59,42 @@ export function toScreamingSnakeCase(input) {
     .replace(/^_+|_+$/g, ""); // Remove leading/trailing underscores
 }
 
-export function reverseString(input) {
+export function reverseString(input: string): string {
   return input.split("").reverse().join("");
 }
 
-export function randomizeCase(input) {
+export function randomizeCase(input: string): string {
   return input
     .split("")
-    .map((char) => {
-      // Randomly decide to convert the character to uppercase or lowercase
-      return Math.random() < 0.5 ? char.toLowerCase() : char.toUpperCase();
-    })
+    .map((char) =>
+      Math.random() < 0.5 ? char.toLowerCase() : char.toUpperCase(),
+    )
     .join("");
 }
 
-export function removeWhitespace(input) {
-  // Remove leading and trailing whitespace
-  const trimmedString = input.trim();
-
-  // Remove all whitespace characters within the string
-  const noWhitespaceString = trimmedString.replace(/\s+/g, "");
-
-  return noWhitespaceString;
+export function removeWhitespace(input: string): string {
+  return input.trim().replace(/\s+/g, "");
 }
 
-export function stringToBinary(input) {
+export function stringToBinary(input: string): string {
   return input
     .split("")
-    .map((char) => char.charCodeAt(0).toString(2).padStart(8, "0")) // Convert each character to binary
-    .join(" "); // Join the binary values with spaces
+    .map((char) => {
+      const codePoint = char.codePointAt(0) ?? 0;
+      const bits = codePoint.toString(2);
+      // Pad to nearest multiple of 8 so each byte boundary is clear.
+      const padWidth = Math.max(8, Math.ceil(bits.length / 8) * 8);
+      return bits.padStart(padWidth, "0");
+    })
+    .join(" ");
 }
 
-export function stringToAscii(input) {
+export function stringToAscii(input: string): string {
   return input
     .split("")
-    .map((char) => char.charCodeAt(0))
-    .join(", "); // Return as comma-separated string for better display
+    .map((char) => {
+      const code = char.charCodeAt(0);
+      return code > 127 ? `${code}(?)` : `${code}`;
+    })
+    .join(", ");
 }

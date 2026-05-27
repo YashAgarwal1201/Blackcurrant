@@ -5,7 +5,6 @@ import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { Dialog } from "primereact/dialog";
-import { useForm } from "react-hook-form";
 import Layout from "../../Layout/Layout";
 import { NUMBER_OPTIONS, numberFunctions } from "../../Services/Data/Constants";
 import useNumberFunctionsStore from "../../Services/Stores/numberFunctionsStore";
@@ -13,22 +12,6 @@ import useToastStore from "../../Services/Stores/toastMessageStore";
 import GoBackBtn from "../../Layout/GoBackBtn";
 import { X, ArrowRight } from "lucide-react";
 
-/*
- * ── Input type classification ─────────────────────────────────────────────────
- *
- * ROOT CAUSE of the "click outside to calculate" bug:
- * InputNumber commits its value on blur, not on change — so the useEffect
- * that watches the value never fires while the field is focused.
- *
- * FIX: use InputText (controlled) for string-input functions (HEX to Number,
- * Binary to Number). For numeric functions, switch from InputNumber + watch()
- * to a controlled local state updated via onChange — this fires on every
- * keystroke, not just on blur.
- *
- * "text" input functions: user types a string (hex or binary), result is a number.
- * "number" input functions: user types a number, result varies.
- * "double" input functions: two numeric inputs (GCD, LCM).
- */
 type InputKind = "number" | "text" | "double";
 
 const FUNCTION_META: Record<
@@ -170,20 +153,10 @@ const FUNCTION_META: Record<
 };
 
 const NumberManipulation = () => {
-  const { reset } = useForm({
-    defaultValues: { inputVal1: 0, inputVal2: 0 },
-    mode: "onChange",
-  });
-
   const showToast = useToastStore((state) => state.showToast);
   const { selectedNumberFunction, setSelectedNumberFunction } =
     useNumberFunctionsStore();
 
-  /*
-   * Controlled local state instead of react-hook-form watch().
-   * This fires on every keystroke (onChange), solving the "click outside" bug.
-   * inputText is used for HEX-to-Number and Binary-to-Number (string inputs).
-   */
   const [inputVal1, setInputVal1] = useState<number>(0);
   const [inputVal2, setInputVal2] = useState<number>(0);
   const [inputText, setInputText] = useState<string>("");
@@ -207,10 +180,6 @@ const NumberManipulation = () => {
   const hasContent =
     hasOutput || inputVal1 !== 0 || inputVal2 !== 0 || inputText !== "";
 
-  /*
-   * Validate input before processing.
-   * Returns an error string or empty string if valid.
-   */
   const validate = useCallback(
     (fn: string, v1: number | string, v2?: number): string => {
       const m = FUNCTION_META[fn];
@@ -274,10 +243,6 @@ const NumberManipulation = () => {
     [isDouble, validate],
   );
 
-  /*
-   * Auto-process on every input change — no blur needed.
-   * Text inputs debounce naturally since the user has to type the full string.
-   */
   useEffect(() => {
     if (!selectedNumberFunction) return;
 
@@ -528,15 +493,11 @@ const NumberManipulation = () => {
                 )}
 
                 {isTextInput ? (
-                  /*
-                   * InputText for string-input functions (HEX → Number, Binary → Number).
-                   * onChange fires on every keystroke — no blur needed.
-                   */
                   <InputText
                     disabled={!selectedNumberFunction}
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
-                    className={`w-full h-12 px-4 text-base text-base-content font-content font-mono
+                    className={`w-full h-12 px-4 text-base text-base-content font-content
                                 bg-base-200 border-2 rounded-xl
                                 focus:border-primary!
                                 disabled:opacity-50 disabled:cursor-not-allowed
@@ -545,12 +506,6 @@ const NumberManipulation = () => {
                     placeholder={meta?.placeholder1 ?? "Enter value…"}
                   />
                 ) : (
-                  /*
-                   * InputNumber for numeric functions.
-                   * FIX: onValueChange fires on every change (including typing),
-                   * unlike onChange which only fires on commit. Combined with
-                   * controlled local state this eliminates the blur requirement.
-                   */
                   <InputNumber
                     disabled={!selectedNumberFunction}
                     value={inputVal1}
@@ -625,18 +580,6 @@ const NumberManipulation = () => {
             )}
           </div>
 
-          {/*
-           * ── Desktop pipeline connector ──
-           *
-           * FIX for "weird separator with empty space on either side":
-           * Changed from `items-stretch` (full height) to `items-start` on the
-           * parent, so the connector only spans the natural height of the content
-           * rather than stretching to fill dead vertical space. The line now
-           * visually connects the two panels' content, not the whole viewport.
-           *
-           * The connector sits at the vertical midpoint of the input fields,
-           * which is where the eye naturally looks for the relationship.
-           */}
           <div className="hidden md:flex flex-col items-center gap-2 px-3 shrink-0 pt-9">
             <div className="h-6 w-px bg-neutral" />
             <div className="flex flex-col items-center gap-1.5">
@@ -646,7 +589,7 @@ const NumberManipulation = () => {
               {selectedNumberFunction && (
                 <span
                   className="max-w-[64px] text-center text-[10px] leading-tight font-semibold text-primary font-content
-                                 bg-base-300 border border-neutral rounded-lg px-1.5 py-1 break-words"
+                                 bg-base-300 border border-neutral rounded-lg px-1.5 py-1 wrap-break-word"
                 >
                   {selectedNumberFunction}
                 </span>
@@ -678,12 +621,6 @@ const NumberManipulation = () => {
               </span>
             </div>
 
-            {/*
-             * Output display.
-             * Grows taller for Fibonacci (array output) which can be long.
-             * Shows the function's output type as a subtle label so the user
-             * understands what they're looking at (e.g. "boolean", "sequence", "hex").
-             */}
             <div
               className={`w-full px-4 flex items-center
                          bg-base-300 border-2 border-neutral border-l-[3px] border-l-primary
@@ -693,7 +630,7 @@ const NumberManipulation = () => {
             >
               {hasOutput ? (
                 <span
-                  className={`${outputIsArray ? "text-sm break-words" : "text-lg font-semibold"} font-mono`}
+                  className={`${outputIsArray ? "text-sm wrap-break-word" : "text-lg font-semibold"} font-mono`}
                 >
                   {outputVal}
                 </span>
@@ -704,10 +641,6 @@ const NumberManipulation = () => {
               )}
             </div>
 
-            {/*
-             * Output type badge — appears once there's a result.
-             * Tells the user what kind of value they're looking at.
-             */}
             {hasOutput && (
               <p className="text-[10px] text-neutral-content font-content mt-1 ml-1">
                 {outputIsArray
