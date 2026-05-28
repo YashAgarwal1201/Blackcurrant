@@ -44,9 +44,8 @@ function isStaticAsset(request) {
 
 async function cacheResponse(request, response) {
   if (!response || !response.ok) return;
-
   const cache = await caches.open(CACHE_NAME);
-  await cache.put(request, response.clone());
+  await cache.put(request, response);
 }
 
 self.addEventListener("install", (event) => {
@@ -80,12 +79,13 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(request.url);
 
-  // Navigation requests: network first, offline fallback to app shell
+  // Navigation: network first, offline fallback
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          cacheResponse(request, response);
+          const clone = response.clone();
+          event.waitUntil(cacheResponse(request, clone));
           return response;
         })
         .catch(() => caches.match("/index.html")),
@@ -93,16 +93,15 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Static assets: cache first, then revalidate in background
+  // Static assets: cache first, revalidate in background
   if (isStaticAsset(request)) {
     event.respondWith(
       caches.match(request).then((cached) => {
-        const networkFetch = fetch(request)
-          .then((response) => {
-            cacheResponse(request, response);
-            return response;
-          })
-          .catch(() => cached);
+        const networkFetch = fetch(request).then((response) => {
+          const clone = response.clone();
+          event.waitUntil(cacheResponse(request, clone));
+          return response;
+        });
 
         if (cached) {
           event.waitUntil(networkFetch);
@@ -119,7 +118,8 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(request)
       .then((response) => {
-        cacheResponse(request, response);
+        const clone = response.clone();
+        event.waitUntil(cacheResponse(request, clone));
         return response;
       })
       .catch(() => caches.match(request)),
