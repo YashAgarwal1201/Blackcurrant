@@ -1,3 +1,4 @@
+// src/Services/Data/Constants.ts
 import {
   addDaysToDate,
   calculateAge,
@@ -8,7 +9,7 @@ import {
   getLastDayOfMonth,
   isLeapYear,
   isWeekend,
-} from "./DateFunctions";
+} from "../DateFunctions";
 import {
   binaryToNumber,
   factorial,
@@ -21,7 +22,7 @@ import {
   numberToHex,
   reverseNumber,
   sumOfDigits,
-} from "./NumberFunctions";
+} from "../NumberFunctions";
 import {
   alternateCase,
   reverseString,
@@ -34,7 +35,7 @@ import {
   removeWhitespace,
   stringToBinary,
   stringToAscii,
-} from "./StringFunctions";
+} from "../StringFunctions";
 
 export const WEB_APIS_CARDS_BASE_STYLES =
   "h-[300px] bg-color2 text-color5 rounded-md";

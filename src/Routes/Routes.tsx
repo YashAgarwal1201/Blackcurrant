@@ -1,3 +1,4 @@
+// src/Routes/Routes.tsx
 import { lazy } from "react";
 
 import {
@@ -29,7 +30,7 @@ const PageNotFound = lazy(() => import("../Pages/PageNotFound/PageNotFound"));
 const Router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
-      <Route path="/" element={<LandingPage />} />
+      <Route index element={<LandingPage />} />
       <Route path="/home" element={<HomePage />} />
       <Route path="/play-with-strings" element={<StringManipulation />} />
       <Route path="/play-with-numbers" element={<NumberManipulation />} />

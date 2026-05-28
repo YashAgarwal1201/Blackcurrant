@@ -1,0 +1,73 @@
+@layer theme, base, primereact, utilities;
+/* All imports FIRST - PostCSS requires this  ──────*/
+@import "primereact/resources/themes/mira/theme.css";
+@import "tailwindcss/theme" layer(theme);
+@import "tailwindcss/preflight" layer(base);
+@import "tailwindcss/utilities" layer(utilities);
+@import "./fonts.css";
+@import "./tokens.css";
+@import "./globals.css";
+@import "./primereact.scss";
+@import "./animations.css";
+@import "./utilities.css";
+@import "./mediaQueries.css";
+
+/* Layer order declaration ─*/
+
+/* Static tokens - baked at build time──────*/
+@theme {
+  --color-color1: var(--base-100);
+  --color-color2: var(--base-200);
+  --color-color3: var(--neutral);
+  --color-color4: var(--neutral-content);
+  --color-color5: var(--base-content);
+
+  --breakpoint-mdl: 896px;
+  --breakpoint-xs: 480px;
+
+  --font-heading: "Acme";
+  --font-subHeading: "Righteous";
+  --font-content: "Urbanist";
+}
+
+/* Dynamic tokens - resolved at runtime via CSS vars  ────*/
+@theme inline {
+  --color-base-100: var(--base-100);
+  --color-base-200: var(--base-200);
+  --color-base-300: var(--base-300);
+  --color-base-content: var(--base-content);
+  --color-neutral: var(--neutral);
+  --color-neutral-content: var(--neutral-content);
+  --color-primary: var(--primary);
+  --color-primary-content: var(--primary-content);
+}
+
+/* below portion will be phased out */
+/* @theme {
+  --color-color1: #312b4c;
+  --color-color2: #8c63a7;
+  --color-color3: #a08bd0;
+  --color-color4: #c3bce7;
+  --color-color5: #fafafa;
+
+  --font-heading: "Acme";
+  --font-subHeading: "Righteous";
+  --font-content: "Urbanist";
+
+  --breakpoint-mdl: 896px;
+  --breakpoint-xs: 480px;
+}
+
+@layer base {
+  html {
+    --color1: #312b4c;
+    --color2: #8c63a7;
+    --color3: #a08bd0;
+    --color4: #c3bce7;
+    --color5: #fafafa;
+
+    --heading: "Acme";
+    --subHeading: "Righteous";
+    --content: "Urbanist";
+  }
+} */

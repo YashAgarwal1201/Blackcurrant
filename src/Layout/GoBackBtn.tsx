@@ -1,3 +1,4 @@
+// src/Layout/GoBackBtn.tsx
 import { ChevronLeft } from "lucide-react";
 import { Button } from "primereact/button";
 
@@ -9,10 +10,9 @@ const GoBackBtn = ({ extraHandelers }: { extraHandelers?: () => void }) => {
   return (
     <Button
       icon={<ChevronLeft size={20} fontWeight={400} />}
-      title="Go back"
-      aria-label="GO back btn"
+      aria-label="Go back btn"
       onClick={() => goBackBtn()}
-      className="rounded-full text-color5"
+      className="rounded-full text-base-content bg-transparent border-transparent"
       rounded
     />
   );

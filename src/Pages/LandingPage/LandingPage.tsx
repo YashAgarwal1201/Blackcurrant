@@ -46,15 +46,15 @@ const LandingPage = () => {
 
   return (
     <div
-      className={`landing-page backdrop-blur-md w-screen h-screen flex flex-col justify-center items-center text-color1 bg-color1 transition-all duration-1000 transform ${
+      className={`landing-page backdrop-blur-md w-dvw h-dvh flex flex-col justify-center items-center text-base-content bg-base-content transition-all duration-1000 transform ${
         // showContent && !animateOut
         //   ? "translate-y-0 opacity-100"
         //   : "-translate-y-full opacity-0"
         showContent && !animateOut
           ? "translate-y-0 opacity-100"
           : animateOut
-          ? "slide-down"
-          : "-translate-y-full opacity-0"
+            ? "slide-down"
+            : "-translate-y-full opacity-0"
       } text-center`}
     >
       <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading">Welcome</h1>

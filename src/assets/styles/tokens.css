@@ -1,0 +1,120 @@
+/* Surface tokens ─────*/
+
+html[data-theme="light"] {
+  --base-100: #faf7fc;
+  --base-200: #ede5f5;
+  --base-300: #d9cce8;
+
+  --base-content: #1a0f2e;
+
+  --neutral: #c4b3d9;
+  --neutral-content: #5c3d80;
+}
+
+html[data-theme="dark"] {
+  --base-100: #0a0810; /* blackcurrant skin — near-black warm purple */
+  --base-200: #150f1f; /* deep violet flesh — clearly above page bg */
+  --base-300: #221830; /* rich pulp — readable surface for textareas/dropdown */
+
+  --base-content: #f0ebf8;
+
+  --neutral: #3d2d52; /* seed — muted purple, ghost button borders now visible */
+  --neutral-content: #c9b8e8;
+}
+
+/* Accent tokens - dark defaults───────────*/
+
+/* Graphite */
+[data-accent="graphite"] {
+  --primary: #a8a1ad;
+  --primary-content: #0a0810;
+}
+
+/* Currant (main brand) */
+[data-accent="currant"] {
+  --primary: #c084fc; /* blackcurrant juice — vivid cool purple */
+  --primary-content: #0a0810;
+}
+
+/* Plum */
+[data-accent="plum"] {
+  --primary: #a855f7;
+  --primary-content: #0a0810;
+}
+
+/* Berry */
+[data-accent="berry"] {
+  --primary: #e879a0;
+  --primary-content: #1a0a12;
+}
+
+/* Wine */
+[data-accent="wine"] {
+  --primary: #c2456b;
+  /* --primary-content: #1a0a12; */
+  --primary-content: #fff;
+}
+
+/* Leaf */
+[data-accent="leaf"] {
+  --primary: #7cad3c;
+  --primary-content: #0c1a04;
+}
+
+/* Accent tokens - light overrides─────────*/
+
+/* Graphite */
+[data-theme="light"][data-accent="graphite"] {
+  --primary: #5f5666;
+  --primary-content: #ffffff;
+}
+
+/* Currant */
+[data-theme="light"][data-accent="currant"] {
+  --primary: #7c22d4;
+  --primary-content: #ffffff;
+}
+
+/* Plum */
+[data-theme="light"][data-accent="plum"] {
+  --primary: #7c3aed;
+  --primary-content: #ffffff;
+}
+
+/* Berry */
+[data-theme="light"][data-accent="berry"] {
+  --primary: #c23d64;
+  --primary-content: #ffffff;
+}
+
+/* Wine */
+[data-theme="light"][data-accent="wine"] {
+  --primary: #a53a59;
+  --primary-content: #ffffff;
+}
+
+/* Leaf */
+[data-theme="light"][data-accent="leaf"] {
+  --primary: #5f7f2f;
+  --primary-content: #ffffff;
+}
+
+/* PrimeReact token sync ───*/
+
+:root {
+  --p-primary-color: var(--primary);
+  --p-primary-contrast-color: var(--primary-content);
+  --p-primary-hover-color: var(--primary);
+  --p-focus-ring-color: var(--primary);
+}
+
+/* Legacy bridge ──────*/
+
+html[data-theme="light"],
+html[data-theme="dark"] {
+  --color1: var(--base-100);
+  --color2: var(--base-200);
+  --color3: var(--neutral);
+  --color4: var(--neutral-content);
+  --color5: var(--base-content);
+}

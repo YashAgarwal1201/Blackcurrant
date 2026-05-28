@@ -1,4 +1,4 @@
-/* ─── General ────────────────────────────────────────────────────────────────── */
+/* General*/
 @keyframes slideDown {
   from {
     transform: translateY(-100%);
@@ -10,7 +10,7 @@
   }
 }
 
-/* ─── Navbar slide-in (direction by breakpoint) ──────────────────────────────── */
+/* Navbar slide-in (direction by breakpoint)*/
 @keyframes navSlideUp {
   from {
     transform: translateY(100%);
@@ -43,7 +43,7 @@
   }
 }
 
-/* ─── Gradient background ────────────────────────────────────────────────────── */
+/* Gradient background */
 @keyframes gradient-move {
   0% {
     background-position: 0% 50%;
@@ -62,7 +62,7 @@
   animation: gradient-move 4s ease infinite;
 }
 
-/* ─── Navbar icon animations ─────────────────────────────────────────────────── */
+/* Navbar icon animations ──*/
 @keyframes icon-pop {
   0% {
     transform: scale(0.75);
@@ -140,7 +140,7 @@
   animation: icon-pulse-scale 0.5s ease-in-out;
 }
 
-/* ─── SideMenu icon animations ───────────────────────────────────────────────── */
+/* SideMenu icon animations */
 @keyframes icon-expand-nudge {
   0% {
     transform: rotate(0deg) scale(1);
@@ -178,7 +178,7 @@
   animation: icon-download-drop 0.45s ease-in-out both;
 }
 
-/* ─── Profile tab icon animations ────────────────────────────────────────────── */
+/* Profile tab icon animations */
 @keyframes icon-tab-work {
   0% {
     transform: rotate(0deg) scale(1);

@@ -2,7 +2,7 @@ import { Button } from "primereact/button";
 import { InputNumber } from "primereact/inputnumber";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { numberFunctions } from "../../../Services/Constants";
+import { numberFunctions } from "../../../Services/Data/Constants";
 import useNumberFunctionsStore from "../../../Services/Stores/numberFunctionsStore";
 import { InputText } from "primereact/inputtext";
 
@@ -124,7 +124,7 @@ const SingleInput = () => {
               className="h-full px-5 text-sm md:text-base lg:text-lg text-color1 bg-color4 font-content rounded-full"
               onClick={() =>
                 navigator.clipboard.writeText(
-                  outputVal?.toString() ? outputVal.toString() : ""
+                  outputVal?.toString() ? outputVal.toString() : "",
                 )
               }
             />

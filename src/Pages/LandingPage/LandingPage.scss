@@ -14,7 +14,12 @@
 // }
 
 .landing-page {
-  background: radial-gradient(circle at bottom, var(--color4) 20%, var(--color3) 60%, var(--color1));
+  background: radial-gradient(
+    circle at bottom,
+    var(--color-primary) 20%,
+    var(--color-primary-content) 60%,
+    var(--color-base-100)
+  );
 
   &.slide-down {
     animation: slideDown 1s forwards;
