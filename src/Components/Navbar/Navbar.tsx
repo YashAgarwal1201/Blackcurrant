@@ -71,12 +71,12 @@ const Navbar = () => {
                 fill={isActive ? "currentColor" : "none"}
                 className={`
                     transition-transform duration-300
-                    ${isActive ? "text-primary-content animate-icon-pop" : "text-color4 group-hover:animate-icon-wiggle"}
+                    ${isActive ? "text-primary-content animate-icon-pop" : "text-base-content group-hover:animate-icon-wiggle"}
                   `}
               />
             </span>
             <span
-              className={`text-xs transition-colors duration-200 ${isActive ? "text-primary font-bold" : "text-color4 font-normal"}`}
+              className={`text-xs transition-colors duration-200 ${isActive ? "text-primary font-bold" : "text-base-content font-normal"}`}
             >
               {label}
             </span>
@@ -100,12 +100,12 @@ const Navbar = () => {
               fill={isSideMenuOpen ? "currentColor" : "none"}
               className={`
                 transition-transform duration-300
-                ${isSideMenuOpen ? "text-primary-content animate-icon-pop" : "text-color4 group-hover:animate-icon-wiggle"}
+                ${isSideMenuOpen ? "text-primary-content animate-icon-pop" : "text-base-content group-hover:animate-icon-wiggle"}
               `}
             />
           </span>
           <span
-            className={`text-xs transition-colors duration-200 ${isSideMenuOpen ? "text-primary font-bold" : "text-color4 font-normal"}`}
+            className={`text-xs transition-colors duration-200 ${isSideMenuOpen ? "text-primary font-bold" : "text-base-content font-normal"}`}
           >
             Menu
           </span>

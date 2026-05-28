@@ -107,7 +107,7 @@ const STRING_FUNCTION_META: Record<string, StringFunctionMeta> = {
   },
 };
 
-// ── Component ────────────────────────────────────────────────────────────────
+// Component
 
 const StringManipulation = () => {
   const { register, handleSubmit, reset, watch, setValue } = useForm();
@@ -182,7 +182,7 @@ const StringManipulation = () => {
 
   return (
     <Layout>
-      {/* ── Function Info Dialog ── */}
+      {/* Function Info Dialog */}
       <Dialog
         header={
           <h2 className="font-heading text-xl sm:text-2xl text-base-content">
@@ -254,7 +254,7 @@ const StringManipulation = () => {
       </Dialog>
 
       <div className="w-full h-full flex flex-col">
-        {/* ── Header ── */}
+        {/* Header */}
         <div className="shrink-0 px-3 pt-3 pb-2 md:px-4 md:pt-4 flex items-center gap-x-1">
           <GoBackBtn />
           <h1 className="text-2xl xs:text-3xl mdl:text-4xl text-primary font-heading select-none truncate">
@@ -262,7 +262,7 @@ const StringManipulation = () => {
           </h1>
         </div>
 
-        {/* ── Function picker ── */}
+        {/* Function picker */}
         <div className="shrink-0 px-3 md:px-4 pb-2 md:pb-3">
           <p className="text-base xs:text-lg text-base-content font-subHeading mb-2">
             Choose a function
@@ -274,8 +274,26 @@ const StringManipulation = () => {
               options={STRING_OPTIONS}
               placeholder="Select a string function"
               filter
+              filterPlaceholder="Search functions..."
               className="flex-1 h-10 bg-base-200! border! border-neutral! rounded-lg! text-base-content"
-              panelClassName="bg-base-200 border border-neutral rounded-lg shadow-lg"
+              panelClassName="bg-base-200 border border-neutral rounded-lg shadow-lg py-2 px-2 mt-2"
+              itemTemplate={(value) => (
+                <span className="font-content">{value}</span>
+              )}
+              valueTemplate={(value) => {
+                if (!value) {
+                  return (
+                    <span className="text-neutral-content font-content">
+                      Select a string function
+                    </span>
+                  );
+                }
+                return (
+                  <span className="text-base-content font-content">
+                    {value}
+                  </span>
+                );
+              }}
             />
             <Button
               type="button"
@@ -340,7 +358,7 @@ const StringManipulation = () => {
         </div>
 
         <div className="flex-1 min-h-0 flex flex-col md:flex-row md:items-stretch px-3 md:px-4 pb-3 md:pb-4 gap-0">
-          {/* ── Input panel ── */}
+          {/* Input panel */}
           <form
             onSubmit={handleSubmit(onSubmit)}
             className={`flex-col min-h-0 md:flex md:flex-1
@@ -403,7 +421,7 @@ const StringManipulation = () => {
             )}
           </form>
 
-          {/* ── Desktop pipeline connector (hidden on mobile) ── */}
+          {/* Desktop pipeline connector (hidden on mobile) */}
           <div className="hidden md:flex flex-col items-center justify-center gap-2 px-3 shrink-0">
             <div className="flex-1 w-px bg-neutral" />
             <div className="flex flex-col items-center gap-1.5">
@@ -422,7 +440,7 @@ const StringManipulation = () => {
             <div className="flex-1 w-px bg-neutral" />
           </div>
 
-          {/* ── Output panel ── */}
+          {/* Output panel */}
           <div
             className={`flex-col min-h-0 md:flex md:flex-1
               ${mobileTab === "output" ? "flex flex-1" : "hidden"}`}

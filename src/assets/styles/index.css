@@ -1,5 +1,5 @@
 @layer theme, base, primereact, utilities;
-/* ─── All imports FIRST - PostCSS requires this ─────────────────────────────── */
+/* All imports FIRST - PostCSS requires this  ──────*/
 @import "primereact/resources/themes/mira/theme.css";
 @import "tailwindcss/theme" layer(theme);
 @import "tailwindcss/preflight" layer(base);
@@ -7,14 +7,14 @@
 @import "./fonts.css";
 @import "./tokens.css";
 @import "./globals.css";
-@import "./primereact.css";
+@import "./primereact.scss";
 @import "./animations.css";
 @import "./utilities.css";
 @import "./mediaQueries.css";
 
-/* ─── Layer order declaration ────────────────────────────────────────────────── */
+/* Layer order declaration ─*/
 
-/* ─── Static tokens - baked at build time ────────────────────────────────────── */
+/* Static tokens - baked at build time──────*/
 @theme {
   --color-color1: var(--base-100);
   --color-color2: var(--base-200);
@@ -30,7 +30,7 @@
   --font-content: "Urbanist";
 }
 
-/* ─── Dynamic tokens - resolved at runtime via CSS vars ──────────────────────── */
+/* Dynamic tokens - resolved at runtime via CSS vars  ────*/
 @theme inline {
   --color-base-100: var(--base-100);
   --color-base-200: var(--base-200);

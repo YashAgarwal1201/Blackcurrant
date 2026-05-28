@@ -1,4 +1,4 @@
-/* ─── Focus / input resets ───────────────────────────────────────────────────── */
+/* Focus / input resets ────*/
 @layer primereact {
   .p-button:focus,
   .p-link:focus {
@@ -24,7 +24,7 @@
     box-shadow: none;
   }
 
-  /* ─── Overlay / mask ─────────────────────────────────────────────────────────── */
+  /* Overlay / mask ─────*/
   .p-dialog-mask,
   .p-image-mask,
   .p-sidebar-mask {
@@ -38,7 +38,7 @@
     backdrop-filter: blur(7px);
   }
 
-  /* ─── Dialog / Sidebar ───────────────────────────────────────────────────────── */
+  /* Dialog / Sidebar ───*/
   .p-sidebar-header,
   .p-dialog-header {
     border-radius: 0.5rem;
@@ -63,18 +63,18 @@
     display: none;
   }
 
-  /* ─── Image preview ──────────────────────────────────────────────────────────── */
+  /* Image preview ──────*/
   .p-image-preview {
     border: 0.25rem solid var(--neutral-content);
     border-radius: 0.375rem;
   }
 
-  /* ─── Checkbox ───────────────────────────────────────────────────────────────── */
+  /* Checkbox ───────────*/
   .p-checkbox-box {
     border-radius: 0;
   }
 
-  /* ─── Breadcrumb ─────────────────────────────────────────────────────────────── */
+  /* Breadcrumb ─────────*/
   .p-breadcrumb {
     background-color: transparent;
     padding: 0;
@@ -103,7 +103,7 @@
     vertical-align: top;
   }
 
-  /* ─── Panel ──────────────────────────────────────────────────────────────────── */
+  /* Panel bg-transparent!─ */
   .p-panel {
     .p-panel-header {
       background-color: var(--base-100);
@@ -117,7 +117,7 @@
     }
   }
 
-  /* ─── TabView ────────────────────────────────────────────────────────────────── */
+  /* TabView*/
   .p-tabview {
     height: fit-content;
 
@@ -170,7 +170,7 @@
     }
   }
 
-  /* ─── Accordion ──────────────────────────────────────────────────────────────── */
+  /* Accordion ──────────*/
   .p-accordion {
     background-color: transparent;
 
@@ -212,7 +212,7 @@
     }
   }
 
-  /* ─── SelectButton ───────────────────────────────────────────────────────────── */
+  /* SelectButton ───────*/
   .p-selectbutton {
     .p-button {
       padding: 4px 8px !important;
@@ -228,7 +228,7 @@
     }
   }
 
-  /* ─── InputSwitch ────────────────────────────────────────────────────────────── */
+  /* InputSwitch ────────*/
   .p-inputswitch-checked {
     .p-inputswitch-slider {
       background-color: var(--neutral);
@@ -238,7 +238,61 @@
     }
   }
 
-  /* ─── Toast ──────────────────────────────────────────────────────────────────── */
+  .p-dropdown {
+    .p-dropdown-label {
+      &.p-placeholder {
+        color: #ffffff;
+      }
+    }
+
+    .p-dropdown-trigger {
+      color: var(--neutral-content);
+    }
+  }
+
+  .p-dropdown-panel {
+    .p-dropdown-header {
+      padding: 0px;
+      margin-bottom: 0.5rem;
+      border-radius: 0.5rem;
+      background-color: transparent;
+
+      .p-dropdown-filter {
+        background-color: transparent;
+        border-radius: 0.5rem;
+        border-color: var(--color-neutral);
+
+        &::placeholder {
+          font-family: var(--font-content);
+          color: var(--neutral-content);
+        }
+      }
+
+      .p-dropdown-filter-icon {
+        color: var(--neutral-content);
+        padding-right: 0.25rem;
+      }
+    }
+    .p-dropdown-items {
+      .p-dropdown-item {
+        &.p-highlight {
+          background-color: var(--color-primary) !important;
+
+          border-radius: 0.5rem;
+
+          .p-dropdown-item-label {
+            color: var(--color-primary-content) !important;
+          }
+        }
+
+        .p-dropdown-item-label {
+          color: var(--base-content);
+        }
+      }
+    }
+  }
+
+  /* Toast bg-transparent!─ */
   .p-toast {
     z-index: 10000;
 

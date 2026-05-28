@@ -305,7 +305,7 @@ const NumberManipulation = () => {
 
   return (
     <Layout>
-      {/* ── Function Info Dialog ── */}
+      {/* Function Info Dialog */}
       <Dialog
         header={
           <h2 className="font-heading text-xl sm:text-2xl text-base-content">
@@ -381,7 +381,7 @@ const NumberManipulation = () => {
       </Dialog>
 
       <div className="w-full h-full flex flex-col">
-        {/* ── Header ── */}
+        {/* Header */}
         <div className="shrink-0 px-3 pt-3 pb-2 md:px-4 md:pt-4 flex items-center gap-x-1">
           <GoBackBtn />
           <h1 className="text-2xl xs:text-3xl mdl:text-4xl text-primary font-heading select-none truncate">
@@ -389,7 +389,7 @@ const NumberManipulation = () => {
           </h1>
         </div>
 
-        {/* ── Function picker ── */}
+        {/* Function picker */}
         <div className="shrink-0 px-3 md:px-4 pb-2 md:pb-3">
           <p className="text-base xs:text-lg text-base-content font-subHeading mb-2">
             Choose a function
@@ -403,7 +403,25 @@ const NumberManipulation = () => {
               filter
               filterPlaceholder="Search functions..."
               className="flex-1 h-10 bg-base-200! border! border-neutral! rounded-lg! text-base-content"
-              panelClassName="bg-base-200 border border-neutral rounded-lg shadow-lg"
+              panelClassName="bg-base-200 border border-neutral rounded-lg shadow-lg py-2 px-2 mt-2"
+              itemTemplate={(value) => (
+                <span className="font-content">{value}</span>
+              )}
+              valueTemplate={(value) => {
+                if (!value) {
+                  return (
+                    <span className="text-neutral-content font-content">
+                      Select a number function
+                    </span>
+                  );
+                }
+                return (
+                  <span className="text-base-content font-content">
+                    {value}
+                  </span>
+                );
+              }}
+              clearIcon={<X size={24} />}
             />
             <Button
               type="button"
@@ -417,7 +435,7 @@ const NumberManipulation = () => {
           </div>
         </div>
 
-        {/* ── Mobile tab switcher ── */}
+        {/* Mobile tab switcher */}
         <div className="md:hidden shrink-0 px-3 pb-2">
           <div className="flex items-center gap-1 bg-base-200 rounded-xl p-1">
             <button
@@ -452,9 +470,9 @@ const NumberManipulation = () => {
           </div>
         </div>
 
-        {/* ── Panels ── */}
+        {/* Panels */}
         <div className="flex-1 min-h-0 flex flex-col md:flex-row md:items-start px-3 md:px-4 pb-3 md:pb-4 gap-0">
-          {/* ── Input panel ── */}
+          {/* Input panel */}
           <div
             className={`flex-col min-h-0 md:flex md:flex-1 ${mobileTab === "input" ? "flex flex-1" : "hidden"}`}
           >
@@ -598,7 +616,7 @@ const NumberManipulation = () => {
             <div className="h-6 w-px bg-neutral" />
           </div>
 
-          {/* ── Output panel ── */}
+          {/* Output panel */}
           <div
             className={`flex-col min-h-0 md:flex md:flex-1 ${mobileTab === "output" ? "flex flex-1" : "hidden"}`}
           >

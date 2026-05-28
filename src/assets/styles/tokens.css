@@ -1,4 +1,4 @@
-/* ─── Surface tokens ─────────────────────────────────────────────────────────── */
+/* Surface tokens ─────*/
 
 html[data-theme="light"] {
   --base-100: #faf7fc;
@@ -22,7 +22,7 @@ html[data-theme="dark"] {
   --neutral-content: #c9b8e8;
 }
 
-/* ─── Accent tokens - dark defaults ─────────────────────────────────────────── */
+/* Accent tokens - dark defaults───────────*/
 
 /* Graphite */
 [data-accent="graphite"] {
@@ -51,7 +51,8 @@ html[data-theme="dark"] {
 /* Wine */
 [data-accent="wine"] {
   --primary: #c2456b;
-  --primary-content: #1a0a12;
+  /* --primary-content: #1a0a12; */
+  --primary-content: #fff;
 }
 
 /* Leaf */
@@ -60,7 +61,7 @@ html[data-theme="dark"] {
   --primary-content: #0c1a04;
 }
 
-/* ─── Accent tokens - light overrides ───────────────────────────────────────── */
+/* Accent tokens - light overrides─────────*/
 
 /* Graphite */
 [data-theme="light"][data-accent="graphite"] {
@@ -98,7 +99,7 @@ html[data-theme="dark"] {
   --primary-content: #ffffff;
 }
 
-/* ─── PrimeReact token sync ──────────────────────────────────────────────────── */
+/* PrimeReact token sync ───*/
 
 :root {
   --p-primary-color: var(--primary);
@@ -107,7 +108,7 @@ html[data-theme="dark"] {
   --p-focus-ring-color: var(--primary);
 }
 
-/* ─── Legacy bridge ──────────────────────────────────────────────────────────── */
+/* Legacy bridge ──────*/
 
 html[data-theme="light"],
 html[data-theme="dark"] {

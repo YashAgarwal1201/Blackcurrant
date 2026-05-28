@@ -1,6 +1,6 @@
 // src/Services/NumberFunctions.ts
 
-// ── Decimal ↔ Hexadecimal ─────────────────────────────────────────────────────
+// Decimal ↔ Hexadecimal ─
 
 export function numberToHex(num: number): string {
   // Guard: only non-negative integers produce valid hex
@@ -15,7 +15,7 @@ export function hexToNumber(hexStr: string): number | string {
   return parseInt(hexStr.trim(), 16);
 }
 
-// ── Decimal ↔ Binary ──────────────────────────────────────────────────────────
+// Decimal ↔ Binary ──────
 
 export function numberToBinary(num: number): string {
   // Guard: negative inputs produce "-101" which looks like valid binary.
@@ -30,7 +30,7 @@ export function binaryToNumber(binaryStr: string): number | string {
   return parseInt(binaryStr.trim(), 2);
 }
 
-// ── Number theory ─────────────────────────────────────────────────────────────
+// Number theory ─────────
 
 export function isPrime(num: number): boolean {
   // Works correctly for all integers ≥ 0.
@@ -93,7 +93,7 @@ export function reverseNumber(num: number): number {
   return sign * reversed;
 }
 
-// ── GCD & LCM ─────────────────────────────────────────────────────────────────
+// GCD & LCM─
 
 export function gcd(a: number, b: number): number {
   // BUG FIX: negative inputs produced a negative GCD (gcd(-12, 8) = -4).

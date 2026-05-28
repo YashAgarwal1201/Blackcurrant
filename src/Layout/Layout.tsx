@@ -1,3 +1,4 @@
+// src/Layout/Layout.tsx
 import * as React from "react";
 import { useLocation } from "react-router-dom";
 import SideMenu from "@/Components/SideMenu/SideMenu";
@@ -15,6 +16,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           <Navbar />
         </div>
       )}
+
       <main id="main-content" className="w-full h-full overflow-hidden">
         <React.Suspense
           fallback={
@@ -30,8 +32,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           {children}
         </React.Suspense>
       </main>
-      <FeedbackDialog />
 
+      <FeedbackDialog />
       <SideMenu />
     </div>
   );

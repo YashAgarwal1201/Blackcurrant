@@ -25,7 +25,7 @@
 } */
 
 /* v2 */
-/* ─── Hover interactions - pointer devices only ──────────────────────────────── */
+/* Hover interactions - pointer devices only*/
 @media (hover: hover) and (pointer: fine) {
   .p-button:hover,
   a:hover,
@@ -38,7 +38,7 @@
   }
 }
 
-/* ─── Toast width on small screens ───────────────────────────────────────────── */
+/* Toast width on small screens─────────────*/
 @media only screen and (max-width: 520px) {
   .p-toast {
     width: 80%;
@@ -46,7 +46,7 @@
   }
 }
 
-/* ─── Scrollbar sizing on mobile ─────────────────────────────────────────────── */
+/* Scrollbar sizing on mobile ─*/
 @media screen and (max-width: 768px) {
   .contentBody::-webkit-scrollbar {
     width: 6px;
@@ -57,7 +57,7 @@
   }
 }
 
-/* ─── Reduced motion - accessibility ─────────────────────────────────────────── */
+/* Reduced motion - accessibility───────────*/
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.001ms !important;

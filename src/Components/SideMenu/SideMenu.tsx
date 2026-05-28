@@ -32,7 +32,7 @@ const TECH_STACK = [
   { label: "Zustand", color: "#FF6B35" },
 ];
 
-// ── Shared panel header - extracted to avoid 5x duplication ──────────────
+// Shared panel header - extracted to avoid 5x duplication ─────────────
 const PanelHeader = ({
   options,
   icon,
@@ -62,7 +62,7 @@ const PanelHeader = ({
     <h3 className="font-subHeading font-medium text-lg sm:text-xl text-base-content flex items-center">
       <span
         className={`mr-4 text-primary transition-transform ${
-          isOpen ? "animate-icon-expand-nudge" : ""
+          !options.collapsed ? "animate-icon-expand-nudge" : ""
         }`}
         aria-hidden="true"
       >
@@ -292,7 +292,7 @@ const SideMenu = () => {
 
         <hr className="mx-2 my-1 border-none h-[1.5px] bg-base-300" />
 
-        {/* ── About This App ── */}
+        {/* About This App */}
         <Panel
           headerTemplate={(options) => (
             <PanelHeader

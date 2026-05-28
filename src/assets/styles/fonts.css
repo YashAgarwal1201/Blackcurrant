@@ -1,4 +1,4 @@
-/* ─── Inter (PrimeReact Mira override - adds font-display: swap) ─────────────── */
+/* Inter (PrimeReact Mira override - adds font-display: swap) ────────────*/
 @layer base {
   @font-face {
     font-family: "Inter";
