@@ -3,9 +3,14 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Toast } from "primereact/toast";
 import "./App.scss";
 import useToastStore from "./Services/Stores/toastMessageStore";
+import { useTheme } from "./Hooks/useThemes";
+import useNavStore from "./Services/Stores/navStore";
 
 const DocumentTitleUpdater = () => {
   const location = useLocation();
+  const { baseTheme, accentColor } = useNavStore();
+
+  useTheme(baseTheme, accentColor);
 
   useEffect(() => {
     const titleMap: { [key: string]: string } = {
@@ -38,9 +43,10 @@ function App() {
   // }, [state]);
 
   return (
-    <div className="w-screen h-[100dvh] bg-color1">
+    <div className="w-screen h-dvh bg-base-100">
       <DocumentTitleUpdater />
       <Toast ref={toastRef} />
+
       <Outlet />
     </div>
   );

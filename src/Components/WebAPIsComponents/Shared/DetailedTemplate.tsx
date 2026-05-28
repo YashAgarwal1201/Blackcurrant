@@ -1,5 +1,4 @@
 // src/Components/WebAPIsComponents/Shared/DetailTemplate.tsx
-
 import { ReactNode } from "react";
 import { DetailSection, CaveatNote } from "./ApiCard";
 
@@ -10,26 +9,21 @@ interface BrowserSupportRow {
 }
 
 interface DetailTemplateProps {
-  /** Plain-English explanation of what the API does. */
   what: string;
-  /** Optional code snippet string — shown in a <pre> block. */
   codeSnippet?: string;
-  /** Optional label above the snippet, e.g. "Detecting on load" */
   codeLabel?: string;
-  /** Browser support matrix rows. */
   browserSupport?: BrowserSupportRow[];
-  /** Any caveats, quirks, or privacy notes. */
   caveat?: ReactNode;
-  /** Extra sections beyond the standard four — append at the end. */
   extra?: ReactNode;
 }
 
+// Intentionally hardcoded — these are semantic status colours (pass/fail/partial),
+// not theme surfaces. They must stay legible on any dialog background.
 const SUPPORT_ICON: Record<string, string> = {
   true: "✓",
   false: "✗",
   partial: "~",
 };
-
 const SUPPORT_COLOR: Record<string, string> = {
   true: "text-green-400",
   false: "text-red-400",
@@ -47,13 +41,18 @@ export const DetailTemplate = ({
   <div>
     {/* What it is */}
     <DetailSection heading="What it is">
-      <p className="text-sm text-color5/80 leading-relaxed">{what}</p>
+      <p className="text-sm text-base-content leading-relaxed">{what}</p>
     </DetailSection>
 
     {/* Code snippet */}
     {codeSnippet && (
       <DetailSection heading={codeLabel ?? "Usage"}>
-        <pre className="text-xs text-color5/70 font-mono bg-white/5 rounded-lg p-2 leading-relaxed overflow-x-auto">
+        {/*
+         * bg-base-300 is the deepest surface in the token stack — appropriate
+         * for a code block that needs to read as "inset" relative to the dialog.
+         * border-neutral adds the same edge treatment as inputs/textareas.
+         */}
+        <pre className="text-xs text-base-content font-mono bg-base-300 border border-neutral rounded-lg p-3 leading-relaxed overflow-x-auto">
           {codeSnippet.trim()}
         </pre>
       </DetailSection>
@@ -66,15 +65,15 @@ export const DetailTemplate = ({
           {browserSupport.map(({ browser, supported, note }) => (
             <div key={browser} className="flex items-center gap-2 text-sm">
               <span
-                className={`font-mono text-xs w-4 text-center shrink-0 ${
-                  SUPPORT_COLOR[String(supported)]
-                }`}
+                className={`font-mono text-xs w-4 text-center shrink-0 ${SUPPORT_COLOR[String(supported)]}`}
               >
                 {SUPPORT_ICON[String(supported)]}
               </span>
-              <span className="text-color5/80">{browser}</span>
+              <span className="text-base-content">{browser}</span>
               {note && (
-                <span className="text-color5/40 text-xs ml-auto">{note}</span>
+                <span className="text-neutral-content text-xs ml-auto">
+                  {note}
+                </span>
               )}
             </div>
           ))}
@@ -82,7 +81,7 @@ export const DetailTemplate = ({
       </DetailSection>
     )}
 
-    {/* Caveat / notes */}
+    {/* Caveats */}
     {caveat && (
       <DetailSection heading="Caveats & notes">
         {typeof caveat === "string" ? (
@@ -93,7 +92,7 @@ export const DetailTemplate = ({
       </DetailSection>
     )}
 
-    {/* Any extra sections */}
+    {/* Extra sections */}
     {extra}
   </div>
 );

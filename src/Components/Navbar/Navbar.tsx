@@ -64,19 +64,19 @@ const Navbar = () => {
             className={`group flex flex-col justify-center items-center gap-y-1 px-2 py-1 rounded-xl ${isActive ? "pointer-events-none" : ""}`}
           >
             <span
-              className={`px-3 py-1 rounded-full transition-colors duration-200 ${isActive ? "bg-color5" : "bg-transparent"}`}
+              className={`px-3 py-1 rounded-full transition-colors duration-200 ${isActive ? "bg-primary" : "bg-transparent"}`}
             >
               <Icon
                 size={16}
                 fill={isActive ? "currentColor" : "none"}
                 className={`
                     transition-transform duration-300
-                    ${isActive ? "text-color1 animate-icon-pop" : "text-color4 group-hover:animate-icon-wiggle"}
+                    ${isActive ? "text-primary-content animate-icon-pop" : "text-base-content group-hover:animate-icon-wiggle"}
                   `}
               />
             </span>
             <span
-              className={`text-xs transition-colors duration-200 ${isActive ? "text-color5 font-bold" : "text-color4 font-normal"}`}
+              className={`text-xs transition-colors duration-200 ${isActive ? "text-primary font-bold" : "text-base-content font-normal"}`}
             >
               {label}
             </span>
@@ -90,22 +90,22 @@ const Navbar = () => {
           title="Open side menu"
           aria-label="Side menu btn"
           onClick={toggleSideMenu}
-          className="group flex flex-col justify-center items-center gap-y-1 px-2 py-1 !bg-transparent border-none rounded-xl"
+          className="group flex flex-col justify-center items-center gap-y-1 px-2 py-1 bg-transparent! border-none! outline-none! rounded-xl"
         >
           <span
-            className={`px-3 py-1 rounded-full transition-colors duration-200 ${isSideMenuOpen ? "bg-color5" : "bg-transparent"}`}
+            className={`px-3 py-1 rounded-full transition-colors duration-200 ${isSideMenuOpen ? "bg-primary" : "bg-transparent"}`}
           >
             <Menu
               size={16}
               fill={isSideMenuOpen ? "currentColor" : "none"}
               className={`
                 transition-transform duration-300
-                ${isSideMenuOpen ? "text-color1 animate-icon-pop" : "text-color4 group-hover:animate-icon-wiggle"}
+                ${isSideMenuOpen ? "text-primary-content animate-icon-pop" : "text-base-content group-hover:animate-icon-wiggle"}
               `}
             />
           </span>
           <span
-            className={`text-xs transition-colors duration-200 ${isSideMenuOpen ? "text-color5 font-bold" : "text-color4 font-normal"}`}
+            className={`text-xs transition-colors duration-200 ${isSideMenuOpen ? "text-primary font-bold" : "text-base-content font-normal"}`}
           >
             Menu
           </span>

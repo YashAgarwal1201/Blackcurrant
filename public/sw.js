@@ -1,7 +1,6 @@
-const CACHE_NAME = "blackcurrant-v2";
+const CACHE_NAME = "blackcurrant-v3";
 
-// Core shell to pre-cache on install
-const STATIC_ASSETS = [
+const APP_SHELL = [
   "/",
   "/index.html",
   "/manifest.webmanifest",
@@ -9,15 +8,54 @@ const STATIC_ASSETS = [
   "/logo2.svg",
 ];
 
-// Install — pre-cache the shell
+const DEV_PATHS = ["/@vite/", "/src/", "/node_modules/"];
+
+function isSameOrigin(request) {
+  return request.url.startsWith(self.location.origin);
+}
+
+function isDevRequest(request) {
+  const url = new URL(request.url);
+  return DEV_PATHS.some((p) => url.pathname.startsWith(p));
+}
+
+function isStaticAsset(request) {
+  const url = new URL(request.url);
+
+  if (request.destination === "script") return true;
+  if (request.destination === "style") return true;
+  if (request.destination === "image") return true;
+  if (request.destination === "font") return true;
+
+  return (
+    url.pathname.startsWith("/assets/") ||
+    url.pathname.endsWith(".css") ||
+    url.pathname.endsWith(".js") ||
+    url.pathname.endsWith(".mjs") ||
+    url.pathname.endsWith(".png") ||
+    url.pathname.endsWith(".jpg") ||
+    url.pathname.endsWith(".jpeg") ||
+    url.pathname.endsWith(".svg") ||
+    url.pathname.endsWith(".webp") ||
+    url.pathname.endsWith(".woff") ||
+    url.pathname.endsWith(".woff2")
+  );
+}
+
+async function cacheResponse(request, response) {
+  if (!response || !response.ok) return;
+
+  const cache = await caches.open(CACHE_NAME);
+  await cache.put(request, response.clone());
+}
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS)),
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)),
   );
   self.skipWaiting();
 });
 
-// Activate — delete stale caches from old versions
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches
@@ -33,41 +71,57 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Fetch — cache first, network fallback, cache any new asset on the way
 self.addEventListener("fetch", (event) => {
-  // Skip non-GET and cross-origin (e.g. bunny.net fonts)
-  if (
-    event.request.method !== "GET" ||
-    !event.request.url.startsWith(self.location.origin)
-  )
-    return;
+  const { request } = event;
 
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
+  if (request.method !== "GET") return;
+  if (!isSameOrigin(request)) return;
+  if (isDevRequest(request)) return;
 
-      return fetch(event.request)
+  const url = new URL(request.url);
+
+  // Navigation requests: network first, offline fallback to app shell
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request)
         .then((response) => {
-          if (
-            !response ||
-            response.status !== 200 ||
-            response.type !== "basic"
-          ) {
-            return response;
-          }
-          // Cache any newly fetched asset (JS chunks, CSS, fonts served locally)
-          const clone = response.clone();
-          caches
-            .open(CACHE_NAME)
-            .then((cache) => cache.put(event.request, clone));
+          cacheResponse(request, response);
           return response;
         })
-        .catch(() => {
-          // Offline fallback — all navigation requests get the app shell
-          if (event.request.mode === "navigate") {
-            return caches.match("/index.html");
-          }
-        });
-    }),
+        .catch(() => caches.match("/index.html")),
+    );
+    return;
+  }
+
+  // Static assets: cache first, then revalidate in background
+  if (isStaticAsset(request)) {
+    event.respondWith(
+      caches.match(request).then((cached) => {
+        const networkFetch = fetch(request)
+          .then((response) => {
+            cacheResponse(request, response);
+            return response;
+          })
+          .catch(() => cached);
+
+        if (cached) {
+          event.waitUntil(networkFetch);
+          return cached;
+        }
+
+        return networkFetch;
+      }),
+    );
+    return;
+  }
+
+  // Everything else: network first, cache fallback
+  event.respondWith(
+    fetch(request)
+      .then((response) => {
+        cacheResponse(request, response);
+        return response;
+      })
+      .catch(() => caches.match(request)),
   );
 });

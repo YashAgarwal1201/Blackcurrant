@@ -3,7 +3,6 @@
 import { useMemo } from "react";
 import Layout from "../../Layout/Layout";
 
-// Card components
 import BatteryStatus from "../../Components/WebAPIsComponents/BatteryStatus/BatteryStatus";
 import BrowserDetection from "../../Components/WebAPIsComponents/BrowserDetection/BrowserDetection";
 import WindowSize from "../../Components/WebAPIsComponents/BrowserWindowSize/BrowserWindowSize";
@@ -38,31 +37,27 @@ import PrefersReducedMotion from "../../Components/WebAPIsComponents/PrefersRedu
 import PrefersContrast from "../../Components/WebAPIsComponents/PrefersContrast/PrefersContrast";
 import ForcedColors from "../../Components/WebAPIsComponents/ForcedColors/ForcedColors";
 
-// PrimeReact
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 
-// Store + categories
 import { useWebApisStore } from "../../Services/Stores/webApisStore";
 import {
   WEB_API_CATEGORIES,
   CARD_CATEGORY_MAP,
   type WebApiCategory,
+  WebApiCategoryMeta,
 } from "../../Services/webApiCategories";
 
 import GoBackBtn from "../../Layout/GoBackBtn";
 import "./WebAPI.scss";
 import { Search, X } from "lucide-react";
 
-// Card registry
-// Each entry: cardKey must match CARD_CATEGORY_MAP, searchTerms drive search.
 const CARD_REGISTRY: {
   cardKey: string;
   searchTerms: string;
   component: React.ReactNode;
 }[] = [
-  // Display & Screen
   {
     cardKey: "screenColorDepth",
     searchTerms: "screen color depth pixel bit display",
@@ -98,8 +93,6 @@ const CARD_REGISTRY: {
     searchTerms: "webgl gpu renderer vendor opengl hardware acceleration",
     component: <WebGLInfo />,
   },
-
-  // Time & Locale
   {
     cardKey: "currentTime",
     searchTerms: "current time local clock live",
@@ -120,8 +113,6 @@ const CARD_REGISTRY: {
     searchTerms: "navigator language locale bcp47 i18n accept-language",
     component: <NavigatorLanguage />,
   },
-
-  // Device & Hardware
   {
     cardKey: "batteryStatus",
     searchTerms: "battery status level charging hardware",
@@ -142,8 +133,6 @@ const CARD_REGISTRY: {
     searchTerms: "touch pointer coarse fine max touch points",
     component: <TouchSupport />,
   },
-
-  // Browser & Environment
   {
     cardKey: "cookieStatus",
     searchTerms: "cookie enabled browser storage access",
@@ -179,8 +168,6 @@ const CARD_REGISTRY: {
     searchTerms: "notification permission push granted denied",
     component: <NotificationPermission />,
   },
-
-  // Media & Sensors
   {
     cardKey: "speechRecognition",
     searchTerms: "speech recognition voice api microphone",
@@ -201,8 +188,6 @@ const CARD_REGISTRY: {
     searchTerms: "vibration haptic feedback mobile",
     component: <VibrationApi />,
   },
-
-  // Network
   {
     cardKey: "onlineStatus",
     searchTerms: "online offline network status connection live",
@@ -214,15 +199,11 @@ const CARD_REGISTRY: {
       "network info connection speed downlink rtt save data bandwidth",
     component: <NetworkInfo />,
   },
-
-  // Performance
   {
     cardKey: "pageVisibility",
     searchTerms: "page visibility hidden visible tab background",
     component: <PageVisibility />,
   },
-
-  // Theme & Accessibility
   {
     cardKey: "themePreference",
     searchTerms: "theme dark light mode preference system",
@@ -245,7 +226,6 @@ const CARD_REGISTRY: {
   },
 ];
 
-// DEV guard: catch unregistered card keys immediately
 if (import.meta.env.DEV) {
   CARD_REGISTRY.forEach(({ cardKey }) => {
     if (!(cardKey in CARD_CATEGORY_MAP)) {
@@ -257,7 +237,6 @@ if (import.meta.env.DEV) {
   });
 }
 
-// Component
 const WebAPI = () => {
   const {
     activeCategory,
@@ -287,16 +266,13 @@ const WebAPI = () => {
         },
       ];
     }
-
     const groups: Map<WebApiCategory, (typeof CARD_REGISTRY)[number][]> =
       new Map();
-
     filteredCards.forEach((card) => {
       const cat = CARD_CATEGORY_MAP[card.cardKey] ?? "browser-environment";
       if (!groups.has(cat)) groups.set(cat, []);
       groups.get(cat)!.push(card);
     });
-
     return WEB_API_CATEGORIES.filter((c) => c.id !== "all")
       .map((catMeta) => ({
         category: catMeta,
@@ -315,37 +291,36 @@ const WebAPI = () => {
         <div className="flex flex-col gap-y-1 pr-2 md:pr-3 lg:pr-4">
           <div className="flex items-center gap-x-1">
             <GoBackBtn extraHandelers={() => resetFilters()} />
-            <h1 className="text-2xl xs:text-3xl mdl:text-4xl text-color5 font-heading select-none">
+            <h1 className="text-2xl xs:text-3xl mdl:text-4xl text-primary font-heading select-none">
               Browser Vitals
             </h1>
           </div>
-          <p className="text-base text-color5 font-content select-none">
+          <p className="text-base text-neutral-content font-content">
             Live browser environment information powered by native Web APIs.
           </p>
         </div>
 
-        {/* Search + Filter bar */}
+        {/* Search + filter bar */}
         <div className="web-apis-controls flex flex-col gap-2 pr-2 md:pr-3 lg:pr-4">
           <div className="flex items-center gap-2">
-            {/* Search */}
+            {/* Search input */}
             <div className="web-apis-search relative grow">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-color5 text-sm pointer-events-none select-none">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-content text-sm pointer-events-none select-none">
                 <Search size={16} />
               </span>
-
               <InputText
                 type="search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search APIs…"
                 aria-label="Search Web API cards"
-                className="w-full !bg-color2 !text-color5 placeholder:text-color5 text-sm font-content rounded-lg pl-9 pr-8 py-2.5 !border !border-white/10 outline-none focus:!border-color3 transition-all"
+                className="w-full bg-base-200! text-base-content! placeholder:text-neutral-content text-base font-content rounded-lg pl-9 pr-8 py-2.5 border! border-neutral! outline-none focus:border-primary! transition-colors"
               />
               {searchQuery && (
                 <Button
                   onClick={() => setSearchQuery("")}
                   aria-label="Clear search"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 !text-color5 hover:!text-color5 transition-colors text-sm leading-none"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 h-full text-neutral-content! transition-colors text-sm leading-none bg-transparent border-transparent rounded-r-lg"
                 >
                   <X size={16} />
                 </Button>
@@ -360,16 +335,24 @@ const WebAPI = () => {
               optionLabel="label"
               optionValue="id"
               aria-label="Filter by category"
-              className={`shrink-0 !bg-color2 *:!text-color5 !text-sm !font-content !rounded-lg !border transition-all ${
-                activeCategory !== "all" ? "!border-color3" : "!border-color4"
+              className={`h-full shrink-0 bg-base-200! *:text-base-content! text-base! font-content! rounded-lg! border! transition-colors ${
+                activeCategory !== "all" ? "border-primary!" : "border-neutral!"
               }`}
-              panelClassName="!bg-color2 !border !border-white !rounded-lg !p-2"
+              panelClassName="bg-base-200 border border-neutral rounded-lg shadow-lg py-2 px-2"
+              itemTemplate={(value: WebApiCategoryMeta) => (
+                <span className="font-content">{value.label}</span>
+              )}
+              valueTemplate={(value: WebApiCategoryMeta) => (
+                <span className="text-base-content font-content">
+                  {value.label}
+                </span>
+              )}
             />
           </div>
 
           {/* Results count */}
           <p
-            className="text-sm text-color5 font-content select-none"
+            className="text-xs md:text-sm text-neutral-content font-content select-none"
             aria-live="polite"
           >
             {searchQuery || activeCategory !== "all"
@@ -385,12 +368,12 @@ const WebAPI = () => {
               <span className="text-4xl" aria-hidden="true">
                 🔍
               </span>
-              <p className="text-color5 text-sm font-content">
+              <p className="text-base-content text-sm font-content">
                 No APIs match your search.
               </p>
               <Button
                 onClick={resetFilters}
-                className="text-sm px-3 py-1.5 !text-color3 hover:!text-color5 underline underline-offset-2 transition-colors font-content"
+                className="text-sm px-3 py-1.5 text-primary! underline underline-offset-2 transition-colors font-content"
               >
                 Clear filters
               </Button>
@@ -405,15 +388,16 @@ const WebAPI = () => {
                     </span>
                     <h2
                       id={`cat-${category.id}`}
-                      className="text-lg font-semibold text-color5 font-heading tracking-wide uppercase"
+                      className="text-lg md:text-xl font-semibold text-base-content font-heading tracking-widest uppercase"
                     >
                       {category.label}
                     </h2>
-                    <span className="text-sm text-color5 font-content">
+                    <span className="text-xs text-neutral-content font-content">
                       ({cards.length})
                     </span>
+                    {/* Separator line — uses neutral token so it adapts to light/dark */}
                     <div
-                      className="flex-1 h-px bg-white/10 ml-1"
+                      className="flex-1 h-px bg-neutral/40 ml-1"
                       aria-hidden="true"
                     />
                   </div>
