@@ -1,8 +1,8 @@
 {
   "name": "Project Blackcurrant",
   "short_name": "Blackcurrant",
-  "theme_color": "#312b4c",
-  "background_color": "#c3bce7",
+  "theme_color": "#faf7fc",
+  "background_color": "#faf7fc",
   "display": "standalone",
   "orientation": "any",
   "scope": "/",
