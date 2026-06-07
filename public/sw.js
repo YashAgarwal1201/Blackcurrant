@@ -1,5 +1,5 @@
 // public/sw.js
-const CACHE = "blackcurrant-v3"; // bump version to force refresh
+const CACHE = "blackcurrant-v4"; // bump version to force refresh
 
 self.addEventListener("install", (e) => {
   e.waitUntil(
