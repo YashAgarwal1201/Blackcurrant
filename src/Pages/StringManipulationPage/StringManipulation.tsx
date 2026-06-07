@@ -258,7 +258,7 @@ const StringManipulation = () => {
         <div className="shrink-0 px-3 pt-3 pb-2 md:px-4 md:pt-4 flex items-center gap-x-1">
           <GoBackBtn />
           <h1 className="text-2xl xs:text-3xl mdl:text-4xl text-primary font-heading select-none truncate">
-            Play with Strings
+            String Utilities
           </h1>
         </div>
 

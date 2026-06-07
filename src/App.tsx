@@ -16,8 +16,8 @@ const DocumentTitleUpdater = () => {
     const titleMap: { [key: string]: string } = {
       "/": "Project Blackcurrant",
       "/home": "Project Blackcurrant | Home",
-      "/play-with-strings": "Project Blackcurrant | Play with Strings",
-      "/play-with-numbers": "Project Blackcurrant | Play with Numbers",
+      "/play-with-strings": "Project Blackcurrant | String Utilities",
+      "/play-with-numbers": "Project Blackcurrant | Number Utilities",
       "/play-with-dates": "Project Blackcurrant | Play with JS Dates",
       "/web-apis": "Project Blackcurrant | Web APIs",
       "/coditor-playground": "Project Blackcurrant | Coditor Playground",

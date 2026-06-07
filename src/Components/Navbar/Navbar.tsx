@@ -14,13 +14,13 @@ const navItems = [
     to: "/play-with-strings",
     icon: Type,
     label: "Strings",
-    title: "Play with Strings",
+    title: "String Utilities",
   },
   {
     to: "/play-with-numbers",
     icon: Hash,
     label: "Numbers",
-    title: "Play with Numbers",
+    title: "Number Utilities",
   },
   {
     to: "/browser-vitals",
