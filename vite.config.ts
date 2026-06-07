@@ -17,7 +17,7 @@ export default defineConfig({
     __APP_VERSION__: JSON.stringify(getBuildVersion()),
   },
   server: {
-    host: true,
+    host: "127.0.0.1",
     port: 5353,
   },
   preview: {
@@ -31,11 +31,18 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      external: ["chart.js/auto"],
       output: {
-        manualChunks: {
-          monaco: ["@monaco-editor/react"],
-          vendor: ["react", "react-dom", "react-router-dom"],
+        manualChunks(id) {
+          if (id.includes("@monaco-editor") || id.includes("monaco-editor")) {
+            return "monaco";
+          }
+          if (
+            id.includes("react") ||
+            id.includes("react-dom") ||
+            id.includes("react-router-dom")
+          ) {
+            return "vendor";
+          }
         },
       },
     },
