@@ -16,7 +16,6 @@ const HomePage = () => {
           <h1 className="text-2xl xs:text-3xl mdl:text-4xl text-base-content font-heading select-none">
             Welcome to Blackcurrant
           </h1>
-
           <Button
             aria-label="Open side menu"
             onClick={toggleSideMenu}
