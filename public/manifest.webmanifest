@@ -7,43 +7,35 @@
   "orientation": "any",
   "scope": "/",
   "start_url": "/",
-  "icons": [{ "src": "./logo.svg", "sizes": "any", "type": "image/svg+xml" }],
+  "icons": [{ "src": "./logo.svg", "type": "image/svg+xml" }],
   "shortcuts": [
     {
       "name": "Browser Vitals",
       "short_name": "Browser Vitals",
       "description": "Inspect network, battery, geolocation, screen, and device capabilities in real time.",
       "url": "/browser-vitals",
-      "icons": [
-        { "src": "./logo.svg", "sizes": "any", "type": "image/svg+xml" }
-      ]
+      "icons": [{ "src": "./logo.svg", "type": "image/svg+xml" }]
     },
     {
       "name": "Number Utilities",
       "short_name": "Number Utilities",
       "description": "Run number operations — base conversions, prime checks, GCD, LCM, Fibonacci, and more.",
       "url": "/play-with-numbers",
-      "icons": [
-        { "src": "./logo.svg", "sizes": "any", "type": "image/svg+xml" }
-      ]
+      "icons": [{ "src": "./logo.svg", "type": "image/svg+xml" }]
     },
     {
       "name": "String Utilities",
       "short_name": "String Utilities",
       "description": "Transform text with case conversions, encoding, reversal, and whitespace operations.",
       "url": "/play-with-strings",
-      "icons": [
-        { "src": "./logo.svg", "sizes": "any", "type": "image/svg+xml" }
-      ]
+      "icons": [{ "src": "./logo.svg", "type": "image/svg+xml" }]
     },
     {
       "name": "Coditor Playground",
       "short_name": "Coditor",
       "description": "Write and preview React, Vue, and HTML/CSS snippets in a live in-browser code editor.",
       "url": "/coditor-playground",
-      "icons": [
-        { "src": "./logo.svg", "sizes": "any", "type": "image/svg+xml" }
-      ]
+      "icons": [{ "src": "./logo.svg", "type": "image/svg+xml" }]
     }
   ]
 }
