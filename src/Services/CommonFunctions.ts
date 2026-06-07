@@ -5,9 +5,7 @@ export const formatDate = (date: Date) => {
   const monthName = date.toLocaleString("en-us", { month: "short" }); // Short month name
   const day = date.getDate();
 
-  return `${hours}:${
-    minutes < 10 ? "0" + minutes : minutes
-  } ${dayName}, ${monthName} ${day}`;
+  return `${hours}:${minutes < 10 ? "0" + minutes : minutes} ${dayName}, ${monthName} ${day}`;
 };
 
 export const openInNewTab = (url: string) => {

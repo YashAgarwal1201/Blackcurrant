@@ -46,11 +46,11 @@ export function convertTimestampToDate(timestamp: number): string {
 
 export function getDaysBetweenDates(
   date1: string | Date,
-  date2: string | Date
+  date2: string | Date,
 ): number {
   const oneDay: number = 24 * 60 * 60 * 1000; // Milliseconds in a day
   const diffInTime: number = Math.abs(
-    new Date(date2).getTime() - new Date(date1).getTime()
+    new Date(date2).getTime() - new Date(date1).getTime(),
   );
   return Math.ceil(diffInTime / oneDay);
 }

@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "env": {
+    "browser": true,
+    "es2020": true
+  },
+  "plugins": ["react", "typescript", "import"],
+  "rules": {
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "react-refresh/only-export-components": "warn"
+  },
+  "ignorePatterns": ["dist", "node_modules"]
+}
