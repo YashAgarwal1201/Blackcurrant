@@ -29,3 +29,14 @@
     }
   }
 }
+
+// [NEW] Mobile popover menu overrides
+.web-apis-mobile-menu {
+  &.p-overlaypanel {
+    // Remove PrimeReact's default arrow/caret
+    &::before,
+    &::after {
+      display: none;
+    }
+  }
+}

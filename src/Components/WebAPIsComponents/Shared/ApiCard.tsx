@@ -195,7 +195,7 @@ export const ApiCard = ({
 
         {/* Purpose line */}
         {purpose && (
-          <p className="text-xs text-neutral-content leading-snug border-t border-neutral/30 pt-2">
+          <p className="data-row-purpose text-xs text-neutral-content leading-snug border-t border-neutral/30 pt-2">
             {purpose}
           </p>
         )}
@@ -255,25 +255,13 @@ export const ApiCard = ({
 };
 
 // DataRow
-export const DataRow = ({
-  label,
-  value,
-  mono = false,
-  copyable = false,
-}: {
-  label: string;
-  value: React.ReactNode;
-  mono?: boolean;
-  copyable?: boolean;
-}) => (
-  <div className="flex flex-col gap-0.5">
-    <span className="text-xs text-neutral-content uppercase tracking-wide leading-none font-content">
+export const DataRow = ({ label, value, mono = false, copyable = false }) => (
+  <div className="data-row flex flex-col gap-0.5">
+    <span className="data-row-label text-xs text-neutral-content uppercase tracking-wide leading-none font-content">
       {label}
     </span>
     <span
-      className={`text-sm font-medium leading-snug break-all flex items-center gap-1 text-base-content ${
-        mono ? "font-mono" : ""
-      }`}
+      className={`data-row-value text-sm font-medium leading-snug break-all flex items-center gap-1 text-base-content ${mono ? "font-mono" : ""}`}
     >
       <span>{value}</span>
       {copyable && typeof value === "string" && <CopyButton value={value} />}

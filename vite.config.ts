@@ -1,7 +1,13 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { fileURLToPath } from "url";
-import { writeFileSync, readFileSync, readdirSync, statSync } from "fs";
+import {
+  writeFileSync,
+  readFileSync,
+  readdirSync,
+  statSync,
+  existsSync,
+} from "fs";
 import { resolve } from "path";
 
 function getBuildVersion() {
@@ -46,19 +52,33 @@ function injectAssetsIntoSW() {
   };
 }
 
-export default defineConfig({
+const certDir = resolve(process.cwd(), "certs");
+const keyPath = resolve(certDir, "petunia-key.pem");
+const certPath = resolve(certDir, "petunia.pem");
+const hasLocalCerts = existsSync(keyPath) && existsSync(certPath);
+
+const httpsOptions = hasLocalCerts
+  ? {
+      key: readFileSync(keyPath),
+      cert: readFileSync(certPath),
+    }
+  : undefined;
+
+export default defineConfig(() => ({
   plugins: [react(), injectAssetsIntoSW()],
   base: "/",
   define: {
     __APP_VERSION__: JSON.stringify(getBuildVersion()),
   },
   server: {
-    host: "127.0.0.1",
+    host: true,
     port: 5353,
+    ...(httpsOptions ? { https: httpsOptions } : {}),
   },
   preview: {
-    host: "127.0.0.1",
+    host: true,
     port: 5353,
+    ...(httpsOptions ? { https: httpsOptions } : {}),
   },
   resolve: {
     alias: {
@@ -83,4 +103,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

@@ -26,7 +26,7 @@ declare const __APP_VERSION__: string;
 const TECH_STACK = [
   { label: "React 19", color: "#61DAFB" },
   { label: "TypeScript", color: "#3178C6" },
-  { label: "Tailwind CSS v3", color: "#38BDF8" },
+  { label: "Tailwind CSS v4", color: "#38BDF8" },
   { label: "PrimeReact", color: "#A78BFA" },
   { label: "Vite", color: "#FFD62E" },
   { label: "Zustand", color: "#FF6B35" },
@@ -185,7 +185,16 @@ const SideMenu = () => {
                 optionValue="value"
                 placeholder="Select theme"
                 className="min-w-[160px] h-10 *:py-2 *:px-3 rounded-xl! bg-primary *:text-primary-content *:font-content border-none"
-                panelClassName="mt-1 rounded-xl *:rounded-xl *:font-content"
+                // panelClassName="mt-1 rounded-xl *:rounded-xl *:font-content"
+                panelClassName="bg-base-200 border border-neutral rounded-lg shadow-lg py-2 px-2"
+                itemTemplate={(value) => (
+                  <span className="font-content">{value.label}</span>
+                )}
+                valueTemplate={(value) => (
+                  <span className="text-base-content font-content">
+                    {value.label}
+                  </span>
+                )}
               />
             </div>
 
