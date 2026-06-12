@@ -46,6 +46,13 @@ function injectAssetsIntoSW() {
   };
 }
 
+const certDir = resolve(fileURLToPath(new URL(".", import.meta.url)), "certs");
+
+const httpsOptions = {
+  key: readFileSync(resolve(certDir, "petunia-key.pem")),
+  cert: readFileSync(resolve(certDir, "petunia.pem")),
+};
+
 export default defineConfig({
   plugins: [react(), injectAssetsIntoSW()],
   base: "/",
@@ -53,12 +60,14 @@ export default defineConfig({
     __APP_VERSION__: JSON.stringify(getBuildVersion()),
   },
   server: {
-    host: "127.0.0.1",
+    host: true, // use "127.0.0.1" only if you want local-machine access only
     port: 5353,
+    https: httpsOptions,
   },
   preview: {
-    host: "127.0.0.1",
+    host: true,
     port: 5353,
+    https: httpsOptions,
   },
   resolve: {
     alias: {
