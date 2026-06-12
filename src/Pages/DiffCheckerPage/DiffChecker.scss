@@ -1,0 +1,17 @@
+.diff-checker-page {
+  // intentionally empty — all styling via Tailwind utility classes
+  // kept as a hook for future targeted overrides
+}
+
+// Diff output token colours — reuse the app's semantic colour variables
+.diff-inline {
+  .diff-added {
+    @apply bg-success/15 text-success;
+  }
+  .diff-removed {
+    @apply bg-error/15 text-error line-through;
+  }
+  .diff-unchanged {
+    @apply text-base-content;
+  }
+}

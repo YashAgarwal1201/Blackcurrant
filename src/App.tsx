@@ -21,6 +21,7 @@ const DocumentTitleUpdater = () => {
       "/play-with-dates": "Project Blackcurrant | Play with JS Dates",
       "/web-apis": "Project Blackcurrant | Web APIs",
       "/coditor-playground": "Project Blackcurrant | Coditor Playground",
+      "/diff-checker": "Project Blackcurrant | Diff Checker",
     };
 
     document.title =

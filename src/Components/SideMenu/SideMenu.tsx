@@ -346,6 +346,22 @@ const SideMenu = () => {
                 ))}
               </div>
             </div>
+            <hr className="border-none h-[1.5px] bg-base-300" />
+            <div className="w-full flex flex-col gap-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-neutral-content">Repository</span>
+
+                <a
+                  href=""
+                  target="_blank"
+                  rel="noreferrer nofollow noindex"
+                  className="bg-primary px-3 py-2 rounded-full text-primary-content flex items-center gap-x-2"
+                >
+                  <span className="pi pi-github"></span>
+                  <span>Github</span>
+                </a>
+              </div>
+            </div>
           </div>
         </Panel>
       </div>
