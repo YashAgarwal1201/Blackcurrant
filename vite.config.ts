@@ -1,7 +1,13 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { fileURLToPath } from "url";
-import { writeFileSync, readFileSync, readdirSync, statSync } from "fs";
+import {
+  writeFileSync,
+  readFileSync,
+  readdirSync,
+  statSync,
+  existsSync,
+} from "fs";
 import { resolve } from "path";
 
 function getBuildVersion() {
@@ -46,28 +52,33 @@ function injectAssetsIntoSW() {
   };
 }
 
-const certDir = resolve(fileURLToPath(new URL(".", import.meta.url)), "certs");
+const certDir = resolve(process.cwd(), "certs");
+const keyPath = resolve(certDir, "petunia-key.pem");
+const certPath = resolve(certDir, "petunia.pem");
+const hasLocalCerts = existsSync(keyPath) && existsSync(certPath);
 
-const httpsOptions = {
-  key: readFileSync(resolve(certDir, "petunia-key.pem")),
-  cert: readFileSync(resolve(certDir, "petunia.pem")),
-};
+const httpsOptions = hasLocalCerts
+  ? {
+      key: readFileSync(keyPath),
+      cert: readFileSync(certPath),
+    }
+  : undefined;
 
-export default defineConfig({
+export default defineConfig(() => ({
   plugins: [react(), injectAssetsIntoSW()],
   base: "/",
   define: {
     __APP_VERSION__: JSON.stringify(getBuildVersion()),
   },
   server: {
-    host: true, // use "127.0.0.1" only if you want local-machine access only
+    host: true,
     port: 5353,
-    https: httpsOptions,
+    ...(httpsOptions ? { https: httpsOptions } : {}),
   },
   preview: {
     host: true,
     port: 5353,
-    https: httpsOptions,
+    ...(httpsOptions ? { https: httpsOptions } : {}),
   },
   resolve: {
     alias: {
@@ -92,4 +103,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));
