@@ -1,15 +1,24 @@
-import { useMemo, useState } from "react";
-import { diffLines, diffWords, diffChars, Change } from "diff";
+// src/Components/DiffChecker/TextDiff.tsx
+import { useMemo, useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "primereact/button";
 import { InputTextarea } from "primereact/inputtextarea";
+import { ArrowLeftRight, Download, ChevronUp, ChevronDown } from "lucide-react";
 
-import { ArrowLeftRight, Download } from "lucide-react";
 import { triggerTextReportDownload } from "@/Services/DiffReportGenerator";
+import {
+  computeDiff,
+  buildUnifiedDiffText,
+  countLabel,
+  type DiffRow,
+  type CharToken,
+} from "@/Services/diffEngine";
 import useDiffCheckerStore, {
   TextDiffGranularity,
   TextDiffView,
 } from "@/Services/Stores/diffCheckerStore";
 import useToastStore from "@/Services/Stores/toastMessageStore";
+
+// ─── constants ────────────────────────────────────────────────────────────────
 
 const GRANULARITY_OPTIONS: { label: string; value: TextDiffGranularity }[] = [
   { label: "Lines", value: "lines" },
@@ -21,6 +30,173 @@ const VIEW_OPTIONS: { label: string; value: TextDiffView }[] = [
   { label: "Inline", value: "inline" },
   { label: "Split", value: "split" },
 ];
+
+// ─── diff colour helpers (always green/red — not theme-dependent) ─────────────
+
+// Row background
+const ROW_BG: Record<string, string> = {
+  added: "bg-emerald-500/10",
+  removed: "bg-red-500/10",
+  modified: "bg-amber-500/8",
+  unchanged: "",
+};
+
+// Gutter background + text
+const GUTTER_CLS: Record<string, string> = {
+  added: "bg-emerald-500/20 text-emerald-400",
+  removed: "bg-red-500/20 text-red-400",
+  modified: "bg-amber-500/15 text-amber-400",
+  unchanged: "bg-base-300 text-neutral-content/50",
+};
+
+// +/−/~/space symbol
+const SYMBOL: Record<string, string> = {
+  added: "+",
+  removed: "−",
+  modified: "~",
+  unchanged: " ",
+};
+
+const SYMBOL_CLS: Record<string, string> = {
+  added: "text-emerald-400 font-bold",
+  removed: "text-red-400 font-bold",
+  modified: "text-amber-400 font-bold",
+  unchanged: "text-neutral-content/30",
+};
+
+// Inline char token background highlight
+function charTokenCls(type: CharToken["type"]): string {
+  if (type === "added")
+    return "bg-emerald-500/30 text-emerald-300 rounded-[2px]";
+  if (type === "removed")
+    return "bg-red-500/30 text-red-300 rounded-[2px] line-through";
+  return "";
+}
+
+// ─── sub-components ───────────────────────────────────────────────────────────
+
+/** Renders a single diff row for inline view (both line number columns) */
+const InlineRow = ({ row }: { row: DiffRow }) => {
+  const rowBg = ROW_BG[row.type] ?? "";
+  const gutterCl = GUTTER_CLS[row.type] ?? "";
+  const symCl = SYMBOL_CLS[row.type] ?? "";
+  const sym = SYMBOL[row.type] ?? " ";
+
+  // For inline view, "modified" rows are split into two sibling rows
+  // (remove row then add row) — handled in the parent loop, not here.
+  // Here we just render a single row with its tokens.
+  const tokens = row.leftTokens.length
+    ? row.leftTokens
+    : row.rightTokens.length
+      ? row.rightTokens
+      : [{ text: " ", type: "unchanged" as const }];
+
+  const lineLeft = row.leftLineNum != null ? String(row.leftLineNum) : "";
+  const lineRight = row.rightLineNum != null ? String(row.rightLineNum) : "";
+
+  return (
+    <div
+      className={`flex items-stretch min-w-0 ${rowBg} hover:brightness-110 transition-[filter] duration-75`}
+    >
+      {/* Orig line # */}
+      <span
+        className={`shrink-0 w-10 py-0.5 text-right pr-1.5 text-xs tabular-nums select-none border-r border-base-200/50 ${gutterCl}`}
+      >
+        {lineLeft}
+      </span>
+      {/* Mod line # */}
+      <span
+        className={`shrink-0 w-10 py-0.5 text-right pr-1.5 text-xs tabular-nums select-none border-r border-base-200/50 ${gutterCl}`}
+      >
+        {lineRight}
+      </span>
+      {/* Symbol */}
+      <span
+        className={`shrink-0 w-6 py-0.5 text-center text-xs select-none border-r border-base-200/50 ${gutterCl} ${symCl}`}
+      >
+        {sym}
+      </span>
+      {/* Content */}
+      <span className="flex-1 min-w-0 py-0.5 px-3 text-sm font-mono leading-relaxed whitespace-pre-wrap break-all">
+        {tokens.map((tk, i) => (
+          <span
+            key={i}
+            className={`${charTokenCls(tk.type)} text-base-content`}
+          >
+            {tk.text || " "}
+          </span>
+        ))}
+      </span>
+    </div>
+  );
+};
+
+/** One side of a split-view row */
+const SplitCell = ({
+  lineNum,
+  tokens,
+  type,
+  side,
+}: {
+  lineNum: number | null;
+  tokens: CharToken[];
+  type: DiffRow["type"];
+  side: "left" | "right";
+}) => {
+  const isEmpty = tokens.length === 0;
+  const gutterCl = isEmpty
+    ? "bg-base-300/50 text-neutral-content/20"
+    : GUTTER_CLS[type];
+  const rowBg = isEmpty ? "bg-base-300/30" : ROW_BG[type];
+  const sym = isEmpty
+    ? ""
+    : side === "left" && type === "removed"
+      ? "−"
+      : side === "right" && type === "added"
+        ? "+"
+        : type === "modified"
+          ? side === "left"
+            ? "−"
+            : "+"
+          : " ";
+  const symCl =
+    type === "removed" || (type === "modified" && side === "left")
+      ? "text-red-400 font-bold"
+      : type === "added" || (type === "modified" && side === "right")
+        ? "text-emerald-400 font-bold"
+        : "text-neutral-content/30";
+
+  return (
+    <div
+      className={`flex items-stretch min-w-0 w-full ${rowBg} hover:brightness-110 transition-[filter] duration-75`}
+    >
+      {/* Line # */}
+      <span
+        className={`shrink-0 w-10 py-0.5 text-right pr-1.5 text-xs tabular-nums select-none border-r border-base-200/50 ${gutterCl}`}
+      >
+        {lineNum ?? ""}
+      </span>
+      {/* Symbol */}
+      <span
+        className={`shrink-0 w-6 py-0.5 text-center text-xs select-none border-r border-base-200/50 ${gutterCl} ${symCl}`}
+      >
+        {sym}
+      </span>
+      {/* Content */}
+      <span className="flex-1 min-w-0 py-0.5 px-3 text-sm font-mono leading-relaxed whitespace-pre-wrap break-all text-base-content">
+        {isEmpty
+          ? null
+          : tokens.map((tk, i) => (
+              <span key={i} className={charTokenCls(tk.type)}>
+                {tk.text || " "}
+              </span>
+            ))}
+      </span>
+    </div>
+  );
+};
+
+// ─── main component ───────────────────────────────────────────────────────────
 
 const TextDiff = () => {
   const {
@@ -37,30 +213,98 @@ const TextDiff = () => {
   const showToast = useToastStore((s) => s.showToast);
   const [mobileTab, setMobileTab] = useState<"inputs" | "output">("inputs");
 
-  // ✅ replace with
-  const changes: Change[] = useMemo(() => {
-    if (!originalText && !modifiedText) return [];
-    if (granularity === "lines") return diffLines(originalText, modifiedText);
-    if (granularity === "words") return diffWords(originalText, modifiedText);
-    return diffChars(originalText, modifiedText);
-  }, [originalText, modifiedText, granularity]);
+  // ── synchronized scroll ─────────────────────────────────────────────────────
+  const leftScrollRef = useRef<HTMLDivElement>(null);
+  const rightScrollRef = useRef<HTMLDivElement>(null);
+  const syncing = useRef(false);
 
-  const stats = useMemo(() => {
-    const added = changes
-      .filter((c) => c.added)
-      .reduce((a, c) => a + (c.count ?? 0), 0);
-    const removed = changes
-      .filter((c) => c.removed)
-      .reduce((a, c) => a + (c.count ?? 0), 0);
-    const unchanged = changes
-      .filter((c) => !c.added && !c.removed)
-      .reduce((a, c) => a + (c.count ?? 0), 0);
-    return { added, removed, unchanged };
-  }, [changes]);
+  const syncScroll = useCallback((source: "left" | "right") => {
+    if (syncing.current) return;
+    syncing.current = true;
+    const from =
+      source === "left" ? leftScrollRef.current : rightScrollRef.current;
+    const to =
+      source === "left" ? rightScrollRef.current : leftScrollRef.current;
+    if (from && to) to.scrollTop = from.scrollTop;
+    syncing.current = false;
+  }, []);
 
-  const hasDiff = changes.length > 0;
-  const hasChanges = stats.added > 0 || stats.removed > 0;
+  // ── change navigation ───────────────────────────────────────────────────────
+  const inlineScrollRef = useRef<HTMLDivElement>(null);
+  const [changeIdx, setChangeIdx] = useState(-1);
+  const changeRowsRef = useRef<number[]>([]); // DOM row indices of non-unchanged rows
 
+  // ── diff computation ────────────────────────────────────────────────────────
+  const { rows, stats } = useMemo(
+    () => computeDiff(originalText, modifiedText, granularity),
+    [originalText, modifiedText, granularity],
+  );
+
+  const hasDiff = rows.length > 0;
+  const hasChanges = stats.added > 0 || stats.removed > 0 || stats.modified > 0;
+
+  // Build flat inline rows — "modified" becomes two rows (remove + add) in inline view
+  const inlineRows = useMemo<DiffRow[]>(() => {
+    if (granularity !== "lines") return rows; // words/chars: single synthetic row
+
+    const result: DiffRow[] = [];
+    for (const row of rows) {
+      if (row.type === "modified") {
+        // emit remove row then add row
+        result.push({
+          type: "removed",
+          leftLineNum: row.leftLineNum,
+          leftTokens: row.leftTokens,
+          rightLineNum: null,
+          rightTokens: [],
+        });
+        result.push({
+          type: "added",
+          leftLineNum: null,
+          leftTokens: [],
+          rightLineNum: row.rightLineNum,
+          rightTokens: row.rightTokens,
+        });
+      } else {
+        result.push(row);
+      }
+    }
+    return result;
+  }, [rows, granularity]);
+
+  // Track indices of change rows for navigation
+  useEffect(() => {
+    changeRowsRef.current = inlineRows.reduce<number[]>((acc, r, i) => {
+      if (r.type !== "unchanged") acc.push(i);
+      return acc;
+    }, []);
+    setChangeIdx(-1);
+  }, [inlineRows]);
+
+  const navigateChange = useCallback(
+    (dir: "prev" | "next") => {
+      const indices = changeRowsRef.current;
+      if (!indices.length || !inlineScrollRef.current) return;
+
+      const next =
+        dir === "next"
+          ? (changeIdx + 1) % indices.length
+          : (changeIdx - 1 + indices.length) % indices.length;
+
+      setChangeIdx(next);
+      const rowEls =
+        inlineScrollRef.current.querySelectorAll<HTMLElement>(
+          "[data-diff-row]",
+        );
+      rowEls[indices[next]]?.scrollIntoView({
+        block: "center",
+        behavior: "smooth",
+      });
+    },
+    [changeIdx],
+  );
+
+  // ── actions ─────────────────────────────────────────────────────────────────
   const handleSwap = () => {
     setOriginalText(modifiedText);
     setModifiedText(originalText);
@@ -78,95 +322,23 @@ const TextDiff = () => {
     showToast("info", "Cleared", "All fields have been cleared");
   };
 
-  const handleCopyDiff = () => {
-    const plain = changes
-      .map((c) => {
-        const prefix = c.added ? "+" : c.removed ? "-" : " ";
-        return c.value
-          .split("\n")
-          .filter((l) => l.length > 0)
-          .map((l) => `${prefix} ${l}`)
-          .join("\n");
-      })
-      .join("\n");
-    navigator.clipboard.writeText(plain);
-    showToast("success", "Copied", "Diff copied to clipboard");
+  const handleCopy = () => {
+    navigator.clipboard.writeText(buildUnifiedDiffText(rows));
+    showToast("success", "Copied", "Unified diff copied to clipboard");
   };
 
-  const renderInlineDiff = () =>
-    changes.map((change, i) => {
-      if (change.added)
-        return (
-          <span
-            key={i}
-            className="bg-success/15 text-success rounded-sm px-0.5"
-          >
-            {change.value}
-          </span>
-        );
-      if (change.removed)
-        return (
-          <span
-            key={i}
-            className="bg-error/15 text-error line-through rounded-sm px-0.5"
-          >
-            {change.value}
-          </span>
-        );
-      return (
-        <span key={i} className="text-base-content">
-          {change.value}
-        </span>
-      );
-    });
+  const granLabel =
+    granularity === "lines"
+      ? "line"
+      : granularity === "words"
+        ? "word"
+        : "char";
 
-  const renderSplitDiff = () => {
-    const leftTokens: React.ReactNode[] = [];
-    const rightTokens: React.ReactNode[] = [];
-
-    changes.forEach((change, i) => {
-      if (change.added) {
-        rightTokens.push(
-          <span
-            key={i}
-            className="bg-success/15 text-success rounded-sm px-0.5"
-          >
-            {change.value}
-          </span>,
-        );
-      } else if (change.removed) {
-        leftTokens.push(
-          <span
-            key={i}
-            className="bg-error/15 text-error line-through rounded-sm px-0.5"
-          >
-            {change.value}
-          </span>,
-        );
-      } else {
-        leftTokens.push(
-          <span key={`l-${i}`} className="text-base-content">
-            {change.value}
-          </span>,
-        );
-        rightTokens.push(
-          <span key={`r-${i}`} className="text-base-content">
-            {change.value}
-          </span>,
-        );
-      }
-    });
-
-    return { leftTokens, rightTokens };
-  };
-
-  const { leftTokens, rightTokens } = renderSplitDiff();
-
+  // ── render ───────────────────────────────────────────────────────────────────
   return (
     <div className="w-full h-full flex flex-col px-3 md:px-4 pb-3 md:pb-4 gap-3">
-      {/* Controls row */}
+      {/* ── Controls ── */}
       <div className="shrink-0 flex flex-wrap items-center gap-2">
-        {/* Granularity */}
         <div className="flex items-center gap-1 bg-base-200 rounded-xl p-1">
           {GRANULARITY_OPTIONS.map((opt) => (
             <button
@@ -174,18 +346,13 @@ const TextDiff = () => {
               type="button"
               onClick={() => setGranularity(opt.value)}
               className={`h-8 px-3 rounded-lg text-xs font-semibold font-subHeading transition-colors duration-150
-                ${
-                  granularity === opt.value
-                    ? "bg-base-100 text-base-content shadow-sm"
-                    : "text-neutral-content hover:text-base-content"
-                }`}
+                ${granularity === opt.value ? "bg-base-100 text-base-content shadow-sm" : "text-neutral-content hover:text-base-content"}`}
             >
               {opt.label}
             </button>
           ))}
         </div>
 
-        {/* View (only meaningful when there's output) */}
         <div className="flex items-center gap-1 bg-base-200 rounded-xl p-1">
           {VIEW_OPTIONS.map((opt) => (
             <button
@@ -193,206 +360,323 @@ const TextDiff = () => {
               type="button"
               onClick={() => setDiffView(opt.value)}
               className={`h-8 px-3 rounded-lg text-xs font-semibold font-subHeading transition-colors duration-150
-                ${
-                  diffView === opt.value
-                    ? "bg-base-100 text-base-content shadow-sm"
-                    : "text-neutral-content hover:text-base-content"
-                }`}
+                ${diffView === opt.value ? "bg-base-100 text-base-content shadow-sm" : "text-neutral-content hover:text-base-content"}`}
             >
               {opt.label}
             </button>
           ))}
         </div>
 
+        {/* Change navigation — only in inline+lines mode */}
+        {diffView === "inline" && granularity === "lines" && hasChanges && (
+          <div className="flex items-center gap-1 bg-base-200 rounded-xl p-1">
+            <button
+              type="button"
+              onClick={() => navigateChange("prev")}
+              title="Previous change"
+              className="h-8 w-8 flex items-center justify-center rounded-lg text-neutral-content hover:text-base-content transition-colors duration-150"
+            >
+              <ChevronUp size={14} />
+            </button>
+            <span className="text-xs tabular-nums text-neutral-content font-content px-1 min-w-[3.5rem] text-center">
+              {changeIdx >= 0
+                ? `${changeIdx + 1} / ${changeRowsRef.current.length}`
+                : `${changeRowsRef.current.length} Δ`}
+            </span>
+            <button
+              type="button"
+              onClick={() => navigateChange("next")}
+              title="Next change"
+              className="h-8 w-8 flex items-center justify-center rounded-lg text-neutral-content hover:text-base-content transition-colors duration-150"
+            >
+              <ChevronDown size={14} />
+            </button>
+          </div>
+        )}
+
         <div className="flex-1" />
 
-        {/* Swap */}
         <Button
           type="button"
           disabled={!originalText && !modifiedText}
           aria-label="Swap inputs"
           title="Swap Original ↔ Modified"
-          className="h-9 w-9 bg-transparent border border-neutral rounded-full
-                     text-neutral-content
-                     disabled:opacity-40 disabled:cursor-not-allowed
-                     active:scale-95 transition-transform duration-100"
+          rounded
+          text
+          className="bg-transparent border border-neutral rounded-full text-neutral-content
+                     disabled:opacity-40 disabled:cursor-not-allowed"
           onClick={handleSwap}
         >
-          <ArrowLeftRight size={14} />
+          <ArrowLeftRight size={16} className="shrink-0" />
         </Button>
 
-        {/* Download report */}
         <Button
           type="button"
           disabled={!hasDiff}
           aria-label="Download diff report"
           title="Download diff report"
-          className="h-9 w-9 bg-transparent border border-neutral rounded-full
-                     text-neutral-content
-                     disabled:opacity-40 disabled:cursor-not-allowed
-                     active:scale-95 transition-transform duration-100"
+          className="shrink-0 bg-transparent border border-neutral rounded-full text-neutral-content
+                     disabled:opacity-40 disabled:cursor-not-allowed"
           onClick={() =>
             triggerTextReportDownload(originalText, modifiedText, granularity)
           }
         >
-          <Download size={14} />
+          <Download size={16} />
         </Button>
 
-        {/* Clear */}
         <Button
           type="button"
           disabled={!originalText && !modifiedText}
           icon="pi pi-trash"
           aria-label="Clear all"
           title="Clear all"
-          className="h-9 w-9 text-rose-400 bg-transparent border border-neutral rounded-full
-                     disabled:opacity-40 disabled:cursor-not-allowed
-                     active:scale-95 transition-transform duration-100"
+          className="shrink-0 h-9 w-9 text-red-400 bg-transparent border border-neutral rounded-full
+                     disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-transform duration-100"
           onClick={handleClear}
         />
       </div>
 
-      {/* Mobile tab switcher */}
+      {/* ── Mobile tabs ── */}
       <div className="md:hidden shrink-0">
         <div className="flex items-center gap-1 bg-base-200 rounded-xl p-1">
-          <button
-            type="button"
-            onClick={() => setMobileTab("inputs")}
-            className={`flex-1 h-9 rounded-lg text-sm font-semibold font-subHeading transition-colors duration-150
-              ${mobileTab === "inputs" ? "bg-base-100 text-base-content shadow-sm" : "text-neutral-content"}`}
-          >
-            Inputs
-          </button>
-          <button
-            type="button"
-            onClick={() => setMobileTab("output")}
-            className={`flex-1 h-9 rounded-lg text-sm font-semibold font-subHeading transition-colors duration-150
-              ${mobileTab === "output" ? "bg-base-100 text-base-content shadow-sm" : "text-neutral-content"}`}
-          >
-            Result
-            {hasChanges && (
-              <span className="ml-1.5 inline-block w-1.5 h-1.5 rounded-full bg-primary" />
-            )}
-          </button>
+          {(["inputs", "output"] as const).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setMobileTab(tab)}
+              className={`flex-1 h-9 rounded-lg text-sm font-semibold font-subHeading transition-colors duration-150
+                ${mobileTab === tab ? "bg-base-100 text-base-content shadow-sm" : "text-neutral-content"}`}
+            >
+              {tab === "inputs" ? (
+                "Inputs"
+              ) : (
+                <span className="flex items-center justify-center gap-1.5">
+                  Result
+                  {hasChanges && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
+                  )}
+                </span>
+              )}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Main area */}
+      {/* ── Main area ── */}
       <div className="flex-1 min-h-0 flex flex-col gap-3">
         {/* Input panels */}
         <div
           className={`flex-col md:flex-row gap-3 min-h-0
-            ${mobileTab === "inputs" ? "flex flex-1" : "hidden md:flex md:flex-[0_0_40%]"}`}
+          ${mobileTab === "inputs" ? "flex flex-1" : "hidden md:flex md:flex-[0_0_38%]"}`}
         >
-          {/* Original */}
-          <div className="flex-1 min-h-0 flex flex-col gap-1.5">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-widest text-neutral-content font-content">
-                Original
-              </span>
-              <span className="text-xs text-neutral-content tabular-nums font-content">
-                {originalText.length}
-              </span>
+          {[
+            {
+              key: "original" as const,
+              label: "Original",
+              text: originalText,
+              onChange: setOriginalText,
+            },
+            {
+              key: "modified" as const,
+              label: "Modified",
+              text: modifiedText,
+              onChange: setModifiedText,
+            },
+          ].map(({ key, label, text, onChange }) => (
+            <div key={key} className="flex-1 min-h-0 flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-widest text-neutral-content font-content">
+                  {label}
+                </span>
+                <span className="text-xs text-neutral-content/70 font-content">
+                  {countLabel(text, granularity)}
+                </span>
+              </div>
+              <InputTextarea
+                value={text}
+                onChange={(e) => onChange(e.target.value)}
+                className="w-full flex-1 min-h-0 p-4 font-mono text-sm text-base-content
+                           bg-base-200 border-2 border-neutral rounded-2xl
+                           focus:border-primary! transition-colors duration-150 resize-none"
+                placeholder={`Paste ${label.toLowerCase()} content here…`}
+              />
             </div>
-            <InputTextarea
-              value={originalText}
-              onChange={(e) => setOriginalText(e.target.value)}
-              className="w-full flex-1 min-h-0 p-4 font-content text-base-content
-                         bg-base-200 border-2 border-neutral rounded-2xl
-                         focus:border-primary!
-                         transition-colors duration-150 resize-none"
-              placeholder="Paste original content here…"
-            />
-          </div>
-
-          {/* Modified */}
-          <div className="flex-1 min-h-0 flex flex-col gap-1.5">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-widest text-neutral-content font-content">
-                Modified
-              </span>
-              <span className="text-xs text-neutral-content tabular-nums font-content">
-                {modifiedText.length}
-              </span>
-            </div>
-            <InputTextarea
-              value={modifiedText}
-              onChange={(e) => setModifiedText(e.target.value)}
-              className="w-full flex-1 min-h-0 p-4 font-content text-base-content
-                         bg-base-200 border-2 border-neutral rounded-2xl
-                         focus:border-primary!
-                         transition-colors duration-150 resize-none"
-              placeholder="Paste modified content here…"
-            />
-          </div>
+          ))}
         </div>
 
         {/* Stats bar */}
         {hasDiff && (
-          <div className="shrink-0 flex items-center gap-3 px-3 py-2 bg-base-200 rounded-xl border border-neutral">
-            <span className="text-xs font-semibold text-success font-content tabular-nums">
-              +{stats.added} added
-            </span>
-            <span className="w-px h-3 bg-neutral shrink-0" />
-            <span className="text-xs font-semibold text-error font-content tabular-nums">
-              -{stats.removed} removed
-            </span>
-            <span className="w-px h-3 bg-neutral shrink-0" />
-            <span className="text-xs text-neutral-content font-content tabular-nums">
-              {stats.unchanged} unchanged
+          <div className="shrink-0 flex flex-wrap items-center gap-x-4 gap-y-1.5 px-3 py-2 bg-base-200 rounded-xl border border-neutral">
+            {stats.modified > 0 && (
+              <span className="flex items-center gap-1.5 text-xs font-semibold font-content tabular-nums text-amber-400">
+                <span className="w-2 h-2 rounded-sm bg-amber-500/60 shrink-0" />
+                {stats.modified} {granLabel}
+                {stats.modified !== 1 ? "s" : ""} modified
+              </span>
+            )}
+            {stats.added > 0 && (
+              <span className="flex items-center gap-1.5 text-xs font-semibold font-content tabular-nums text-emerald-400">
+                <span className="w-2 h-2 rounded-sm bg-emerald-500/60 shrink-0" />
+                +{stats.added} {granLabel}
+                {stats.added !== 1 ? "s" : ""} added
+              </span>
+            )}
+            {stats.removed > 0 && (
+              <span className="flex items-center gap-1.5 text-xs font-semibold font-content tabular-nums text-red-400">
+                <span className="w-2 h-2 rounded-sm bg-red-500/60 shrink-0" />−
+                {stats.removed} {granLabel}
+                {stats.removed !== 1 ? "s" : ""} removed
+              </span>
+            )}
+            <span className="flex items-center gap-1.5 text-xs text-neutral-content font-content tabular-nums">
+              <span className="w-2 h-2 rounded-sm bg-neutral-content/20 shrink-0" />
+              {stats.unchanged} {granLabel}
+              {stats.unchanged !== 1 ? "s" : ""} unchanged
             </span>
             <div className="flex-1" />
             <button
               type="button"
               disabled={!hasChanges}
-              onClick={handleCopyDiff}
-              className="text-xs text-neutral-content font-content
-                         disabled:opacity-40 disabled:cursor-not-allowed
-                         hover:text-base-content transition-colors duration-150"
+              onClick={handleCopy}
+              className="text-xs text-neutral-content font-content disabled:opacity-40 disabled:cursor-not-allowed hover:text-base-content transition-colors duration-150"
             >
               Copy diff
             </button>
           </div>
         )}
 
-        {/* Diff output */}
+        {/* ── Diff output ── */}
         <div
           className={`min-h-0 flex flex-col gap-1.5
-            ${mobileTab === "output" ? "flex flex-1" : "hidden md:flex md:flex-1"}`}
+          ${mobileTab === "output" ? "flex flex-1" : "hidden md:flex md:flex-1"}`}
         >
-          <span className="text-xs font-semibold uppercase tracking-widest text-neutral-content font-content shrink-0">
-            {diffView === "inline" ? "Inline Diff" : "Split Diff"}
-          </span>
+          {/* Legend */}
+          <div className="shrink-0 flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-widest text-neutral-content font-content">
+              {diffView === "inline" ? "Inline Diff" : "Split Diff"}
+            </span>
+            <div className="flex items-center gap-3 text-xs text-neutral-content font-content">
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-sm bg-emerald-500/50" />
+                added
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-sm bg-red-500/50" />
+                removed
+              </span>
+              {granularity === "lines" && (
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-sm bg-amber-500/50" />
+                  modified
+                </span>
+              )}
+            </div>
+          </div>
 
+          {/* Empty state */}
           {!hasDiff ? (
-            <div className="flex-1 flex items-center justify-center bg-base-200 rounded-2xl border-2 border-neutral border-dashed">
+            <div className="flex-1 flex items-center justify-center bg-base-200 rounded-2xl border-2 border-dashed border-neutral">
               <p className="text-sm text-neutral-content font-content">
                 Diff output will appear here…
               </p>
             </div>
-          ) : diffView === "inline" ? (
-            <div
-              className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4
-                         bg-base-300 border-2 border-neutral border-l-[3px] border-l-primary
-                         rounded-2xl font-mono text-sm leading-relaxed whitespace-pre-wrap break-words"
-            >
-              {renderInlineDiff()}
+          ) : /* ══ INLINE VIEW ══ */
+          diffView === "inline" ? (
+            <div className="flex-1 min-h-0 rounded-2xl border border-neutral overflow-hidden flex flex-col bg-base-300">
+              {/* Column header */}
+              <div className="shrink-0 flex items-stretch bg-base-200 border-b border-neutral text-xs text-neutral-content/60 font-content select-none">
+                <span className="shrink-0 w-10 py-1.5 text-right pr-1.5 border-r border-base-200/50 bg-base-200">
+                  Orig
+                </span>
+                <span className="shrink-0 w-10 py-1.5 text-right pr-1.5 border-r border-base-200/50 bg-base-200">
+                  Mod
+                </span>
+                <span className="shrink-0 w-6  py-1.5 text-center      border-r border-base-200/50 bg-base-200" />
+                <span className="flex-1 py-1.5 px-3">Content</span>
+              </div>
+              {/* Rows */}
+              <div
+                ref={inlineScrollRef}
+                className="flex-1 min-h-0 overflow-y-auto overflow-x-auto custom-scrollbar"
+              >
+                {inlineRows.map((row, i) => (
+                  <div key={i} data-diff-row>
+                    <InlineRow row={row} />
+                  </div>
+                ))}
+              </div>
             </div>
           ) : (
-            <div className="flex-1 min-h-0 flex gap-3">
-              <div
-                className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4
-                           bg-base-300 border-2 border-neutral border-l-[3px] border-l-error
-                           rounded-2xl font-mono text-sm leading-relaxed whitespace-pre-wrap break-words"
-              >
-                {leftTokens}
+            /* ══ SPLIT VIEW ══ */
+            <div className="flex-1 min-h-0 flex gap-2 overflow-hidden">
+              {/* ── Left panel (Original) ── */}
+              <div className="flex-1 min-w-0 flex flex-col rounded-2xl border border-neutral overflow-hidden bg-base-300">
+                <div className="shrink-0 flex items-center px-3 py-1.5 bg-base-200 border-b border-neutral">
+                  <span className="flex-1 text-xs font-semibold uppercase tracking-widest text-neutral-content font-content">
+                    Original
+                  </span>
+                  <span className="flex items-center gap-1 text-xs text-red-400 font-content">
+                    <span className="w-2 h-2 rounded-sm bg-red-500/50" />
+                    removed
+                  </span>
+                </div>
+                <div className="shrink-0 flex items-stretch bg-base-200 border-b border-neutral text-xs text-neutral-content/60 font-content select-none">
+                  <span className="shrink-0 w-10 py-1 text-right pr-1.5 border-r border-base-200/50">
+                    Line
+                  </span>
+                  <span className="shrink-0 w-6  py-1 text-center      border-r border-base-200/50" />
+                  <span className="flex-1 py-1 px-3">Content</span>
+                </div>
+                <div
+                  ref={leftScrollRef}
+                  onScroll={() => syncScroll("left")}
+                  className="flex-1 min-h-0 overflow-y-auto overflow-x-auto custom-scrollbar"
+                >
+                  {rows.map((row, i) => (
+                    <SplitCell
+                      key={i}
+                      lineNum={row.leftLineNum}
+                      tokens={row.leftTokens}
+                      type={row.type}
+                      side="left"
+                    />
+                  ))}
+                </div>
               </div>
-              <div
-                className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4
-                           bg-base-300 border-2 border-neutral border-l-[3px] border-l-success
-                           rounded-2xl font-mono text-sm leading-relaxed whitespace-pre-wrap break-words"
-              >
-                {rightTokens}
+
+              {/* ── Right panel (Modified) ── */}
+              <div className="flex-1 min-w-0 flex flex-col rounded-2xl border border-neutral overflow-hidden bg-base-300">
+                <div className="shrink-0 flex items-center px-3 py-1.5 bg-base-200 border-b border-neutral">
+                  <span className="flex-1 text-xs font-semibold uppercase tracking-widest text-neutral-content font-content">
+                    Modified
+                  </span>
+                  <span className="flex items-center gap-1 text-xs text-emerald-400 font-content">
+                    <span className="w-2 h-2 rounded-sm bg-emerald-500/50" />
+                    added
+                  </span>
+                </div>
+                <div className="shrink-0 flex items-stretch bg-base-200 border-b border-neutral text-xs text-neutral-content/60 font-content select-none">
+                  <span className="shrink-0 w-10 py-1 text-right pr-1.5 border-r border-base-200/50">
+                    Line
+                  </span>
+                  <span className="shrink-0 w-6  py-1 text-center      border-r border-base-200/50" />
+                  <span className="flex-1 py-1 px-3">Content</span>
+                </div>
+                <div
+                  ref={rightScrollRef}
+                  onScroll={() => syncScroll("right")}
+                  className="flex-1 min-h-0 overflow-y-auto overflow-x-auto custom-scrollbar"
+                >
+                  {rows.map((row, i) => (
+                    <SplitCell
+                      key={i}
+                      lineNum={row.rightLineNum}
+                      tokens={row.rightTokens}
+                      type={row.type}
+                      side="right"
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           )}
