@@ -24,6 +24,9 @@ export interface DiffStats {
   removed: number;
   modified: number;
   unchanged: number;
+  // ── NEW: sub-line units that changed in-place (char/word mode only)
+  // For lines mode this stays 0 — "modified" carries that meaning instead.
+  changed: number;
 }
 
 export interface DiffResult {
@@ -129,7 +132,14 @@ function hunksToRows(
   ) => { left: CharToken[]; right: CharToken[] },
 ): { rows: DiffRow[]; stats: DiffStats } {
   const rows: DiffRow[] = [];
-  const stats: DiffStats = { added: 0, removed: 0, modified: 0, unchanged: 0 };
+  // changed starts at 0; only recomputeTokenStats fills it for words/chars
+  const stats: DiffStats = {
+    added: 0,
+    removed: 0,
+    modified: 0,
+    unchanged: 0,
+    changed: 0,
+  };
   let leftNum = 1;
   let rightNum = 1;
 
@@ -190,27 +200,28 @@ function hunksToRows(
 
 // ─── token-level stat recount ─────────────────────────────────────────────────
 //
-// hunksToRows always counts by LINE (1 modified line, 1 added line, …).
-// For words/chars granularity we want the stats bar to reflect actual
-// word-count or char-count, not line-count.
+// For words/chars granularity we recount by actual token units instead of lines.
 //
-// Strategy:
-//   - Walk every row's leftTokens + rightTokens.
-//   - For "modified" rows: sum up the length of removed-type tokens (left side)
-//     and added-type tokens (right side) plus unchanged tokens.
-//   - For "added"/"removed" rows: count the full text length.
-//   - For "unchanged" rows: count the full text length.
+// Key change vs previous version:
+//   "modified" rows now populate stats.changed instead of stats.removed+added.
 //
-// "length" means:
-//   chars mode  → number of characters  (token.text.length)
-//   words mode  → number of whitespace-delimited words
+//   Per modified row:
+//     rawRemoved = sum of countUnits for all left-side "removed" tokens
+//     rawAdded   = sum of countUnits for all right-side "added" tokens
+//     changed    = min(rawRemoved, rawAdded)   ← units that changed in-place
+//     net removed = rawRemoved - changed        ← purely deleted units
+//     net added   = rawAdded   - changed        ← purely inserted units
 //
-// We report removed+added rather than "modified" for sub-line granularity
-// because "5 chars modified" is ambiguous — "5 removed, 5 added" is precise.
+//   This way "gamma → GAMMA" (5 removed, 5 added, same length) →
+//     changed = 5, net removed = 0, net added = 0
+//   And "running → runner" (7 removed, 6 added) →
+//     changed = 6, net removed = 1, net added = 0
+//
+//   Pure insertion/deletion rows (type "added"/"removed") are unaffected
+//   and still go into stats.added / stats.removed.
 
 function countUnits(text: string, granularity: "words" | "chars"): number {
   if (granularity === "chars") return text.length;
-  // words: split on whitespace, filter empty strings
   return text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
 }
 
@@ -218,11 +229,16 @@ function recomputeTokenStats(
   rows: DiffRow[],
   granularity: "words" | "chars",
 ): DiffStats {
-  const stats: DiffStats = { added: 0, removed: 0, modified: 0, unchanged: 0 };
+  const stats: DiffStats = {
+    added: 0,
+    removed: 0,
+    modified: 0,
+    unchanged: 0,
+    changed: 0,
+  };
 
   for (const row of rows) {
     if (row.type === "unchanged") {
-      // Both sides are identical — count either side once
       for (const tk of row.leftTokens) {
         stats.unchanged += countUnits(tk.text, granularity);
       }
@@ -243,22 +259,31 @@ function recomputeTokenStats(
       continue;
     }
 
-    // "modified" row — tokens carry "added" | "removed" | "unchanged" type
+    // ── "modified" row ──
+    // Count raw removed and added units from the token streams,
+    // then resolve into changed + net-removed + net-added.
+    let rawRemoved = 0;
+    let rawAdded = 0;
+
     for (const tk of row.leftTokens) {
       if (tk.type === "removed") {
-        stats.removed += countUnits(tk.text, granularity);
+        rawRemoved += countUnits(tk.text, granularity);
       } else {
-        // "unchanged" tokens appear on both sides of a modified row;
-        // count them once here (left side) and skip right side below
+        // unchanged tokens on left — count once
         stats.unchanged += countUnits(tk.text, granularity);
       }
     }
     for (const tk of row.rightTokens) {
       if (tk.type === "added") {
-        stats.added += countUnits(tk.text, granularity);
+        rawAdded += countUnits(tk.text, granularity);
       }
-      // skip "unchanged" tokens on right side — already counted on left
+      // skip unchanged on right — already counted on left
     }
+
+    const changed = Math.min(rawRemoved, rawAdded);
+    stats.changed += changed;
+    stats.removed += rawRemoved - changed; // net-deleted (0 for same-length changes)
+    stats.added += rawAdded - changed; // net-inserted (0 for same-length changes)
   }
 
   return stats;
@@ -274,7 +299,7 @@ export function computeDiff(
   if (!original && !modified)
     return {
       rows: [],
-      stats: { added: 0, removed: 0, modified: 0, unchanged: 0 },
+      stats: { added: 0, removed: 0, modified: 0, unchanged: 0, changed: 0 },
     };
 
   const lineChanges = diffLines(original, modified);
@@ -282,7 +307,6 @@ export function computeDiff(
   const innerDiff = granularity === "words" ? wordDiff : charDiff;
   const { rows, stats } = hunksToRows(hunks, innerDiff);
 
-  // For words/chars, replace line-count stats with actual token-unit counts
   const finalStats =
     granularity === "lines" ? stats : recomputeTokenStats(rows, granularity);
 

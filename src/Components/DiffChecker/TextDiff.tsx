@@ -36,7 +36,9 @@ const VIEW_OPTIONS: { label: string; value: TextDiffView }[] = [
 const ROW_BG: Record<string, string> = {
   added: "bg-emerald-500/10",
   removed: "bg-red-500/10",
-  modified: "bg-amber-500/8",
+  // ── CHANGE 2: bumped from /8 → /12 so modified rows in split view are
+  //    clearly visually paired across both sides
+  modified: "bg-amber-500/12",
   unchanged: "",
 };
 
@@ -61,21 +63,29 @@ const SYMBOL_CLS: Record<string, string> = {
   unchanged: "text-neutral-content/30",
 };
 
-// ── Change 2: char mode gets micro-padding so adjacent char spans visually
-//    separate from each other — making char mode look distinct from word mode.
+// ── CHANGE 1: char mode uses character-cell box treatment on highlighted tokens
+//    (Option B — only added/removed tokens get boxes, unchanged stays plain)
+//    Word mode keeps the original flowing highlight style.
 function charTokenCls(
   type: CharToken["type"],
   granularity: TextDiffGranularity,
 ): string {
-  const isChar = granularity === "chars";
-  const pad = isChar ? "px-[1px] mx-[0.5px]" : "";
+  if (granularity === "chars") {
+    // Each changed char rendered as a distinct keycap-style cell
+    if (type === "added")
+      return "inline-flex items-center justify-center bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded-[3px] px-[2px] mx-[1px] min-w-[0.8em]";
+    if (type === "removed")
+      return "inline-flex items-center justify-center bg-red-500/30 text-red-300 border border-red-500/40 rounded-[3px] px-[2px] mx-[1px] min-w-[0.8em] line-through";
+    // unchanged in char mode — subtle spacing to maintain rhythm, no box
+    return "mx-[0.5px]";
+  }
 
+  // word mode — original flowing highlight style
   if (type === "added")
-    return `bg-emerald-500/30 text-emerald-300 rounded-[2px] ${pad}`;
+    return "bg-emerald-500/30 text-emerald-300 rounded-[2px]";
   if (type === "removed")
-    return `bg-red-500/30 text-red-300 rounded-[2px] line-through ${pad}`;
-  // unchanged tokens in char mode still get spacing so the rhythm is consistent
-  return isChar ? pad : "";
+    return "bg-red-500/30 text-red-300 rounded-[2px] line-through";
+  return "";
 }
 
 // ─── sub-components ───────────────────────────────────────────────────────────
@@ -134,7 +144,6 @@ const InlineRow = ({
   );
 };
 
-// ── Change 3: border-b between sub-rows tightens the visual grouping
 const ModifiedInlineRow = ({
   row,
   granularity,
@@ -300,7 +309,14 @@ const TextDiff = () => {
   );
 
   const hasDiff = rows.length > 0;
-  const hasChanges = stats.added > 0 || stats.removed > 0 || stats.modified > 0;
+
+  // ── CHANGE 4: include stats.changed so pure case-flip diffs still show
+  //    the nav counter and mobile result dot in words/chars mode
+  const hasChanges =
+    stats.added > 0 ||
+    stats.removed > 0 ||
+    stats.modified > 0 ||
+    stats.changed > 0;
 
   const inlineRows = rows;
 
@@ -358,10 +374,6 @@ const TextDiff = () => {
     showToast("success", "Copied", "Unified diff copied to clipboard");
   };
 
-  // ── Change 1: stats bar labels
-  // For lines mode: "modified / added / removed" makes sense at line level.
-  // For words/chars: recomputeTokenStats gives us removed+added counts (no
-  // "modified" bucket) — so we only show removed and added in those modes.
   const granLabel =
     granularity === "lines"
       ? "line"
@@ -554,18 +566,23 @@ const TextDiff = () => {
           ))}
         </div>
 
-        {/* ── Change 1: Stats bar ──
-            Lines mode: show modified / added / removed / unchanged (line counts).
-            Words/chars mode: recomputeTokenStats returns removed+added with no
-            "modified" bucket — show those directly with the correct unit label. */}
+        {/* ── Stats bar ── */}
         {hasDiff && (
           <div className="shrink-0 flex flex-wrap items-center gap-x-4 gap-y-1.5 px-3 py-2 bg-base-200 rounded-xl border border-neutral">
-            {/* "modified" only meaningful for line mode */}
+            {/* lines mode: modified line count */}
             {granularity === "lines" && stats.modified > 0 && (
               <span className="flex items-center gap-1.5 text-xs font-semibold font-content tabular-nums text-amber-400">
                 <span className="w-2 h-2 rounded-sm bg-amber-500/60 shrink-0" />
                 {stats.modified} {granLabel}
                 {stats.modified !== 1 ? "s" : ""} modified
+              </span>
+            )}
+            {/* ── CHANGE 3: words/chars mode — show "changed" for in-place modifications */}
+            {granularity !== "lines" && stats.changed > 0 && (
+              <span className="flex items-center gap-1.5 text-xs font-semibold font-content tabular-nums text-amber-400">
+                <span className="w-2 h-2 rounded-sm bg-amber-500/60 shrink-0" />
+                ~{stats.changed} {granLabel}
+                {stats.changed !== 1 ? "s" : ""} changed
               </span>
             )}
             {stats.added > 0 && (
@@ -604,13 +621,11 @@ const TextDiff = () => {
           className={`min-h-0 flex flex-col gap-1.5
           ${mobileTab === "output" ? "flex flex-1" : "hidden md:flex md:flex-1"}`}
         >
-          {/* Legend + granularity subtitle */}
           <div className="shrink-0 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold uppercase tracking-widest text-neutral-content font-content">
                 {diffView === "inline" ? "Inline Diff" : "Split Diff"}
               </span>
-              {/* ── Change 2: subtitle that tells users which granularity is active */}
               {granularity !== "lines" && (
                 <span className="text-xs text-neutral-content/50 font-content">
                   · {granularity === "words" ? "word-level" : "character-level"}
@@ -633,7 +648,6 @@ const TextDiff = () => {
             </div>
           </div>
 
-          {/* Empty state */}
           {!hasDiff ? (
             <div className="flex-1 flex items-center justify-center bg-base-200 rounded-2xl border-2 border-dashed border-neutral">
               <p className="text-sm text-neutral-content font-content">
