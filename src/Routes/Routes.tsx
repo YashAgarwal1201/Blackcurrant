@@ -25,6 +25,9 @@ const WebAPI = lazy(() => import("../Pages/WebAPIsPage/WebAPI"));
 const Playground = lazy(
   () => import("../Pages/CoditorPlayground/PlaygroundPage"),
 );
+const DiffChecker = lazy(
+  () => import("../Pages/DiffCheckerPage/DiffCheckerPage"),
+);
 const PageNotFound = lazy(() => import("../Pages/PageNotFound/PageNotFound"));
 
 const Router = createBrowserRouter(
@@ -37,6 +40,7 @@ const Router = createBrowserRouter(
       <Route path="/play-with-dates" element={<PlayWithJsDates />} />
       <Route path="/browser-vitals" element={<WebAPI />} />
       <Route path="/coditor-playground" element={<Playground />} />
+      <Route path="/diff-checker" element={<DiffChecker />} />
       <Route path="*" element={<PageNotFound />} />
     </Route>,
   ),

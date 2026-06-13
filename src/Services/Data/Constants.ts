@@ -152,4 +152,5 @@ export const NAV_OPTIONS = [
   // { title: "Play with JS Dates", link: "/play-with-dates" },
   { title: "Browser Vitals", link: "/browser-vitals" },
   { title: "Coditor Playground", link: "/coditor-playground" },
+  { title: "Diff Checker", link: "/diff-checker" },
 ];
