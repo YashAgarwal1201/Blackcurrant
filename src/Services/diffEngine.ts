@@ -6,19 +6,15 @@ import type { TextDiffGranularity } from "./Stores/diffCheckerStore";
 
 export type RowType = "unchanged" | "modified" | "added" | "removed";
 
-/** A token within a line with char-level highlighting (for modified lines) */
 export interface CharToken {
   text: string;
   type: "unchanged" | "added" | "removed";
 }
 
-/** One display row — used for BOTH inline and split views */
 export interface DiffRow {
   type: RowType;
-  // left side (original)
   leftLineNum: number | null;
-  leftTokens: CharToken[]; // char-highlighted tokens; single token for unchanged/added/removed
-  // right side (modified)
+  leftTokens: CharToken[];
   rightLineNum: number | null;
   rightTokens: CharToken[];
 }
@@ -44,10 +40,6 @@ function toTokens(
   return [{ text, type }];
 }
 
-/**
- * For a "modified" row pair (oldLine, newLine), run diffChars to produce
- * char-level token arrays for each side.
- */
 function charDiff(
   oldLine: string,
   newLine: string,
@@ -55,7 +47,6 @@ function charDiff(
   const changes = diffChars(oldLine, newLine);
   const left: CharToken[] = [];
   const right: CharToken[] = [];
-
   for (const c of changes) {
     if (c.removed) {
       left.push({ text: c.value, type: "removed" });
@@ -66,22 +57,38 @@ function charDiff(
       right.push({ text: c.value, type: "unchanged" });
     }
   }
-
   return { left, right };
 }
 
-/**
- * Group a flat Change[] (from diffLines) into hunks.
- * Each hunk is a consecutive block of removes and/or adds.
- * Unchanged changes are emitted individually.
- *
- * Returns an array of either:
- *   { kind: "unchanged", lines: string[] }
- *   { kind: "hunk", removes: string[], adds: string[] }
- */
+function wordDiff(
+  oldLine: string,
+  newLine: string,
+): { left: CharToken[]; right: CharToken[] } {
+  const changes = diffWords(oldLine, newLine);
+  const left: CharToken[] = [];
+  const right: CharToken[] = [];
+  for (const c of changes) {
+    if (c.removed) {
+      left.push({ text: c.value, type: "removed" });
+    } else if (c.added) {
+      right.push({ text: c.value, type: "added" });
+    } else {
+      left.push({ text: c.value, type: "unchanged" });
+      right.push({ text: c.value, type: "unchanged" });
+    }
+  }
+  return { left, right };
+}
+
 type Hunk =
   | { kind: "unchanged"; lines: string[] }
   | { kind: "hunk"; removes: string[]; adds: string[] };
+
+function splitLines(value: string): string[] {
+  const lines = value.split("\n");
+  if (lines[lines.length - 1] === "") lines.pop();
+  return lines;
+}
 
 function groupIntoHunks(changes: Change[]): Hunk[] {
   const hunks: Hunk[] = [];
@@ -91,23 +98,18 @@ function groupIntoHunks(changes: Change[]): Hunk[] {
     const c = changes[i];
 
     if (!c.added && !c.removed) {
-      // unchanged block — split into individual lines
-      const lines = c.value.split("\n");
-      // trailing \n produces empty last element — remove it
-      if (lines[lines.length - 1] === "") lines.pop();
+      const lines = splitLines(c.value);
       if (lines.length > 0) hunks.push({ kind: "unchanged", lines });
       i++;
       continue;
     }
 
-    // collect a contiguous run of removes and adds
     const removes: string[] = [];
     const adds: string[] = [];
 
     while (i < changes.length && (changes[i].added || changes[i].removed)) {
       const ch = changes[i];
-      const lines = ch.value.split("\n");
-      if (lines[lines.length - 1] === "") lines.pop();
+      const lines = splitLines(ch.value);
       if (ch.removed) removes.push(...lines);
       else adds.push(...lines);
       i++;
@@ -119,11 +121,13 @@ function groupIntoHunks(changes: Change[]): Hunk[] {
   return hunks;
 }
 
-/**
- * Convert hunks → DiffRow[].
- * Modified pairs are detected by zipping removes+adds within each hunk.
- */
-function hunksToRows(hunks: Hunk[]): { rows: DiffRow[]; stats: DiffStats } {
+function hunksToRows(
+  hunks: Hunk[],
+  innerDiff: (
+    oldLine: string,
+    newLine: string,
+  ) => { left: CharToken[]; right: CharToken[] },
+): { rows: DiffRow[]; stats: DiffStats } {
   const rows: DiffRow[] = [];
   const stats: DiffStats = { added: 0, removed: 0, modified: 0, unchanged: 0 };
   let leftNum = 1;
@@ -144,11 +148,10 @@ function hunksToRows(hunks: Hunk[]): { rows: DiffRow[]; stats: DiffStats } {
       continue;
     }
 
-    // pair removes and adds into modified rows
     const pairCount = Math.min(hunk.removes.length, hunk.adds.length);
 
     for (let j = 0; j < pairCount; j++) {
-      const { left, right } = charDiff(hunk.removes[j], hunk.adds[j]);
+      const { left, right } = innerDiff(hunk.removes[j], hunk.adds[j]);
       rows.push({
         type: "modified",
         leftLineNum: leftNum++,
@@ -159,7 +162,6 @@ function hunksToRows(hunks: Hunk[]): { rows: DiffRow[]; stats: DiffStats } {
       stats.modified++;
     }
 
-    // leftover removes
     for (let j = pairCount; j < hunk.removes.length; j++) {
       rows.push({
         type: "removed",
@@ -171,7 +173,6 @@ function hunksToRows(hunks: Hunk[]): { rows: DiffRow[]; stats: DiffStats } {
       stats.removed++;
     }
 
-    // leftover adds
     for (let j = pairCount; j < hunk.adds.length; j++) {
       rows.push({
         type: "added",
@@ -187,6 +188,82 @@ function hunksToRows(hunks: Hunk[]): { rows: DiffRow[]; stats: DiffStats } {
   return { rows, stats };
 }
 
+// ─── token-level stat recount ─────────────────────────────────────────────────
+//
+// hunksToRows always counts by LINE (1 modified line, 1 added line, …).
+// For words/chars granularity we want the stats bar to reflect actual
+// word-count or char-count, not line-count.
+//
+// Strategy:
+//   - Walk every row's leftTokens + rightTokens.
+//   - For "modified" rows: sum up the length of removed-type tokens (left side)
+//     and added-type tokens (right side) plus unchanged tokens.
+//   - For "added"/"removed" rows: count the full text length.
+//   - For "unchanged" rows: count the full text length.
+//
+// "length" means:
+//   chars mode  → number of characters  (token.text.length)
+//   words mode  → number of whitespace-delimited words
+//
+// We report removed+added rather than "modified" for sub-line granularity
+// because "5 chars modified" is ambiguous — "5 removed, 5 added" is precise.
+
+function countUnits(text: string, granularity: "words" | "chars"): number {
+  if (granularity === "chars") return text.length;
+  // words: split on whitespace, filter empty strings
+  return text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
+}
+
+function recomputeTokenStats(
+  rows: DiffRow[],
+  granularity: "words" | "chars",
+): DiffStats {
+  const stats: DiffStats = { added: 0, removed: 0, modified: 0, unchanged: 0 };
+
+  for (const row of rows) {
+    if (row.type === "unchanged") {
+      // Both sides are identical — count either side once
+      for (const tk of row.leftTokens) {
+        stats.unchanged += countUnits(tk.text, granularity);
+      }
+      continue;
+    }
+
+    if (row.type === "added") {
+      for (const tk of row.rightTokens) {
+        stats.added += countUnits(tk.text, granularity);
+      }
+      continue;
+    }
+
+    if (row.type === "removed") {
+      for (const tk of row.leftTokens) {
+        stats.removed += countUnits(tk.text, granularity);
+      }
+      continue;
+    }
+
+    // "modified" row — tokens carry "added" | "removed" | "unchanged" type
+    for (const tk of row.leftTokens) {
+      if (tk.type === "removed") {
+        stats.removed += countUnits(tk.text, granularity);
+      } else {
+        // "unchanged" tokens appear on both sides of a modified row;
+        // count them once here (left side) and skip right side below
+        stats.unchanged += countUnits(tk.text, granularity);
+      }
+    }
+    for (const tk of row.rightTokens) {
+      if (tk.type === "added") {
+        stats.added += countUnits(tk.text, granularity);
+      }
+      // skip "unchanged" tokens on right side — already counted on left
+    }
+  }
+
+  return stats;
+}
+
 // ─── public API ───────────────────────────────────────────────────────────────
 
 export function computeDiff(
@@ -200,76 +277,26 @@ export function computeDiff(
       stats: { added: 0, removed: 0, modified: 0, unchanged: 0 },
     };
 
-  if (granularity === "lines") {
-    const changes = diffLines(original, modified);
-    const hunks = groupIntoHunks(changes);
-    return hunksToRows(hunks);
-  }
+  const lineChanges = diffLines(original, modified);
+  const hunks = groupIntoHunks(lineChanges);
+  const innerDiff = granularity === "words" ? wordDiff : charDiff;
+  const { rows, stats } = hunksToRows(hunks, innerDiff);
 
-  // words / chars — treat the whole text as one segment, inline token stream
-  const changes: Change[] =
-    granularity === "words"
-      ? diffWords(original, modified)
-      : diffChars(original, modified);
+  // For words/chars, replace line-count stats with actual token-unit counts
+  const finalStats =
+    granularity === "lines" ? stats : recomputeTokenStats(rows, granularity);
 
-  // For sub-word granularity, we emit a single "synthetic" modified row
-  // containing all the inline tokens — this is how Kaleidoscope / IntelliJ handle it.
-  const leftTokens: CharToken[] = [];
-  const rightTokens: CharToken[] = [];
-  let addedCount = 0;
-  let removedCount = 0;
-  let unchangedCount = 0;
-
-  for (const c of changes) {
-    if (c.removed) {
-      leftTokens.push({ text: c.value, type: "removed" });
-      removedCount += c.count ?? 1;
-    } else if (c.added) {
-      rightTokens.push({ text: c.value, type: "added" });
-      addedCount += c.count ?? 1;
-    } else {
-      leftTokens.push({ text: c.value, type: "unchanged" });
-      rightTokens.push({ text: c.value, type: "unchanged" });
-      unchangedCount += c.count ?? 1;
-    }
-  }
-
-  return {
-    rows:
-      leftTokens.length > 0 || rightTokens.length > 0
-        ? [
-            {
-              type: "modified",
-              leftLineNum: null,
-              leftTokens,
-              rightLineNum: null,
-              rightTokens,
-            },
-          ]
-        : [],
-    stats: {
-      added: addedCount,
-      removed: removedCount,
-      modified: 0,
-      unchanged: unchangedCount,
-    },
-  };
+  return { rows, stats: finalStats };
 }
 
 export function buildUnifiedDiffText(rows: DiffRow[]): string {
   return rows
     .map((row) => {
-      const sym =
-        row.type === "added"
-          ? "+"
-          : row.type === "removed"
-            ? "-"
-            : row.type === "modified"
-              ? "~"
-              : " ";
       const left = row.leftTokens.map((t) => t.text).join("");
       const right = row.rightTokens.map((t) => t.text).join("");
       if (row.type === "modified") return `- ${left}\n+ ${right}`;
+      const sym =
+        row.type === "added" ? "+" : row.type === "removed" ? "-" : " ";
       return `${sym} ${left || right}`;
     })
     .join("\n");

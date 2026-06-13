@@ -31,9 +31,8 @@ const VIEW_OPTIONS: { label: string; value: TextDiffView }[] = [
   { label: "Split", value: "split" },
 ];
 
-// ─── diff colour helpers (always green/red — not theme-dependent) ─────────────
+// ─── colour helpers ───────────────────────────────────────────────────────────
 
-// Row background
 const ROW_BG: Record<string, string> = {
   added: "bg-emerald-500/10",
   removed: "bg-red-500/10",
@@ -41,7 +40,6 @@ const ROW_BG: Record<string, string> = {
   unchanged: "",
 };
 
-// Gutter background + text
 const GUTTER_CLS: Record<string, string> = {
   added: "bg-emerald-500/20 text-emerald-400",
   removed: "bg-red-500/20 text-red-400",
@@ -49,7 +47,6 @@ const GUTTER_CLS: Record<string, string> = {
   unchanged: "bg-base-300 text-neutral-content/50",
 };
 
-// +/−/~/space symbol
 const SYMBOL: Record<string, string> = {
   added: "+",
   removed: "−",
@@ -64,27 +61,37 @@ const SYMBOL_CLS: Record<string, string> = {
   unchanged: "text-neutral-content/30",
 };
 
-// Inline char token background highlight
-function charTokenCls(type: CharToken["type"]): string {
+// ── Change 2: char mode gets micro-padding so adjacent char spans visually
+//    separate from each other — making char mode look distinct from word mode.
+function charTokenCls(
+  type: CharToken["type"],
+  granularity: TextDiffGranularity,
+): string {
+  const isChar = granularity === "chars";
+  const pad = isChar ? "px-[1px] mx-[0.5px]" : "";
+
   if (type === "added")
-    return "bg-emerald-500/30 text-emerald-300 rounded-[2px]";
+    return `bg-emerald-500/30 text-emerald-300 rounded-[2px] ${pad}`;
   if (type === "removed")
-    return "bg-red-500/30 text-red-300 rounded-[2px] line-through";
-  return "";
+    return `bg-red-500/30 text-red-300 rounded-[2px] line-through ${pad}`;
+  // unchanged tokens in char mode still get spacing so the rhythm is consistent
+  return isChar ? pad : "";
 }
 
 // ─── sub-components ───────────────────────────────────────────────────────────
 
-/** Renders a single diff row for inline view (both line number columns) */
-const InlineRow = ({ row }: { row: DiffRow }) => {
+const InlineRow = ({
+  row,
+  granularity,
+}: {
+  row: DiffRow;
+  granularity: TextDiffGranularity;
+}) => {
   const rowBg = ROW_BG[row.type] ?? "";
   const gutterCl = GUTTER_CLS[row.type] ?? "";
   const symCl = SYMBOL_CLS[row.type] ?? "";
   const sym = SYMBOL[row.type] ?? " ";
 
-  // For inline view, "modified" rows are split into two sibling rows
-  // (remove row then add row) — handled in the parent loop, not here.
-  // Here we just render a single row with its tokens.
   const tokens = row.leftTokens.length
     ? row.leftTokens
     : row.rightTokens.length
@@ -98,30 +105,26 @@ const InlineRow = ({ row }: { row: DiffRow }) => {
     <div
       className={`flex items-stretch min-w-0 ${rowBg} hover:brightness-110 transition-[filter] duration-75`}
     >
-      {/* Orig line # */}
       <span
         className={`shrink-0 w-10 py-0.5 text-right pr-1.5 text-xs tabular-nums select-none border-r border-base-200/50 ${gutterCl}`}
       >
         {lineLeft}
       </span>
-      {/* Mod line # */}
       <span
         className={`shrink-0 w-10 py-0.5 text-right pr-1.5 text-xs tabular-nums select-none border-r border-base-200/50 ${gutterCl}`}
       >
         {lineRight}
       </span>
-      {/* Symbol */}
       <span
         className={`shrink-0 w-6 py-0.5 text-center text-xs select-none border-r border-base-200/50 ${gutterCl} ${symCl}`}
       >
         {sym}
       </span>
-      {/* Content */}
       <span className="flex-1 min-w-0 py-0.5 px-3 text-sm font-mono leading-relaxed whitespace-pre-wrap break-all">
         {tokens.map((tk, i) => (
           <span
             key={i}
-            className={`${charTokenCls(tk.type)} text-base-content`}
+            className={`${charTokenCls(tk.type, granularity)} text-base-content`}
           >
             {tk.text || " "}
           </span>
@@ -131,17 +134,76 @@ const InlineRow = ({ row }: { row: DiffRow }) => {
   );
 };
 
-/** One side of a split-view row */
+// ── Change 3: border-b between sub-rows tightens the visual grouping
+const ModifiedInlineRow = ({
+  row,
+  granularity,
+}: {
+  row: DiffRow;
+  granularity: TextDiffGranularity;
+}) => {
+  const leftLineNum = row.leftLineNum != null ? String(row.leftLineNum) : "";
+  const rightLineNum = row.rightLineNum != null ? String(row.rightLineNum) : "";
+
+  return (
+    <div className="border-l-2 border-amber-500/60">
+      {/* Old line — red tint, bottom separator to pair with new line */}
+      <div className="flex items-stretch min-w-0 bg-red-500/10 border-b border-amber-500/20 hover:brightness-110 transition-[filter] duration-75">
+        <span className="shrink-0 w-10 py-0.5 text-right pr-1.5 text-xs tabular-nums select-none border-r border-base-200/50 bg-red-500/20 text-red-400">
+          {leftLineNum}
+        </span>
+        <span className="shrink-0 w-10 py-0.5 border-r border-base-200/50 bg-red-500/20" />
+        <span className="shrink-0 w-6 py-0.5 text-center text-xs select-none border-r border-base-200/50 bg-red-500/20 text-red-400 font-bold">
+          −
+        </span>
+        <span className="flex-1 min-w-0 py-0.5 px-3 text-sm font-mono leading-relaxed whitespace-pre-wrap break-all">
+          {row.leftTokens.map((tk, i) => (
+            <span
+              key={i}
+              className={`${charTokenCls(tk.type, granularity)} text-base-content`}
+            >
+              {tk.text || " "}
+            </span>
+          ))}
+        </span>
+      </div>
+
+      {/* New line — green tint */}
+      <div className="flex items-stretch min-w-0 bg-emerald-500/10 hover:brightness-110 transition-[filter] duration-75">
+        <span className="shrink-0 w-10 py-0.5 border-r border-base-200/50 bg-emerald-500/20" />
+        <span className="shrink-0 w-10 py-0.5 text-right pr-1.5 text-xs tabular-nums select-none border-r border-base-200/50 bg-emerald-500/20 text-emerald-400">
+          {rightLineNum}
+        </span>
+        <span className="shrink-0 w-6 py-0.5 text-center text-xs select-none border-r border-base-200/50 bg-emerald-500/20 text-emerald-400 font-bold">
+          +
+        </span>
+        <span className="flex-1 min-w-0 py-0.5 px-3 text-sm font-mono leading-relaxed whitespace-pre-wrap break-all">
+          {row.rightTokens.map((tk, i) => (
+            <span
+              key={i}
+              className={`${charTokenCls(tk.type, granularity)} text-base-content`}
+            >
+              {tk.text || " "}
+            </span>
+          ))}
+        </span>
+      </div>
+    </div>
+  );
+};
+
 const SplitCell = ({
   lineNum,
   tokens,
   type,
   side,
+  granularity,
 }: {
   lineNum: number | null;
   tokens: CharToken[];
   type: DiffRow["type"];
   side: "left" | "right";
+  granularity: TextDiffGranularity;
 }) => {
   const isEmpty = tokens.length === 0;
   const gutterCl = isEmpty
@@ -170,24 +232,21 @@ const SplitCell = ({
     <div
       className={`flex items-stretch min-w-0 w-full ${rowBg} hover:brightness-110 transition-[filter] duration-75`}
     >
-      {/* Line # */}
       <span
         className={`shrink-0 w-10 py-0.5 text-right pr-1.5 text-xs tabular-nums select-none border-r border-base-200/50 ${gutterCl}`}
       >
         {lineNum ?? ""}
       </span>
-      {/* Symbol */}
       <span
         className={`shrink-0 w-6 py-0.5 text-center text-xs select-none border-r border-base-200/50 ${gutterCl} ${symCl}`}
       >
         {sym}
       </span>
-      {/* Content */}
       <span className="flex-1 min-w-0 py-0.5 px-3 text-sm font-mono leading-relaxed whitespace-pre-wrap break-all text-base-content">
         {isEmpty
           ? null
           : tokens.map((tk, i) => (
-              <span key={i} className={charTokenCls(tk.type)}>
+              <span key={i} className={charTokenCls(tk.type, granularity)}>
                 {tk.text || " "}
               </span>
             ))}
@@ -213,7 +272,7 @@ const TextDiff = () => {
   const showToast = useToastStore((s) => s.showToast);
   const [mobileTab, setMobileTab] = useState<"inputs" | "output">("inputs");
 
-  // ── synchronized scroll ─────────────────────────────────────────────────────
+  // ── synchronized scroll ──────────────────────────────────────────────────────
   const leftScrollRef = useRef<HTMLDivElement>(null);
   const rightScrollRef = useRef<HTMLDivElement>(null);
   const syncing = useRef(false);
@@ -229,12 +288,12 @@ const TextDiff = () => {
     syncing.current = false;
   }, []);
 
-  // ── change navigation ───────────────────────────────────────────────────────
+  // ── change navigation ────────────────────────────────────────────────────────
   const inlineScrollRef = useRef<HTMLDivElement>(null);
   const [changeIdx, setChangeIdx] = useState(-1);
-  const changeRowsRef = useRef<number[]>([]); // DOM row indices of non-unchanged rows
+  const changeRowsRef = useRef<number[]>([]);
 
-  // ── diff computation ────────────────────────────────────────────────────────
+  // ── diff computation ─────────────────────────────────────────────────────────
   const { rows, stats } = useMemo(
     () => computeDiff(originalText, modifiedText, granularity),
     [originalText, modifiedText, granularity],
@@ -243,36 +302,8 @@ const TextDiff = () => {
   const hasDiff = rows.length > 0;
   const hasChanges = stats.added > 0 || stats.removed > 0 || stats.modified > 0;
 
-  // Build flat inline rows — "modified" becomes two rows (remove + add) in inline view
-  const inlineRows = useMemo<DiffRow[]>(() => {
-    if (granularity !== "lines") return rows; // words/chars: single synthetic row
+  const inlineRows = rows;
 
-    const result: DiffRow[] = [];
-    for (const row of rows) {
-      if (row.type === "modified") {
-        // emit remove row then add row
-        result.push({
-          type: "removed",
-          leftLineNum: row.leftLineNum,
-          leftTokens: row.leftTokens,
-          rightLineNum: null,
-          rightTokens: [],
-        });
-        result.push({
-          type: "added",
-          leftLineNum: null,
-          leftTokens: [],
-          rightLineNum: row.rightLineNum,
-          rightTokens: row.rightTokens,
-        });
-      } else {
-        result.push(row);
-      }
-    }
-    return result;
-  }, [rows, granularity]);
-
-  // Track indices of change rows for navigation
   useEffect(() => {
     changeRowsRef.current = inlineRows.reduce<number[]>((acc, r, i) => {
       if (r.type !== "unchanged") acc.push(i);
@@ -304,7 +335,7 @@ const TextDiff = () => {
     [changeIdx],
   );
 
-  // ── actions ─────────────────────────────────────────────────────────────────
+  // ── actions ──────────────────────────────────────────────────────────────────
   const handleSwap = () => {
     setOriginalText(modifiedText);
     setModifiedText(originalText);
@@ -327,6 +358,10 @@ const TextDiff = () => {
     showToast("success", "Copied", "Unified diff copied to clipboard");
   };
 
+  // ── Change 1: stats bar labels
+  // For lines mode: "modified / added / removed" makes sense at line level.
+  // For words/chars: recomputeTokenStats gives us removed+added counts (no
+  // "modified" bucket) — so we only show removed and added in those modes.
   const granLabel =
     granularity === "lines"
       ? "line"
@@ -346,7 +381,11 @@ const TextDiff = () => {
               type="button"
               onClick={() => setGranularity(opt.value)}
               className={`h-8 px-3 rounded-lg text-xs font-semibold font-subHeading transition-colors duration-150
-                ${granularity === opt.value ? "bg-base-100 text-base-content shadow-sm" : "text-neutral-content hover:text-base-content"}`}
+                ${
+                  granularity === opt.value
+                    ? "bg-base-100 text-base-content shadow-sm"
+                    : "text-neutral-content hover:text-base-content"
+                }`}
             >
               {opt.label}
             </button>
@@ -360,15 +399,18 @@ const TextDiff = () => {
               type="button"
               onClick={() => setDiffView(opt.value)}
               className={`h-8 px-3 rounded-lg text-xs font-semibold font-subHeading transition-colors duration-150
-                ${diffView === opt.value ? "bg-base-100 text-base-content shadow-sm" : "text-neutral-content hover:text-base-content"}`}
+                ${
+                  diffView === opt.value
+                    ? "bg-base-100 text-base-content shadow-sm"
+                    : "text-neutral-content hover:text-base-content"
+                }`}
             >
               {opt.label}
             </button>
           ))}
         </div>
 
-        {/* Change navigation — only in inline+lines mode */}
-        {diffView === "inline" && granularity === "lines" && hasChanges && (
+        {diffView === "inline" && hasChanges && (
           <div className="flex items-center gap-1 bg-base-200 rounded-xl p-1">
             <button
               type="button"
@@ -378,7 +420,7 @@ const TextDiff = () => {
             >
               <ChevronUp size={14} />
             </button>
-            <span className="text-xs tabular-nums text-neutral-content font-content px-1 min-w-[3.5rem] text-center">
+            <span className="text-xs tabular-nums text-neutral-content font-content px-1 min-w-14 text-center">
               {changeIdx >= 0
                 ? `${changeIdx + 1} / ${changeRowsRef.current.length}`
                 : `${changeRowsRef.current.length} Δ`}
@@ -445,7 +487,11 @@ const TextDiff = () => {
               type="button"
               onClick={() => setMobileTab(tab)}
               className={`flex-1 h-9 rounded-lg text-sm font-semibold font-subHeading transition-colors duration-150
-                ${mobileTab === tab ? "bg-base-100 text-base-content shadow-sm" : "text-neutral-content"}`}
+                ${
+                  mobileTab === tab
+                    ? "bg-base-100 text-base-content shadow-sm"
+                    : "text-neutral-content"
+                }`}
             >
               {tab === "inputs" ? (
                 "Inputs"
@@ -467,7 +513,11 @@ const TextDiff = () => {
         {/* Input panels */}
         <div
           className={`flex-col md:flex-row gap-3 min-h-0
-          ${mobileTab === "inputs" ? "flex flex-1" : "hidden md:flex md:flex-[0_0_38%]"}`}
+          ${
+            mobileTab === "inputs"
+              ? "flex flex-1"
+              : "hidden md:flex md:flex-[0_0_38%]"
+          }`}
         >
           {[
             {
@@ -504,10 +554,14 @@ const TextDiff = () => {
           ))}
         </div>
 
-        {/* Stats bar */}
+        {/* ── Change 1: Stats bar ──
+            Lines mode: show modified / added / removed / unchanged (line counts).
+            Words/chars mode: recomputeTokenStats returns removed+added with no
+            "modified" bucket — show those directly with the correct unit label. */}
         {hasDiff && (
           <div className="shrink-0 flex flex-wrap items-center gap-x-4 gap-y-1.5 px-3 py-2 bg-base-200 rounded-xl border border-neutral">
-            {stats.modified > 0 && (
+            {/* "modified" only meaningful for line mode */}
+            {granularity === "lines" && stats.modified > 0 && (
               <span className="flex items-center gap-1.5 text-xs font-semibold font-content tabular-nums text-amber-400">
                 <span className="w-2 h-2 rounded-sm bg-amber-500/60 shrink-0" />
                 {stats.modified} {granLabel}
@@ -550,11 +604,19 @@ const TextDiff = () => {
           className={`min-h-0 flex flex-col gap-1.5
           ${mobileTab === "output" ? "flex flex-1" : "hidden md:flex md:flex-1"}`}
         >
-          {/* Legend */}
+          {/* Legend + granularity subtitle */}
           <div className="shrink-0 flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-widest text-neutral-content font-content">
-              {diffView === "inline" ? "Inline Diff" : "Split Diff"}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-widest text-neutral-content font-content">
+                {diffView === "inline" ? "Inline Diff" : "Split Diff"}
+              </span>
+              {/* ── Change 2: subtitle that tells users which granularity is active */}
+              {granularity !== "lines" && (
+                <span className="text-xs text-neutral-content/50 font-content">
+                  · {granularity === "words" ? "word-level" : "character-level"}
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-3 text-xs text-neutral-content font-content">
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-sm bg-emerald-500/50" />
@@ -564,12 +626,10 @@ const TextDiff = () => {
                 <span className="w-2 h-2 rounded-sm bg-red-500/50" />
                 removed
               </span>
-              {granularity === "lines" && (
-                <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-sm bg-amber-500/50" />
-                  modified
-                </span>
-              )}
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-sm bg-amber-500/50" />
+                modified
+              </span>
             </div>
           </div>
 
@@ -580,10 +640,9 @@ const TextDiff = () => {
                 Diff output will appear here…
               </p>
             </div>
-          ) : /* ══ INLINE VIEW ══ */
-          diffView === "inline" ? (
+          ) : diffView === "inline" ? (
+            /* ══ INLINE VIEW ══ */
             <div className="flex-1 min-h-0 rounded-2xl border border-neutral overflow-hidden flex flex-col bg-base-300">
-              {/* Column header */}
               <div className="shrink-0 flex items-stretch bg-base-200 border-b border-neutral text-xs text-neutral-content/60 font-content select-none">
                 <span className="shrink-0 w-10 py-1.5 text-right pr-1.5 border-r border-base-200/50 bg-base-200">
                   Orig
@@ -591,17 +650,20 @@ const TextDiff = () => {
                 <span className="shrink-0 w-10 py-1.5 text-right pr-1.5 border-r border-base-200/50 bg-base-200">
                   Mod
                 </span>
-                <span className="shrink-0 w-6  py-1.5 text-center      border-r border-base-200/50 bg-base-200" />
+                <span className="shrink-0 w-6 py-1.5 text-center border-r border-base-200/50 bg-base-200" />
                 <span className="flex-1 py-1.5 px-3">Content</span>
               </div>
-              {/* Rows */}
               <div
                 ref={inlineScrollRef}
                 className="flex-1 min-h-0 overflow-y-auto overflow-x-auto custom-scrollbar"
               >
                 {inlineRows.map((row, i) => (
                   <div key={i} data-diff-row>
-                    <InlineRow row={row} />
+                    {row.type === "modified" ? (
+                      <ModifiedInlineRow row={row} granularity={granularity} />
+                    ) : (
+                      <InlineRow row={row} granularity={granularity} />
+                    )}
                   </div>
                 ))}
               </div>
@@ -609,7 +671,6 @@ const TextDiff = () => {
           ) : (
             /* ══ SPLIT VIEW ══ */
             <div className="flex-1 min-h-0 flex gap-2 overflow-hidden">
-              {/* ── Left panel (Original) ── */}
               <div className="flex-1 min-w-0 flex flex-col rounded-2xl border border-neutral overflow-hidden bg-base-300">
                 <div className="shrink-0 flex items-center px-3 py-1.5 bg-base-200 border-b border-neutral">
                   <span className="flex-1 text-xs font-semibold uppercase tracking-widest text-neutral-content font-content">
@@ -624,7 +685,7 @@ const TextDiff = () => {
                   <span className="shrink-0 w-10 py-1 text-right pr-1.5 border-r border-base-200/50">
                     Line
                   </span>
-                  <span className="shrink-0 w-6  py-1 text-center      border-r border-base-200/50" />
+                  <span className="shrink-0 w-6 py-1 text-center border-r border-base-200/50" />
                   <span className="flex-1 py-1 px-3">Content</span>
                 </div>
                 <div
@@ -639,12 +700,12 @@ const TextDiff = () => {
                       tokens={row.leftTokens}
                       type={row.type}
                       side="left"
+                      granularity={granularity}
                     />
                   ))}
                 </div>
               </div>
 
-              {/* ── Right panel (Modified) ── */}
               <div className="flex-1 min-w-0 flex flex-col rounded-2xl border border-neutral overflow-hidden bg-base-300">
                 <div className="shrink-0 flex items-center px-3 py-1.5 bg-base-200 border-b border-neutral">
                   <span className="flex-1 text-xs font-semibold uppercase tracking-widest text-neutral-content font-content">
@@ -659,7 +720,7 @@ const TextDiff = () => {
                   <span className="shrink-0 w-10 py-1 text-right pr-1.5 border-r border-base-200/50">
                     Line
                   </span>
-                  <span className="shrink-0 w-6  py-1 text-center      border-r border-base-200/50" />
+                  <span className="shrink-0 w-6 py-1 text-center border-r border-base-200/50" />
                   <span className="flex-1 py-1 px-3">Content</span>
                 </div>
                 <div
@@ -674,6 +735,7 @@ const TextDiff = () => {
                       tokens={row.rightTokens}
                       type={row.type}
                       side="right"
+                      granularity={granularity}
                     />
                   ))}
                 </div>
