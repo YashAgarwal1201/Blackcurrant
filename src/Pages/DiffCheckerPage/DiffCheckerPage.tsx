@@ -1,3 +1,8 @@
+// TODO:
+// 1. move "modes" to dropdown and a helper text below it or an infor button.
+// 2. move the 'sub-settings' in a popover or sidebar for mobile screens and the button can be on very right of the 'header'
+// 3. we should have line number in text diff for 'original' and 'modified' content blocks.
+
 import ImageDiff from "@/Components/DiffChecker/ImageDiff";
 import TextDiff from "@/Components/DiffChecker/TextDiff";
 import GoBackBtn from "@/Layout/GoBackBtn";

@@ -1,8 +1,15 @@
 // src/Components/DiffChecker/TextDiff.tsx
 import { useMemo, useState, useRef, useCallback, useEffect } from "react";
+import type { ReactNode } from "react";
 import { Button } from "primereact/button";
 import { InputTextarea } from "primereact/inputtextarea";
-import { ArrowLeftRight, Download, ChevronUp, ChevronDown } from "lucide-react";
+import {
+  ArrowLeftRight,
+  Download,
+  ChevronUp,
+  ChevronDown,
+  Copy,
+} from "lucide-react";
 
 import { triggerTextReportDownload } from "@/Services/DiffReportGenerator";
 import {
@@ -36,7 +43,7 @@ const VIEW_OPTIONS: { label: string; value: TextDiffView }[] = [
 const ROW_BG: Record<string, string> = {
   added: "bg-emerald-500/10",
   removed: "bg-red-500/10",
-  modified: "bg-amber-500/8",
+  modified: "bg-amber-500/12",
   unchanged: "",
 };
 
@@ -61,21 +68,72 @@ const SYMBOL_CLS: Record<string, string> = {
   unchanged: "text-neutral-content/30",
 };
 
-// ── Change 2: char mode gets micro-padding so adjacent char spans visually
-//    separate from each other — making char mode look distinct from word mode.
+// ─── token class helper ───────────────────────────────────────────────────────
+//
+// Char mode: added/removed tokens get a keycap-style bordered cell.
+//            unchanged tokens get minimal spacing only — no box.
+// Word mode: added/removed tokens get a flowing blob highlight (original style).
+
 function charTokenCls(
   type: CharToken["type"],
   granularity: TextDiffGranularity,
 ): string {
-  const isChar = granularity === "chars";
-  const pad = isChar ? "px-[1px] mx-[0.5px]" : "";
+  if (granularity === "chars") {
+    if (type === "added")
+      return "inline-flex items-center justify-center bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded-[3px] px-[2px] mx-[1px] min-w-[0.8em]";
+    if (type === "removed")
+      return "inline-flex items-center justify-center bg-red-500/30 text-red-300 border border-red-500/40 rounded-[3px] px-[2px] mx-[1px] min-w-[0.8em] line-through";
+    return "mx-[0.5px]";
+  }
 
+  // word mode — flowing highlight
   if (type === "added")
-    return `bg-emerald-500/30 text-emerald-300 rounded-[2px] ${pad}`;
+    return "bg-emerald-500/30 text-emerald-300 rounded-[2px]";
   if (type === "removed")
-    return `bg-red-500/30 text-red-300 rounded-[2px] line-through ${pad}`;
-  // unchanged tokens in char mode still get spacing so the rhythm is consistent
-  return isChar ? pad : "";
+    return "bg-red-500/30 text-red-300 rounded-[2px] line-through";
+  return "";
+}
+
+// ─── renderToken ──────────────────────────────────────────────────────────────
+//
+// FIX 1 — Per-character rendering in char mode.
+//
+// Previously, the diff engine returned multi-character token strings like
+// "ing" or "er" as a single CharToken. In char mode these rendered as one
+// keycap box [ing] instead of three individual cells [i][n][g].
+//
+// Fix: when granularity === "chars" and the token is added/removed, split
+// tk.text into individual characters via [...tk.text] and render each as its
+// own keycap span. Unchanged tokens stay as one span regardless — no box,
+// just the subtle mx-[0.5px] spacing from charTokenCls.
+//
+// In lines/words mode every token renders as a single span (original behaviour
+// unchanged).
+
+function renderToken(
+  tk: CharToken,
+  i: number,
+  granularity: TextDiffGranularity,
+  extraCls = "text-base-content",
+): ReactNode {
+  if (granularity === "chars" && tk.type !== "unchanged") {
+    return [...tk.text].map((char, ci) => (
+      <span
+        key={`${i}-${ci}`}
+        className={`${charTokenCls(tk.type, granularity)} ${extraCls}`}
+      >
+        {char}
+      </span>
+    ));
+  }
+  return (
+    <span
+      key={i}
+      className={`${charTokenCls(tk.type, granularity)} ${extraCls}`}
+    >
+      {tk.text || " "}
+    </span>
+  );
 }
 
 // ─── sub-components ───────────────────────────────────────────────────────────
@@ -121,20 +179,24 @@ const InlineRow = ({
         {sym}
       </span>
       <span className="flex-1 min-w-0 py-0.5 px-3 text-sm font-mono leading-relaxed whitespace-pre-wrap break-all">
-        {tokens.map((tk, i) => (
-          <span
-            key={i}
-            className={`${charTokenCls(tk.type, granularity)} text-base-content`}
-          >
-            {tk.text || " "}
-          </span>
-        ))}
+        {tokens.map((tk, i) => renderToken(tk, i, granularity))}
       </span>
     </div>
   );
 };
 
-// ── Change 3: border-b between sub-rows tightens the visual grouping
+// ── ModifiedInlineRow ─────────────────────────────────────────────────────────
+//
+// FIX 2 — Modified row gutter symbols changed from − / + to ~ on both sub-rows.
+//
+// Previously the old line showed − and the new line showed +, making a modified
+// pair look like an independent deletion followed by an insertion (e.g. baz → BAZ
+// appeared as "deleted baz, inserted BAZ" rather than "modified baz to BAZ").
+//
+// Fix: both sub-rows now show ~ in amber. The red/green backgrounds already
+// communicate which side is old vs new — the ~ symbol makes it unambiguous that
+// this is a modification, not a delete+add pair.
+
 const ModifiedInlineRow = ({
   row,
   granularity,
@@ -147,24 +209,18 @@ const ModifiedInlineRow = ({
 
   return (
     <div className="border-l-2 border-amber-500/60">
-      {/* Old line — red tint, bottom separator to pair with new line */}
+      {/* Old line — red tint, bottom separator to visually pair with new line */}
       <div className="flex items-stretch min-w-0 bg-red-500/10 border-b border-amber-500/20 hover:brightness-110 transition-[filter] duration-75">
         <span className="shrink-0 w-10 py-0.5 text-right pr-1.5 text-xs tabular-nums select-none border-r border-base-200/50 bg-red-500/20 text-red-400">
           {leftLineNum}
         </span>
         <span className="shrink-0 w-10 py-0.5 border-r border-base-200/50 bg-red-500/20" />
-        <span className="shrink-0 w-6 py-0.5 text-center text-xs select-none border-r border-base-200/50 bg-red-500/20 text-red-400 font-bold">
-          −
+        {/* ~ instead of − : signals modification, not deletion */}
+        <span className="shrink-0 w-6 py-0.5 text-center text-xs select-none border-r border-base-200/50 bg-red-500/20 text-amber-400 font-bold">
+          ~
         </span>
         <span className="flex-1 min-w-0 py-0.5 px-3 text-sm font-mono leading-relaxed whitespace-pre-wrap break-all">
-          {row.leftTokens.map((tk, i) => (
-            <span
-              key={i}
-              className={`${charTokenCls(tk.type, granularity)} text-base-content`}
-            >
-              {tk.text || " "}
-            </span>
-          ))}
+          {row.leftTokens.map((tk, i) => renderToken(tk, i, granularity))}
         </span>
       </div>
 
@@ -174,18 +230,12 @@ const ModifiedInlineRow = ({
         <span className="shrink-0 w-10 py-0.5 text-right pr-1.5 text-xs tabular-nums select-none border-r border-base-200/50 bg-emerald-500/20 text-emerald-400">
           {rightLineNum}
         </span>
-        <span className="shrink-0 w-6 py-0.5 text-center text-xs select-none border-r border-base-200/50 bg-emerald-500/20 text-emerald-400 font-bold">
-          +
+        {/* ~ instead of + : signals modification, not insertion */}
+        <span className="shrink-0 w-6 py-0.5 text-center text-xs select-none border-r border-base-200/50 bg-emerald-500/20 text-amber-400 font-bold">
+          ~
         </span>
         <span className="flex-1 min-w-0 py-0.5 px-3 text-sm font-mono leading-relaxed whitespace-pre-wrap break-all">
-          {row.rightTokens.map((tk, i) => (
-            <span
-              key={i}
-              className={`${charTokenCls(tk.type, granularity)} text-base-content`}
-            >
-              {tk.text || " "}
-            </span>
-          ))}
+          {row.rightTokens.map((tk, i) => renderToken(tk, i, granularity))}
         </span>
       </div>
     </div>
@@ -210,6 +260,9 @@ const SplitCell = ({
     ? "bg-base-300/50 text-neutral-content/20"
     : GUTTER_CLS[type];
   const rowBg = isEmpty ? "bg-base-300/30" : ROW_BG[type];
+
+  // FIX 2 (split view) — modified cells use ~ on both sides, consistent
+  // with ModifiedInlineRow. Pure added/removed rows still show +/−.
   const sym = isEmpty
     ? ""
     : side === "left" && type === "removed"
@@ -217,16 +270,18 @@ const SplitCell = ({
       : side === "right" && type === "added"
         ? "+"
         : type === "modified"
-          ? side === "left"
-            ? "−"
-            : "+"
+          ? "~"
           : " ";
+
+  // Modified rows always get amber for the ~ symbol
   const symCl =
-    type === "removed" || (type === "modified" && side === "left")
-      ? "text-red-400 font-bold"
-      : type === "added" || (type === "modified" && side === "right")
-        ? "text-emerald-400 font-bold"
-        : "text-neutral-content/30";
+    type === "modified"
+      ? "text-amber-400 font-bold"
+      : type === "removed"
+        ? "text-red-400 font-bold"
+        : type === "added"
+          ? "text-emerald-400 font-bold"
+          : "text-neutral-content/30";
 
   return (
     <div
@@ -245,17 +300,14 @@ const SplitCell = ({
       <span className="flex-1 min-w-0 py-0.5 px-3 text-sm font-mono leading-relaxed whitespace-pre-wrap break-all text-base-content">
         {isEmpty
           ? null
-          : tokens.map((tk, i) => (
-              <span key={i} className={charTokenCls(tk.type, granularity)}>
-                {tk.text || " "}
-              </span>
-            ))}
+          : tokens.map((tk, i) => renderToken(tk, i, granularity, ""))}
       </span>
     </div>
   );
 };
 
 // ─── main component ───────────────────────────────────────────────────────────
+// (unchanged from branch — no modifications below this line)
 
 const TextDiff = () => {
   const {
@@ -272,7 +324,6 @@ const TextDiff = () => {
   const showToast = useToastStore((s) => s.showToast);
   const [mobileTab, setMobileTab] = useState<"inputs" | "output">("inputs");
 
-  // ── synchronized scroll ──────────────────────────────────────────────────────
   const leftScrollRef = useRef<HTMLDivElement>(null);
   const rightScrollRef = useRef<HTMLDivElement>(null);
   const syncing = useRef(false);
@@ -288,19 +339,22 @@ const TextDiff = () => {
     syncing.current = false;
   }, []);
 
-  // ── change navigation ────────────────────────────────────────────────────────
   const inlineScrollRef = useRef<HTMLDivElement>(null);
   const [changeIdx, setChangeIdx] = useState(-1);
   const changeRowsRef = useRef<number[]>([]);
 
-  // ── diff computation ─────────────────────────────────────────────────────────
   const { rows, stats } = useMemo(
     () => computeDiff(originalText, modifiedText, granularity),
     [originalText, modifiedText, granularity],
   );
 
   const hasDiff = rows.length > 0;
-  const hasChanges = stats.added > 0 || stats.removed > 0 || stats.modified > 0;
+
+  const hasChanges =
+    stats.added > 0 ||
+    stats.removed > 0 ||
+    stats.modified > 0 ||
+    stats.changed > 0;
 
   const inlineRows = rows;
 
@@ -335,7 +389,6 @@ const TextDiff = () => {
     [changeIdx],
   );
 
-  // ── actions ──────────────────────────────────────────────────────────────────
   const handleSwap = () => {
     setOriginalText(modifiedText);
     setModifiedText(originalText);
@@ -358,10 +411,6 @@ const TextDiff = () => {
     showToast("success", "Copied", "Unified diff copied to clipboard");
   };
 
-  // ── Change 1: stats bar labels
-  // For lines mode: "modified / added / removed" makes sense at line level.
-  // For words/chars: recomputeTokenStats gives us removed+added counts (no
-  // "modified" bucket) — so we only show removed and added in those modes.
   const granLabel =
     granularity === "lines"
       ? "line"
@@ -535,9 +584,9 @@ const TextDiff = () => {
           ].map(({ key, label, text, onChange }) => (
             <div key={key} className="flex-1 min-h-0 flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-widest text-neutral-content font-content">
+                <h2 className="text-base font-semibold uppercase tracking-widest text-neutral-content font-content">
                   {label}
-                </span>
+                </h2>
                 <span className="text-xs text-neutral-content/70 font-content">
                   {countLabel(text, granularity)}
                 </span>
@@ -545,7 +594,7 @@ const TextDiff = () => {
               <InputTextarea
                 value={text}
                 onChange={(e) => onChange(e.target.value)}
-                className="w-full flex-1 min-h-0 p-4 font-mono text-sm text-base-content
+                className="w-full flex-1 min-h-0 p-4 font-mono text-sm md:text-base text-base-content
                            bg-base-200 border-2 border-neutral rounded-2xl
                            focus:border-primary! transition-colors duration-150 resize-none"
                 placeholder={`Paste ${label.toLowerCase()} content here…`}
@@ -554,18 +603,23 @@ const TextDiff = () => {
           ))}
         </div>
 
-        {/* ── Change 1: Stats bar ──
-            Lines mode: show modified / added / removed / unchanged (line counts).
-            Words/chars mode: recomputeTokenStats returns removed+added with no
-            "modified" bucket — show those directly with the correct unit label. */}
+        {/* ── Stats bar ── */}
         {hasDiff && (
           <div className="shrink-0 flex flex-wrap items-center gap-x-4 gap-y-1.5 px-3 py-2 bg-base-200 rounded-xl border border-neutral">
-            {/* "modified" only meaningful for line mode */}
+            {/* lines mode: modified line count */}
             {granularity === "lines" && stats.modified > 0 && (
               <span className="flex items-center gap-1.5 text-xs font-semibold font-content tabular-nums text-amber-400">
                 <span className="w-2 h-2 rounded-sm bg-amber-500/60 shrink-0" />
                 {stats.modified} {granLabel}
                 {stats.modified !== 1 ? "s" : ""} modified
+              </span>
+            )}
+            {/* ── CHANGE 3: words/chars mode — show "changed" for in-place modifications */}
+            {granularity !== "lines" && stats.changed > 0 && (
+              <span className="flex items-center gap-1.5 text-xs font-semibold font-content tabular-nums text-amber-400">
+                <span className="w-2 h-2 rounded-sm bg-amber-500/60 shrink-0" />
+                ~{stats.changed} {granLabel}
+                {stats.changed !== 1 ? "s" : ""} changed
               </span>
             )}
             {stats.added > 0 && (
@@ -588,14 +642,6 @@ const TextDiff = () => {
               {stats.unchanged !== 1 ? "s" : ""} unchanged
             </span>
             <div className="flex-1" />
-            <button
-              type="button"
-              disabled={!hasChanges}
-              onClick={handleCopy}
-              className="text-xs text-neutral-content font-content disabled:opacity-40 disabled:cursor-not-allowed hover:text-base-content transition-colors duration-150"
-            >
-              Copy diff
-            </button>
           </div>
         )}
 
@@ -604,20 +650,18 @@ const TextDiff = () => {
           className={`min-h-0 flex flex-col gap-1.5
           ${mobileTab === "output" ? "flex flex-1" : "hidden md:flex md:flex-1"}`}
         >
-          {/* Legend + granularity subtitle */}
-          <div className="shrink-0 flex items-center justify-between">
+          <div className="shrink-0 flex items-center flex-wrap gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-widest text-neutral-content font-content">
+              <h2 className="text-base font-semibold uppercase tracking-widest text-neutral-content font-content">
                 {diffView === "inline" ? "Inline Diff" : "Split Diff"}
-              </span>
-              {/* ── Change 2: subtitle that tells users which granularity is active */}
+              </h2>
               {granularity !== "lines" && (
                 <span className="text-xs text-neutral-content/50 font-content">
                   · {granularity === "words" ? "word-level" : "character-level"}
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-3 text-xs text-neutral-content font-content">
+            <div className="ml-auto mr-4 flex items-center gap-3 text-xs text-neutral-content font-content">
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-sm bg-emerald-500/50" />
                 added
@@ -631,9 +675,17 @@ const TextDiff = () => {
                 modified
               </span>
             </div>
+
+            <button
+              type="button"
+              disabled={!hasChanges}
+              onClick={handleCopy}
+              className="text-xs lg:text-sm flex items-center gap-x-2 text-neutral-content font-content cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <Copy size={16} /> Copy diff
+            </button>
           </div>
 
-          {/* Empty state */}
           {!hasDiff ? (
             <div className="flex-1 flex items-center justify-center bg-base-200 rounded-2xl border-2 border-dashed border-neutral">
               <p className="text-sm text-neutral-content font-content">
@@ -670,12 +722,12 @@ const TextDiff = () => {
             </div>
           ) : (
             /* ══ SPLIT VIEW ══ */
-            <div className="flex-1 min-h-0 flex gap-2 overflow-hidden">
-              <div className="flex-1 min-w-0 flex flex-col rounded-2xl border border-neutral overflow-hidden bg-base-300">
+            <div className="flex-1 min-h-0 flex overflow-hidden">
+              <div className="flex-1 min-w-0 flex flex-col rounded-l-xl border border-neutral overflow-hidden bg-base-300">
                 <div className="shrink-0 flex items-center px-3 py-1.5 bg-base-200 border-b border-neutral">
-                  <span className="flex-1 text-xs font-semibold uppercase tracking-widest text-neutral-content font-content">
+                  <h3 className="flex-1 text-sm font-semibold uppercase tracking-widest text-neutral-content font-content">
                     Original
-                  </span>
+                  </h3>
                   <span className="flex items-center gap-1 text-xs text-red-400 font-content">
                     <span className="w-2 h-2 rounded-sm bg-red-500/50" />
                     removed
@@ -706,11 +758,11 @@ const TextDiff = () => {
                 </div>
               </div>
 
-              <div className="flex-1 min-w-0 flex flex-col rounded-2xl border border-neutral overflow-hidden bg-base-300">
+              <div className="flex-1 min-w-0 flex flex-col rounded-r-xl border border-neutral overflow-hidden bg-base-300">
                 <div className="shrink-0 flex items-center px-3 py-1.5 bg-base-200 border-b border-neutral">
-                  <span className="flex-1 text-xs font-semibold uppercase tracking-widest text-neutral-content font-content">
+                  <h3 className="flex-1 text-sm font-semibold uppercase tracking-widest text-neutral-content font-content">
                     Modified
-                  </span>
+                  </h3>
                   <span className="flex items-center gap-1 text-xs text-emerald-400 font-content">
                     <span className="w-2 h-2 rounded-sm bg-emerald-500/50" />
                     added
