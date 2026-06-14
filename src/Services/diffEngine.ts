@@ -330,7 +330,7 @@ export function countLabel(
   text: string,
   granularity: TextDiffGranularity,
 ): string {
-  if (!text) return "empty";
+  if (!text) return "";
   const chars = text.length;
   const lines = text.split("\n").length;
   const words = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
